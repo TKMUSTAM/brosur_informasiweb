@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#124B3A"/>
+      <stop offset="1" stop-color="#0C3529"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="1050" cy="80" r="220" fill="#1E6B54" opacity="0.35"/>
+  <circle cx="120" cy="560" r="240" fill="#F4C542" opacity="0.08"/>
+  <path d="M560 60 Q780 40 820 200 Q860 380 700 470 Q520 570 380 440 Q220 320 300 170 Q370 80 560 60 Z" fill="#FFFFFF" opacity="0.06"/>
+  <g transform="translate(90 300)">
+    <path d="M0 0 Q5 12 0 26 Q-5 12 0 0 Z" fill="#F4C542"/>
+    <path d="M40 -20 Q46 -6 40 10 Q34 -6 40 -20 Z" fill="#3D82C6"/>
+    <path d="M90 14 Q95 26 90 40 Q85 26 90 14 Z" fill="#F4C542"/>
+    <path d="M150 -10 Q155 2 150 16 Q145 2 150 -10 Z" fill="#F4C542"/>
+    <path d="M220 18 Q225 30 220 44 Q215 30 220 18 Z" fill="#3D82C6"/>
+  </g>
+  <text x="120" y="150" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="44" font-weight="700" fill="#F4C542">YAYASAN MUSTAM</text>
+  <text x="118" y="250" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="78" font-weight="800" fill="#FFFFFF">Membentuk Generasi</text>
+  <text x="118" y="345" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="78" font-weight="800" fill="#FFFFFF">Beradab, Berakhlak,</text>
+  <text x="118" y="440" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="78" font-weight="800" fill="#F4C542">dan Beraqidah.</text>
+  <text x="122" y="515" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="400" fill="#EAF4EE">TPA • KB • TK A • TK B • Pendidikan &amp; Pembinaan Yatim Piatu</text>
+  <rect x="118" y="555" width="420" height="10" rx="5" fill="#F4C542"/>
+</svg>

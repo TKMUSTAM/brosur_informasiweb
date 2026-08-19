@@ -1,0 +1,36 @@
+FOTO KONTEN — SUMBER & LISENSI
+================================
+Foto-foto ini adalah placeholder sementara dari Openverse (aggregator
+Creative Commons) — bersumber dari Flickr & Wikimedia Commons.
+Ganti dengan dokumentasi asli yayasan secepatnya.
+
+Semua foto bebas digunakan dengan atribusi sesuai lisensi CC di bawah.
+Lisensi CC0 = domain publik, tanpa atribusi wajib.
+CC BY / BY-SA / BY-ND / BY-NC / BY-NC-ND = wajib kredit penulis.
+
+Slot                 | Sumber (judul asli)                        | Lisensi
+---------------------|---------------------------------------------|-----------
+galeri-1  Belajar Iqra| A young boy reads the holy Quran (rawpixel) | CC0
+galeri-2  Murojaah    | Learning the Quran by Heart                 | CC BY
+galeri-3  Bermain Blk | Lego Play                                   | CC BY
+galeri-4  PHBI        | Aidilfitri 2014                             | CC BY
+galeri-5  Berkebun    | School allotment plot                       | CC BY
+galeri-6  Praktik Ibdh| Moslems prayer mosque (rawpixel)            | CC0
+galeri-7  Sembako     | Food to Donate                              | CC BY-SA
+galeri-8  Mewarnai    | Wheel of Colors                             | CC BY
+galeri-9  Perpustakaan| In the children's library                   | CC BY-NC-SA
+galeri-10 Doa Bersama | Prayer at night                             | CC BY-SA
+galeri-11 Maulid      | Happy Eid                                   | CC BY-SA
+galeri-12 Bermain     | A day at a Kindergarten                     | CC BY
+news-isra-miraj       | Mosque wallpaper (islamic.pictures)         | CC0
+news-outing           | Children's Garden School Building           | CC0
+news-parenting        | Parenting                                   | CC BY
+news-beasiswa         | Muslim school children Peradeniya (Wiki)    | CC0
+news-murojaah         | Quran reading                               | CC BY-SA
+news-baksos           | Helping Children From India's Slums         | CC BY
+prog-tpa              | Quranic school in Mombasa                   | CC BY
+prog-kb               | Yangzhou Muslim kindergarten (Wiki)         | CC BY-SA
+prog-tk-a             | Classroom Materials                         | CC BY
+prog-tk-b             | student_ipad_school                         | CC BY
+
+Sumber: https://openverse.org  (cari judul di atas untuk kredit penuh)

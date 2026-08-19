@@ -1,0 +1,240 @@
+@import "tailwindcss";
+
+@theme {
+  /* ===== Yayasan & TK Islam Al-Mustam Palette ===== */
+  --color-primary: #0f4435;
+  --color-primary-dark: #092e24;
+  --color-primary-deep: #062019;
+  --color-primary-light: #165b47;
+  --color-primary-mint: #258367;
+
+  --color-secondary: #2b6cb0;
+  --color-secondary-dark: #1e5288;
+  --color-secondary-light: #4299e1;
+
+  --color-gold: #e5b235;
+  --color-gold-dark: #c69214;
+  --color-gold-light: #f5cb5c;
+  --color-gold-ink: #785708;
+
+  --color-warmred: #c94c4c;
+  --color-warmred-dark: #a83c3c;
+
+  --color-cream: #faf7f2;
+  --color-cream-dark: #f0eae1;
+
+  --color-softgreen: #e9f5ef;
+  --color-softblue: #eaf3fb;
+  --color-softyellow: #fef8db;
+  --color-softred: #fdeeee;
+
+  --color-ink: #16241e;
+  --color-ink-soft: #4a5c54;
+  --color-ink-mute: #62756d;
+
+  /* ===== Typography ===== */
+  --font-heading: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Inter", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* ===== Radii (Modern Institutional & Child-Friendly) ===== */
+  --radius-card: 1.25rem;
+  --radius-card-lg: 1.75rem;
+  --radius-pill: 9999px;
+
+  /* ===== Shadows ===== */
+  --shadow-soft: 0 4px 20px -2px rgb(15 68 53 / 0.08), 0 2px 6px -1px rgb(15 68 53 / 0.04);
+  --shadow-lift: 0 16px 36px -6px rgb(15 68 53 / 0.16), 0 6px 14px -2px rgb(15 68 53 / 0.08);
+  --shadow-gold: 0 10px 28px -6px rgb(229 178 53 / 0.45);
+  --shadow-glow: 0 0 35px -5px rgb(229 178 53 / 0.3);
+
+  /* ===== Animations ===== */
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-float-slow: float 9s ease-in-out infinite;
+  --animate-shimmer: shimmer 2.5s infinite;
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+}
+
+/* ===== Base ===== */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.025em;
+}
+
+::selection {
+  background: var(--color-gold);
+  color: var(--color-primary-deep);
+}
+
+/* Accessible focus */
+:focus-visible {
+  outline: 3px solid var(--color-gold);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ===== Scroll Reveal Animations ===== */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ===== Decorative Helpers ===== */
+.text-gradient-gold {
+  background: linear-gradient(135deg, #c69214 0%, #e5b235 40%, #f7db7d 70%, #d49f1d 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-gradient-primary {
+  background: linear-gradient(135deg, #092e24 0%, #0f4435 50%, #165b47 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.dot-grid {
+  background-image: radial-gradient(rgb(15 68 53 / 0.12) 1.5px, transparent 1.5px);
+  background-size: 20px 20px;
+}
+
+.islamic-pattern {
+  background-color: var(--color-cream);
+  background-image: radial-gradient(circle at 50% 50%, rgb(229 178 53 / 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 0 0, rgb(15 68 53 / 0.05) 1px, transparent 1px);
+  background-size: 24px 24px, 48px 48px;
+}
+
+/* ===== Chat widget animations ===== */
+@keyframes chat-pop {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.chat-pop {
+  animation: chat-pop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.msg-in {
+  animation: msg-in 0.2s ease-out;
+}
+
+/* ===== Dropdown navbar ===== */
+@keyframes dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.dropdown-in {
+  animation: dropdown-in 0.16s ease-out;
+  transform-origin: top;
+}
+
+@keyframes typing-bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}
+.typing-dot {
+  animation: typing-bounce 1.2s infinite;
+}
+
+/* Scrollbar utilities */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.thin-scroll::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.thin-scroll::-webkit-scrollbar-thumb {
+  background: rgb(15 68 53 / 0.2);
+  border-radius: 4px;
+}
