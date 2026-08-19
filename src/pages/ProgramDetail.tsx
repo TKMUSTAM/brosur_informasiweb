@@ -6,10 +6,13 @@ import ContentImage from '../components/illustrations/ContentImage'
 import CTASection from '../components/CTASection'
 import { ButtonLink } from '../components/Buttons'
 import { useSEO } from '../hooks/useSEO'
-import { programs } from '../data/programs'
+import { useCMS } from '../hooks/useCMS'
+import { programs as defaultPrograms } from '../data/programs'
 import { iconToScene } from '../lib/scenes'
 
 export default function ProgramDetail() {
+  const { data } = useCMS()
+  const programs = data.programs.length > 0 ? data.programs : defaultPrograms
   const { slug } = useParams()
   const program = programs.find((p) => p.slug === slug)
 

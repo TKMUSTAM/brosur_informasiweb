@@ -3,9 +3,13 @@ import PageHeader from '../components/PageHeader'
 import NewsCard from '../components/cards/NewsCard'
 import Reveal from '../components/Reveal'
 import { useSEO } from '../hooks/useSEO'
-import { news, newsCategories } from '../data/news'
+import { useCMS } from '../hooks/useCMS'
+import { newsCategories } from '../data/news'
 
 export default function Berita() {
+  const { data } = useCMS()
+  const news = data.news
+
   useSEO({
     title: 'Berita & Kegiatan',
     description: 'Berita dan kegiatan terbaru Yayasan Mustam: pendidikan, kajian, PHBI, kegiatan anak, sosial, dan yatim.',

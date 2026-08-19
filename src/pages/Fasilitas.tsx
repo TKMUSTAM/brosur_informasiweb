@@ -6,8 +6,8 @@ import Icon from '../components/Icon'
 import CTASection from '../components/CTASection'
 import { ButtonLink } from '../components/Buttons'
 import { useSEO } from '../hooks/useSEO'
-import { fasilitas } from '../data/content'
-import { site } from '../data/site'
+import { useCMS } from '../hooks/useCMS'
+import { fasilitas as defaultFasilitas } from '../data/content'
 
 const safetyStandards = [
   { icon: Video, title: 'CCTV 24 Jam Terpadu', desc: 'Kamera pengawas di setiap sudut kelas, lorong, dan area bermain luar.' },
@@ -17,6 +17,9 @@ const safetyStandards = [
 ]
 
 export default function Fasilitas() {
+  const { data } = useCMS()
+  const site = data.site
+  const fasilitas = data.facilities.length > 0 ? data.facilities : defaultFasilitas
   useSEO({
     title: 'Fasilitas Kampus Ramah Anak — TK Islam Al-Mustam',
     description: 'Fasilitas belajar yang nyaman, aman, ber-AC, terpantau CCTV 24 jam dan mendukung tumbuh kembang anak di TK Islam Al-Mustam.',

@@ -4,14 +4,21 @@ import SectionHeading from '../components/SectionHeading'
 import Reveal from '../components/Reveal'
 import CTASection from '../components/CTASection'
 import { useSEO } from '../hooks/useSEO'
-import { organization } from '../data/content'
+import { useCMS } from '../hooks/useCMS'
+import { organization as defaultOrg } from '../data/content'
 
 export default function Organisasi() {
+  const { data } = useCMS()
+  const teachers = data.teachers.length > 0 ? data.teachers : defaultOrg
+
   useSEO({
     title: 'Struktur Organisasi & Tenaga Pendidik — Yayasan & TK Islam Al-Mustam',
     description: 'Profil dewan pembina, kepala sekolah, guru S1 PAUD, ustadz hafidz, dan psikolog anak di Yayasan & TK Islam Al-Mustam.',
     path: '/organisasi',
   })
+
+  const leader = teachers[0]
+  const restTeachers = teachers.slice(1)
 
   return (
     <>
@@ -31,26 +38,28 @@ export default function Organisasi() {
             subtitle="Menjaga integritas, visi keilmuan, dan amanah sosial yayasan."
           />
 
-          <div className="mt-12 flex justify-center">
-            <Reveal className="w-full max-w-md">
-              <div className="rounded-3xl border border-primary/20 bg-primary p-8 text-center text-white shadow-lift">
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 text-gold">
-                  <ShieldCheck className="h-8 w-8" />
+          {leader && (
+            <div className="mt-12 flex justify-center">
+              <Reveal className="w-full max-w-md">
+                <div className="rounded-3xl border border-primary/20 bg-primary p-8 text-center text-white shadow-lift">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 text-gold">
+                    <ShieldCheck className="h-8 w-8" />
+                  </div>
+                  <span className="mt-4 inline-block rounded-full bg-gold px-3.5 py-1 text-xs font-extrabold text-primary-deep">
+                    {leader.role}
+                  </span>
+                  <h3 className="mt-2 font-heading text-xl font-extrabold">{leader.name}</h3>
+                  <p className="mt-1 text-xs text-white/80">{leader.note}</p>
                 </div>
-                <span className="mt-4 inline-block rounded-full bg-gold px-3.5 py-1 text-xs font-extrabold text-primary-deep">
-                  {organization[0].role}
-                </span>
-                <h3 className="mt-2 font-heading text-xl font-extrabold">{organization[0].name}</h3>
-                <p className="mt-1 text-xs text-white/80">{organization[0].note}</p>
-              </div>
-            </Reveal>
-          </div>
+              </Reveal>
+            </div>
+          )}
 
           <div className="mx-auto h-8 w-0.5 bg-primary/20" aria-hidden="true" />
 
           {/* Jajaran Pengurus & Pendidik */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {organization.slice(1).map((o, i) => (
+            {restTeachers.map((o, i) => (
               <Reveal key={o.role} delay={i * 70} className="h-full">
                 <div className="group flex h-full flex-col justify-between rounded-3xl border border-primary/10 bg-white p-7 shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:border-gold/50 hover:shadow-lift">
                   <div>

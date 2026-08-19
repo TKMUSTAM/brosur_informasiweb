@@ -6,10 +6,12 @@ import NewsCard from '../components/cards/NewsCard'
 import Reveal from '../components/Reveal'
 import CTASection from '../components/CTASection'
 import { useSEO } from '../hooks/useSEO'
-import { news } from '../data/news'
+import { useCMS } from '../hooks/useCMS'
 import { sceneForNewsSlug } from '../lib/scenes'
 
 export default function BeritaDetail() {
+  const { data } = useCMS()
+  const news = data.news
   const { slug } = useParams()
   const item = news.find((n) => n.slug === slug)
 

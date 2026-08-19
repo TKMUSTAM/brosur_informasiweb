@@ -4,10 +4,14 @@ import PageHeader from '../components/PageHeader'
 import GalleryCard from '../components/cards/GalleryCard'
 import Reveal from '../components/Reveal'
 import { useSEO } from '../hooks/useSEO'
-import { gallery, galleryCategories, type GalleryItem } from '../data/gallery'
-import { site } from '../data/site'
+import { useCMS } from '../hooks/useCMS'
+import { galleryCategories, type GalleryItem } from '../data/gallery'
 
 export default function Galeri() {
+  const { data } = useCMS()
+  const site = data.site
+  const gallery = data.gallery
+
   useSEO({
     title: `Galeri Foto Dokumentasi — ${site.name}`,
     description: `Galeri dokumentasi kegiatan pembelajaran, murojaah tahfidz, praktik ibadah, dan outing santri di ${site.name}.`,
@@ -21,7 +25,7 @@ export default function Galeri() {
 
   const filtered = useMemo(
     () => (category === 'Semua' ? gallery : gallery.filter((g) => g.category === category)),
-    [category],
+    [category, gallery],
   )
 
   const openLightbox = (item: GalleryItem) => {

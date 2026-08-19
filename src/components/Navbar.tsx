@@ -17,15 +17,18 @@ import {
 import Logo from './Logo'
 import SearchOverlay from './SearchOverlay'
 import { InstagramIcon, FacebookIcon, YoutubeIcon } from './SocialIcons'
-import { navItems, site, type NavItem } from '../data/site'
-
-const socials = [
-  { icon: InstagramIcon, href: site.social.instagram, label: 'Instagram' },
-  { icon: FacebookIcon, href: site.social.facebook, label: 'Facebook' },
-  { icon: YoutubeIcon, href: site.social.youtube, label: 'YouTube' },
-]
+import { navItems, type NavItem } from '../data/site'
+import { useCMS } from '../hooks/useCMS'
 
 export default function Navbar() {
+  const { data } = useCMS()
+  const site = data.site
+
+  const socials = [
+    { icon: InstagramIcon, href: site.social.instagram, label: 'Instagram' },
+    { icon: FacebookIcon, href: site.social.facebook, label: 'Facebook' },
+    { icon: YoutubeIcon, href: site.social.youtube, label: 'YouTube' },
+  ]
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)

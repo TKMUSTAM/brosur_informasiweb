@@ -2,9 +2,13 @@ import PageHeader from '../components/PageHeader'
 import ProgramCard from '../components/cards/ProgramCard'
 import CTASection from '../components/CTASection'
 import { useSEO } from '../hooks/useSEO'
-import { programs } from '../data/programs'
+import { useCMS } from '../hooks/useCMS'
+import { programs as defaultPrograms } from '../data/programs'
 
 export default function Program() {
+  const { data } = useCMS()
+  const programs = data.programs.length > 0 ? data.programs : defaultPrograms
+
   useSEO({
     title: 'Program Pendidikan',
     description: 'Program pendidikan Yayasan Mustam: TPA, KB, TK A, dan TK B dengan Kurikulum Merdeka dan muatan diniyah.',

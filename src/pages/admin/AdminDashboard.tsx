@@ -1,39 +1,54 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
 import {
-  ArrowUpRight, Bell, BookOpen, CalendarDays, ChartColumn, FileText, GalleryHorizontalEnd,
-  GraduationCap, HandCoins, Heart, LayoutDashboard, LogOut, Menu, Moon, Settings,
-  Sparkles, Users, X,
+  ArrowUpRight,
+  Bell,
+  BookOpen,
+  FileText,
+  GalleryHorizontalEnd,
+  HandCoins,
+  Heart,
+  LayoutDashboard,
+  Menu,
+  Settings,
+  Sparkles,
+  Users,
+  X,
+  Building,
+  Database,
+  Lock,
 } from 'lucide-react'
-import Icon from '../../components/Icon'
 import { LogoEmblem } from '../../components/Logo'
 import { useSEO } from '../../hooks/useSEO'
-import { adminChart, adminDonations, adminPpdb, adminStats } from '../../data/donations'
+import { useCMS } from '../../hooks/useCMS'
 import { formatRupiah } from '../../lib/format'
 
-type PanelId =
-  | 'dashboard' | 'ppdb' | 'siswa' | 'guru' | 'program' | 'yatim' | 'donasi'
-  | 'laporan' | 'berita' | 'galeri' | 'konten' | 'jadwal' | 'pengaturan'
+// CMS Tabs
+import AdminLoginModal from './components/AdminLoginModal'
+import SiteSettingsTab from './components/SiteSettingsTab'
+import NewsManagementTab from './components/NewsManagementTab'
+import ProgramsManagementTab from './components/ProgramsManagementTab'
+import TeachersManagementTab from './components/TeachersManagementTab'
+import GalleryManagementTab from './components/GalleryManagementTab'
+import PPDBManagementTab from './components/PPDBManagementTab'
+import DonasiManagementTab from './components/DonasiManagementTab'
+import FacilitiesManagementTab from './components/FacilitiesManagementTab'
+import DataBackupTab from './components/DataBackupTab'
 
-const menu: { id: PanelId; label: string; icon: typeof LayoutDashboard; badge?: string }[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'ppdb', label: 'PPDB', icon: FileText, badge: '24' },
-  { id: 'siswa', label: 'Siswa', icon: GraduationCap },
-  { id: 'guru', label: 'Guru', icon: Users },
-  { id: 'program', label: 'Program', icon: BookOpen },
-  { id: 'yatim', label: 'Yatim', icon: Heart },
-  { id: 'donasi', label: 'Donasi', icon: HandCoins },
-  { id: 'laporan', label: 'Laporan Donasi', icon: ChartColumn },
-  { id: 'berita', label: 'Berita', icon: Sparkles },
-  { id: 'galeri', label: 'Galeri', icon: GalleryHorizontalEnd },
-  { id: 'konten', label: 'Konten Islami', icon: Moon },
-  { id: 'jadwal', label: 'Jadwal Sholat', icon: CalendarDays },
-  { id: 'pengaturan', label: 'Pengaturan', icon: Settings },
-]
+type PanelId =
+  | 'dashboard'
+  | 'ppdb'
+  | 'program'
+  | 'guru'
+  | 'berita'
+  | 'galeri'
+  | 'donasi'
+  | 'fasilitas'
+  | 'pengaturan'
+  | 'backup'
 
 /* ===== Chart komponen (SVG murni, ringan) ===== */
 function BarChart({ data, color = '#124B3A' }: { data: { month: string; value: number }[]; color?: string }) {
-  const max = Math.max(...data.map((d) => d.value))
+  const max = Math.max(...data.map((d) => d.value), 1)
   return (
     <div className="mt-4 flex h-44 items-end gap-2" role="img" aria-label="Grafik batang">
       {data.map((d) => (
@@ -53,7 +68,7 @@ function BarChart({ data, color = '#124B3A' }: { data: { month: string; value: n
 }
 
 function DonutChart({ data }: { data: { label: string; value: number; color: string }[] }) {
-  const total = data.reduce((s, d) => s + d.value, 0)
+  const total = data.reduce((s, d) => s + d.value, 0) || 1
   let offset = 0
   const R = 42
   const C = 2 * Math.PI * R
@@ -67,8 +82,13 @@ function DonutChart({ data }: { data: { label: string; value: number; color: str
           const el = (
             <circle
               key={d.label}
-              cx="60" cy="60" r={R} fill="none"
-              stroke={d.color} strokeWidth="16" strokeLinecap="round"
+              cx="60"
+              cy="60"
+              r={R}
+              fill="none"
+              stroke={d.color}
+              strokeWidth="16"
+              strokeLinecap="round"
               strokeDasharray={`${dash} ${C - dash}`}
               strokeDashoffset={-offset}
               transform="rotate(-90 60 60)"
@@ -77,7 +97,15 @@ function DonutChart({ data }: { data: { label: string; value: number; color: str
           offset += dash
           return el
         })}
-        <text x="60" y="58" textAnchor="middle" className="fill-primary" fontSize="20" fontWeight="800" fontFamily="Plus Jakarta Sans, sans-serif">
+        <text
+          x="60"
+          y="58"
+          textAnchor="middle"
+          className="fill-primary"
+          fontSize="20"
+          fontWeight="800"
+          fontFamily="Plus Jakarta Sans, sans-serif"
+        >
           {total}%
         </text>
         <text x="60" y="74" textAnchor="middle" className="fill-[#7B8B84]" fontSize="9" fontWeight="600">
@@ -96,40 +124,14 @@ function DonutChart({ data }: { data: { label: string; value: number; color: str
   )
 }
 
-/* ===== Tabel ===== */
-function DataTable<T extends { id: string }>({ rows, columns }: { rows: T[]; columns: { key: string; label: string; render: (r: T) => React.ReactNode }[] }) {
-  return (
-    <div className="thin-scroll overflow-x-auto">
-      <table className="w-full min-w-[640px] text-left text-sm">
-        <thead>
-          <tr className="border-b border-primary/5 text-xs uppercase tracking-wider text-ink-mute">
-            {columns.map((c) => (
-              <th key={c.key} className="px-6 py-4 font-bold">{c.label}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={r.id} className="border-b border-primary/5 transition-colors last:border-0 hover:bg-cream/60">
-              {columns.map((c) => (
-                <td key={c.key} className="px-6 py-4">{c.render(r)}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
-}
-
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    'Diterima': 'bg-softgreen text-primary',
-    'Wawancara': 'bg-softyellow text-gold-ink',
-    'Verifikasi': 'bg-softblue text-secondary-dark',
-    'Baru': 'bg-softred text-warmred-dark',
-    'Terkumpul': 'bg-softblue text-secondary-dark',
-    'Tersalur': 'bg-softgreen text-primary',
+    Diterima: 'bg-softgreen text-primary',
+    Wawancara: 'bg-softyellow text-gold-ink',
+    Verifikasi: 'bg-softblue text-secondary-dark',
+    Baru: 'bg-softred text-warmred-dark',
+    Terkumpul: 'bg-softblue text-secondary-dark',
+    Tersalur: 'bg-softgreen text-primary',
   }
   return (
     <span className={`inline-block rounded-full px-3 py-1 text-xs font-bold ${styles[status] ?? 'bg-cream text-ink-soft'}`}>
@@ -138,51 +140,146 @@ function StatusBadge({ status }: { status: string }) {
   )
 }
 
-/* ===== Panel ===== */
-function DashboardPanel() {
+/* ===== Panel Utama Dashboard ===== */
+function DashboardOverview({ onNavigate }: { onNavigate: (panel: PanelId) => void }) {
+  const { data } = useCMS()
+
+  const totalDonation = data.donations.reduce((sum, d) => sum + d.amount, 0)
+  const newApplicants = data.ppdbApplicants.filter((a) => a.status === 'Baru').length
+
+  const chartPendaftaran = [
+    { month: 'Mar', value: 6 },
+    { month: 'Apr', value: 9 },
+    { month: 'Mei', value: 12 },
+    { month: 'Jun', value: 10 },
+    { month: 'Jul', value: 18 },
+    { month: 'Agu', value: data.ppdbApplicants.length },
+  ]
+
+  const chartDonasi = [
+    { month: 'Mar', value: 38 },
+    { month: 'Apr', value: 44 },
+    { month: 'Mei', value: 52 },
+    { month: 'Jun', value: 48 },
+    { month: 'Jul', value: 55 },
+    { month: 'Agu', value: 61 },
+  ]
+
+  const programAktif = [
+    { label: 'Pendidikan Yatim', value: 41, color: '#124B3A' },
+    { label: 'Beasiswa', value: 18, color: '#3D82C6' },
+    { label: 'Makanan Anak', value: 22, color: '#F4C542' },
+    { label: 'Fasilitas', value: 12, color: '#C94C4C' },
+    { label: 'Operasional', value: 7, color: '#8AA79B' },
+  ]
+
   return (
     <div className="space-y-6">
+      {/* 4 STATS CARDS */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {adminStats.map((s) => (
-          <div key={s.label} className="rounded-card bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift">
-            <div className="flex items-center justify-between">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-softgreen text-primary">
-                <Icon name={s.icon} className="h-5 w-5" />
-              </span>
-              <span className="flex items-center gap-1 rounded-full bg-softgreen px-2.5 py-1 text-xs font-bold text-primary">
-                <ArrowUpRight className="h-3 w-3" /> {s.delta}
-              </span>
-            </div>
-            <p className="mt-4 font-heading text-2xl font-extrabold text-primary">{s.value}</p>
-            <p className="text-xs font-bold uppercase tracking-wider text-ink-mute">{s.label}</p>
+        <div
+          onClick={() => onNavigate('ppdb')}
+          className="group cursor-pointer rounded-3xl border border-primary/10 bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
+        >
+          <div className="flex items-center justify-between">
+            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-softgreen text-primary group-hover:scale-110 transition-transform">
+              <FileText className="h-5 w-5" />
+            </span>
+            <span className="flex items-center gap-1 rounded-full bg-softgreen px-2.5 py-1 text-xs font-bold text-primary">
+              <ArrowUpRight className="h-3 w-3" /> {newApplicants} Baru
+            </span>
           </div>
-        ))}
+          <p className="mt-4 font-heading text-2xl font-black text-primary">{data.ppdbApplicants.length}</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-ink-mute">Calon Siswa PPDB</p>
+        </div>
+
+        <div
+          onClick={() => onNavigate('berita')}
+          className="group cursor-pointer rounded-3xl border border-primary/10 bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
+        >
+          <div className="flex items-center justify-between">
+            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-softblue text-secondary-dark group-hover:scale-110 transition-transform">
+              <Sparkles className="h-5 w-5" />
+            </span>
+            <span className="rounded-full bg-softblue px-2.5 py-1 text-xs font-bold text-secondary-dark">
+              {data.news.filter((n) => n.featured).length} Utama
+            </span>
+          </div>
+          <p className="mt-4 font-heading text-2xl font-black text-primary">{data.news.length}</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-ink-mute">Artikel Berita</p>
+        </div>
+
+        <div
+          onClick={() => onNavigate('donasi')}
+          className="group cursor-pointer rounded-3xl border border-primary/10 bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
+        >
+          <div className="flex items-center justify-between">
+            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-softred/30 text-warmred group-hover:scale-110 transition-transform">
+              <Heart className="h-5 w-5" />
+            </span>
+            <span className="rounded-full bg-softred/40 px-2.5 py-1 text-xs font-bold text-warmred-dark">
+              {data.orphans.filter((o) => o.status === 'Aktif Terbantu').length} Terbantu
+            </span>
+          </div>
+          <p className="mt-4 font-heading text-2xl font-black text-primary">{data.orphans.length}</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-ink-mute">Santri Yatim Binaan</p>
+        </div>
+
+        <div
+          onClick={() => onNavigate('donasi')}
+          className="group cursor-pointer rounded-3xl border border-primary/10 bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
+        >
+          <div className="flex items-center justify-between">
+            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-softyellow text-gold-ink group-hover:scale-110 transition-transform">
+              <HandCoins className="h-5 w-5" />
+            </span>
+            <span className="rounded-full bg-softyellow px-2.5 py-1 text-xs font-bold text-gold-ink">
+              {data.donations.length} Trx
+            </span>
+          </div>
+          <p className="mt-4 font-heading text-xl font-black text-primary truncate">{formatRupiah(totalDonation)}</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-ink-mute">Total Donasi Masuk</p>
+        </div>
       </div>
 
+      {/* CHARTS */}
       <div className="grid gap-6 xl:grid-cols-2">
-        <div className="rounded-card bg-white p-6 shadow-soft">
-          <h3 className="font-heading text-base font-extrabold text-primary">Pendaftaran Siswa (6 Bulan)</h3>
-          <BarChart data={adminChart.pendaftaran} />
+        <div className="rounded-3xl border border-primary/10 bg-white p-6 shadow-soft">
+          <h3 className="font-heading text-base font-extrabold text-primary">Pendaftaran Siswa PPDB (6 Bulan)</h3>
+          <BarChart data={chartPendaftaran} />
         </div>
-        <div className="rounded-card bg-white p-6 shadow-soft">
-          <h3 className="font-heading text-base font-extrabold text-primary">Donasi per Bulan (juta)</h3>
-          <BarChart data={adminChart.donasiPerBulan} color="#F4C542" />
+        <div className="rounded-3xl border border-primary/10 bg-white p-6 shadow-soft">
+          <h3 className="font-heading text-base font-extrabold text-primary">Donasi Masuk per Bulan (Juta Rupiah)</h3>
+          <BarChart data={chartDonasi} color="#F4C542" />
         </div>
       </div>
 
+      {/* QUICK PREVIEW & RECENT APPLICANTS */}
       <div className="grid gap-6 xl:grid-cols-2">
-        <div className="rounded-card bg-white p-6 shadow-soft">
-          <h3 className="mb-5 font-heading text-base font-extrabold text-primary">Program Aktif</h3>
-          <DonutChart data={adminChart.programAktif} />
+        <div className="rounded-3xl border border-primary/10 bg-white p-6 shadow-soft">
+          <h3 className="mb-5 font-heading text-base font-extrabold text-primary">Distribusi Program Aktif</h3>
+          <DonutChart data={programAktif} />
         </div>
-        <div className="rounded-card bg-white p-6 shadow-soft">
-          <h3 className="font-heading text-base font-extrabold text-primary">Pendaftar Terbaru</h3>
+
+        <div className="rounded-3xl border border-primary/10 bg-white p-6 shadow-soft">
+          <div className="flex items-center justify-between">
+            <h3 className="font-heading text-base font-extrabold text-primary">Pendaftar PPDB Terbaru</h3>
+            <button
+              type="button"
+              onClick={() => onNavigate('ppdb')}
+              className="text-xs font-bold text-primary hover:underline"
+            >
+              Lihat Semua →
+            </button>
+          </div>
           <ul className="mt-4 divide-y divide-primary/5">
-            {adminPpdb.slice(0, 4).map((p) => (
+            {data.ppdbApplicants.slice(0, 4).map((p) => (
               <li key={p.id} className="flex items-center justify-between gap-3 py-3">
                 <div>
                   <p className="text-sm font-bold text-ink">{p.name}</p>
-                  <p className="text-xs text-ink-mute">{p.id} • {p.program}</p>
+                  <p className="text-xs text-ink-mute">
+                    {p.id} • {p.program}
+                  </p>
                 </div>
                 <StatusBadge status={p.status} />
               </li>
@@ -194,124 +291,43 @@ function DashboardPanel() {
   )
 }
 
-function PpdPanel() {
-  return (
-    <div className="rounded-card bg-white shadow-soft">
-      <div className="flex items-center justify-between border-b border-primary/5 px-6 py-5">
-        <h3 className="font-heading text-base font-extrabold text-primary">Daftar Pendaftar PPDB 2026/2027</h3>
-        <span className="rounded-full bg-softgreen px-3 py-1 text-xs font-bold text-primary">{adminPpdb.length} pendaftar</span>
-      </div>
-      <DataTable
-        rows={adminPpdb}
-        columns={[
-          { key: 'id', label: 'No. Pendaftaran', render: (r) => <span className="font-bold text-primary">{r.id}</span> },
-          { key: 'name', label: 'Nama', render: (r) => <span className="font-semibold text-ink">{r.name}</span> },
-          { key: 'program', label: 'Program', render: (r) => r.program },
-          { key: 'date', label: 'Tanggal', render: (r) => r.date },
-          { key: 'status', label: 'Status', render: (r) => <StatusBadge status={r.status} /> },
-        ]}
-      />
-    </div>
-  )
-}
-
-function DonasiPanel() {
-  return (
-    <div className="rounded-card bg-white shadow-soft">
-      <div className="flex items-center justify-between border-b border-primary/5 px-6 py-5">
-        <h3 className="font-heading text-base font-extrabold text-primary">Donasi Terbaru</h3>
-        <span className="rounded-full bg-softyellow px-3 py-1 text-xs font-bold text-gold-ink">{formatRupiah(adminDonations.reduce((s, d) => s + d.amount, 0))}</span>
-      </div>
-      <DataTable
-        rows={adminDonations}
-        columns={[
-          { key: 'id', label: 'ID', render: (r) => <span className="font-bold text-primary">{r.id}</span> },
-          { key: 'donor', label: 'Donatur', render: (r) => <span className="font-semibold text-ink">{r.donor}</span> },
-          { key: 'program', label: 'Program', render: (r) => r.program },
-          { key: 'amount', label: 'Nominal', render: (r) => <span className="font-extrabold text-primary">{formatRupiah(r.amount)}</span> },
-          { key: 'date', label: 'Tanggal', render: (r) => r.date },
-          { key: 'status', label: 'Status', render: (r) => <StatusBadge status={r.status} /> },
-        ]}
-      />
-    </div>
-  )
-}
-
-function LaporanPanel() {
-  const total = adminDonations.reduce((s, d) => s + d.amount, 0)
-  return (
-    <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-      <div className="rounded-card bg-white p-6 shadow-soft">
-        <h3 className="font-heading text-base font-extrabold text-primary">Rekap Donasi Bulan Ini</h3>
-        <div className="mt-4 grid grid-cols-2 gap-4">
-          {[
-            { label: 'Total Terkumpul', value: formatRupiah(total) },
-            { label: 'Transaksi', value: String(adminDonations.length) },
-            { label: 'Rata-rata', value: formatRupiah(Math.round(total / adminDonations.length)) },
-            { label: 'Tersalurkan', value: formatRupiah(Math.round(total * 0.62)) },
-          ].map((s) => (
-            <div key={s.label} className="rounded-xl bg-cream p-4">
-              <p className="text-xs font-bold uppercase tracking-wider text-ink-mute">{s.label}</p>
-              <p className="mt-1 font-heading text-lg font-extrabold text-primary">{s.value}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-6">
-          <h4 className="text-sm font-bold text-ink-soft">Donasi per Bulan (juta)</h4>
-          <BarChart data={adminChart.donasiPerBulan} color="#3D82C6" />
-        </div>
-      </div>
-      <div className="rounded-card bg-white p-6 shadow-soft">
-        <h3 className="font-heading text-base font-extrabold text-primary">Distribusi Program</h3>
-        <div className="mt-6"><DonutChart data={adminChart.programAktif} /></div>
-      </div>
-    </div>
-  )
-}
-
-function PengaturanPanel() {
-  return (
-    <div className="max-w-2xl rounded-card bg-white p-8 shadow-soft">
-      <h3 className="font-heading text-base font-extrabold text-primary">Pengaturan Akun</h3>
-      <div className="mt-6 grid gap-4">
-        {['Nama Admin', 'Email Admin', 'WhatsApp Yayasan'].map((label, i) => (
-          <div key={label}>
-            <label className="mb-1.5 block text-sm font-bold text-ink">{label}</label>
-            <input
-              type={i === 1 ? 'email' : 'text'}
-              defaultValue={i === 0 ? 'Admin Yayasan' : i === 1 ? 'admin@yayasanmustam.id' : '6281234567890'}
-              className="w-full rounded-xl border-2 border-primary/10 bg-cream px-4 py-3.5 text-sm font-medium text-ink outline-none transition-colors focus:border-primary"
-            />
-          </div>
-        ))}
-        <button className="mt-2 w-fit rounded-full bg-primary px-7 py-3 text-sm font-bold text-white transition-all hover:bg-primary-light">
-          Simpan Pengaturan
-        </button>
-      </div>
-    </div>
-  )
-}
-
-function PlaceholderPanel({ label }: { label: string }) {
-  return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-card bg-white p-14 text-center shadow-soft">
-      <Users className="h-10 w-10 text-ink-mute" />
-      <h3 className="font-heading text-lg font-extrabold text-primary">{label}</h3>
-      <p className="max-w-sm text-sm text-ink-mute">
-        Panel ini siap diisi data dari backend. Data placeholder tersedia di <code className="rounded bg-cream px-1.5 py-0.5 text-xs">src/data/donations.ts</code>.
-      </p>
-    </div>
-  )
-}
-
 export default function AdminDashboard() {
-  useSEO({ title: 'Admin Dashboard', path: '/admin' })
+  useSEO({ title: 'CMS Admin Dashboard', path: '/admin' })
+  const { data, isLoggedIn, logout } = useCMS()
+
   const [panel, setPanel] = useState<PanelId>('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
   const sidebarBtnRef = useRef<HTMLButtonElement | null>(null)
 
-  // tutup sidebar mobile dengan Escape + fokus kembali ke tombol buka
+  const menu: { id: PanelId; label: string; icon: any; badge?: string }[] = useMemo(
+    () => [
+      { id: 'dashboard', label: 'Ringkasan', icon: LayoutDashboard },
+      {
+        id: 'ppdb',
+        label: 'PPDB & Calon Siswa',
+        icon: FileText,
+        badge: String(data.ppdbApplicants.length),
+      },
+      { id: 'program', label: 'Program & Biaya', icon: BookOpen },
+      { id: 'guru', label: 'Guru & Tenaga Pendidik', icon: Users, badge: String(data.teachers.length) },
+      { id: 'berita', label: 'Berita & Kegiatan', icon: Sparkles, badge: String(data.news.length) },
+      { id: 'galeri', label: 'Galeri Foto', icon: GalleryHorizontalEnd, badge: String(data.gallery.length) },
+      { id: 'donasi', label: 'Santri Yatim & Donasi', icon: Heart },
+      { id: 'fasilitas', label: 'Fasilitas Kampus', icon: Building },
+      { id: 'pengaturan', label: 'Identitas & Kontak', icon: Settings },
+      { id: 'backup', label: 'Backup & Restore Data', icon: Database },
+    ],
+    [data]
+  )
+
+  // Auto-logout whenever leaving / navigating away from the admin route
+  useEffect(() => {
+    return () => {
+      logout()
+    }
+  }, [logout])
+
   useEffect(() => {
     if (!sidebarOpen) return
     const onKey = (e: KeyboardEvent) => {
@@ -324,23 +340,37 @@ export default function AdminDashboard() {
     return () => window.removeEventListener('keydown', onKey)
   }, [sidebarOpen])
 
-  const activeLabel = useMemo(() => menu.find((m) => m.id === panel)?.label ?? 'Dashboard', [panel])
+  const activeLabel = useMemo(() => menu.find((m) => m.id === panel)?.label ?? 'Ringkasan', [menu, panel])
+
+  // If not logged in, render authentication modal
+  if (!isLoggedIn) {
+    return <AdminLoginModal />
+  }
 
   const panelContent = (() => {
     switch (panel) {
-      case 'dashboard': return <DashboardPanel />
-      case 'ppdb': return <PpdPanel />
-      case 'donasi': return <DonasiPanel />
-      case 'laporan': return <LaporanPanel />
-      case 'pengaturan': return <PengaturanPanel />
-      case 'siswa': return <PlaceholderPanel label="Manajemen Siswa" />
-      case 'guru': return <PlaceholderPanel label="Manajemen Guru" />
-      case 'program': return <PlaceholderPanel label="Manajemen Program" />
-      case 'yatim': return <PlaceholderPanel label="Manajemen Anak Yatim" />
-      case 'berita': return <PlaceholderPanel label="Manajemen Berita" />
-      case 'galeri': return <PlaceholderPanel label="Manajemen Galeri" />
-      case 'konten': return <PlaceholderPanel label="Manajemen Konten Islami" />
-      case 'jadwal': return <PlaceholderPanel label="Jadwal Sholat" />
+      case 'dashboard':
+        return <DashboardOverview onNavigate={(p) => setPanel(p)} />
+      case 'ppdb':
+        return <PPDBManagementTab />
+      case 'program':
+        return <ProgramsManagementTab />
+      case 'guru':
+        return <TeachersManagementTab />
+      case 'berita':
+        return <NewsManagementTab />
+      case 'galeri':
+        return <GalleryManagementTab />
+      case 'donasi':
+        return <DonasiManagementTab />
+      case 'fasilitas':
+        return <FacilitiesManagementTab />
+      case 'pengaturan':
+        return <SiteSettingsTab />
+      case 'backup':
+        return <DataBackupTab />
+      default:
+        return <DashboardOverview onNavigate={(p) => setPanel(p)} />
     }
   })()
 
@@ -349,25 +379,34 @@ export default function AdminDashboard() {
       <div className="flex items-center gap-3 px-5 py-6">
         <LogoEmblem size={40} />
         <div>
-          <p className="font-heading text-base font-extrabold text-white">Yayasan Mustam</p>
-          <p className="text-xs text-white/50">Admin Panel</p>
+          <p className="font-heading text-base font-extrabold text-white">CMS Al-Mustam</p>
+          <p className="text-xs text-white/50">Admin Panel Kendali</p>
         </div>
       </div>
-      <nav className="flex-1 space-y-1 overflow-y-auto px-3" aria-label="Menu admin">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-2" aria-label="Menu admin">
         {menu.map((m) => (
           <button
             key={m.id}
             type="button"
-            onClick={() => { setPanel(m.id); setSidebarOpen(false) }}
-            className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-semibold transition-all ${
-              panel === m.id ? 'bg-gold text-primary shadow-soft' : 'text-white/70 hover:bg-white/10 hover:text-white'
+            onClick={() => {
+              setPanel(m.id)
+              setSidebarOpen(false)
+            }}
+            className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-xs font-bold transition-all ${
+              panel === m.id
+                ? 'bg-gold text-primary shadow-soft'
+                : 'text-white/70 hover:bg-white/10 hover:text-white'
             }`}
             aria-current={panel === m.id ? 'page' : undefined}
           >
-            <m.icon className="h-4.5 w-4.5" />
+            <m.icon className="h-4 w-4" />
             <span className="flex-1 text-left">{m.label}</span>
             {m.badge && (
-              <span className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold ${panel === m.id ? 'bg-primary text-white' : 'bg-white/15 text-white'}`}>
+              <span
+                className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold ${
+                  panel === m.id ? 'bg-primary text-white' : 'bg-white/15 text-white'
+                }`}
+              >
                 {m.badge}
               </span>
             )}
@@ -375,9 +414,14 @@ export default function AdminDashboard() {
         ))}
       </nav>
       <div className="border-t border-white/10 p-4">
-        <Link to="/" className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-semibold text-white/70 transition-colors hover:bg-white/10 hover:text-white">
-          <LogOut className="h-4.5 w-4.5" /> Kembali ke Website
-        </Link>
+        <button
+          type="button"
+          onClick={logout}
+          className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-white/10 px-4 py-3 text-xs font-bold text-white shadow-soft transition-all hover:bg-warmred hover:text-white"
+        >
+          <Lock className="h-4 w-4 text-gold-light" />
+          <span>Kunci / Logout Admin</span>
+        </button>
       </div>
     </div>
   )
@@ -385,9 +429,7 @@ export default function AdminDashboard() {
   return (
     <div className="flex min-h-screen bg-cream">
       {/* sidebar desktop */}
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 bg-primary-deep lg:block">
-        {sidebar}
-      </aside>
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 bg-primary-deep lg:block">{sidebar}</aside>
 
       {/* sidebar mobile */}
       {sidebarOpen && (
@@ -400,7 +442,7 @@ export default function AdminDashboard() {
                 setSidebarOpen(false)
                 sidebarBtnRef.current?.focus()
               }}
-              className="absolute right-3 top-4 flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white"
+              className="absolute right-3 top-4 flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-white"
               aria-label="Tutup menu admin"
             >
               <X className="h-5 w-5" />
@@ -419,7 +461,7 @@ export default function AdminDashboard() {
               ref={sidebarBtnRef}
               type="button"
               onClick={() => setSidebarOpen(true)}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/10 text-primary lg:hidden"
+              className="flex h-10 w-10 items-center justify-center rounded-2xl border border-primary/10 text-primary lg:hidden"
               aria-label="Buka menu admin"
               aria-expanded={sidebarOpen}
               aria-controls="menu-admin-mobile"
@@ -427,7 +469,7 @@ export default function AdminDashboard() {
               <Menu className="h-5 w-5" />
             </button>
             <div>
-              <p className="text-xs font-semibold text-ink-mute">Admin / {activeLabel}</p>
+              <p className="text-[11px] font-bold text-ink-mute">Admin CMS / {activeLabel}</p>
               <h1 className="font-heading text-lg font-extrabold text-primary">{activeLabel}</h1>
             </div>
           </div>
@@ -436,39 +478,45 @@ export default function AdminDashboard() {
               <button
                 type="button"
                 onClick={() => setNotifOpen((v) => !v)}
-                className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-primary/10 text-primary transition-colors hover:bg-softgreen"
+                className="relative flex h-10 w-10 items-center justify-center rounded-2xl border border-primary/10 text-primary transition-colors hover:bg-softgreen"
                 aria-label="Notifikasi"
               >
                 <Bell className="h-4.5 w-4.5" />
                 <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-warmred" />
               </button>
               {notifOpen && (
-                <div className="absolute right-0 top-12 w-72 rounded-2xl border border-primary/10 bg-white p-3 shadow-lift">
-                  <p className="px-2 pb-2 text-xs font-bold uppercase tracking-wider text-ink-mute">Notifikasi</p>
-                  <p className="rounded-xl bg-softgreen px-3 py-2.5 text-sm font-semibold text-primary">
-                    5 pendaftar baru menunggu verifikasi.
+                <div className="absolute right-0 top-12 w-80 rounded-3xl border border-primary/10 bg-white p-4 shadow-lift">
+                  <p className="px-1 pb-2 text-xs font-bold uppercase tracking-wider text-ink-mute">Notifikasi Sistem</p>
+                  <p className="rounded-2xl bg-softgreen px-3.5 py-3 text-xs font-semibold text-primary">
+                    {data.ppdbApplicants.filter((a) => a.status === 'Baru').length} pendaftar baru PPDB siap diverifikasi.
                   </p>
                 </div>
               )}
             </div>
             <div className="flex items-center gap-2.5">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary font-heading text-sm font-extrabold text-gold">AY</span>
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary font-heading text-sm font-extrabold text-gold shadow-soft">
+                AY
+              </span>
               <div className="hidden sm:block">
-                <p className="text-sm font-bold text-ink">Admin Yayasan</p>
-                <p className="text-xs text-ink-mute">admin@yayasanmustam.id</p>
+                <p className="text-xs font-bold text-ink">Admin Yayasan</p>
+                <p className="text-[11px] text-ink-mute">{data.site.contact.email}</p>
               </div>
             </div>
           </div>
         </header>
 
         <main className="flex-1 p-4 sm:p-7">
-          <h2 className="sr-only">Panel Dashboard</h2>
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-ink-mute">
-              Selamat datang kembali, Admin! Ini ringkasan aktivitas yayasan hari ini.
+            <p className="text-xs text-ink-mute">
+              Panel Pengelolaan Konten Terpusat (CMS) — Yayasan Pendidikan Islam Al-Mustam
             </p>
-            <span className="rounded-full bg-softyellow px-4 py-2 text-xs font-bold text-gold-ink">
-              {new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date())}
+            <span className="rounded-full bg-softyellow px-4 py-1.5 text-xs font-bold text-gold-ink shadow-soft">
+              {new Intl.DateTimeFormat('id-ID', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              }).format(new Date())}
             </span>
           </div>
           {panelContent}

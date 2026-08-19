@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Check, Copy, MessageCircle, ArrowRight, ShieldCheck, User, Users, FileCheck } from 'lucide-react'
 import { Button } from '../Buttons'
-import { programs } from '../../data/programs'
-import { site } from '../../data/site'
+import { useCMS } from '../../hooks/useCMS'
+import { programs as defaultPrograms } from '../../data/programs'
 
 type FormState = {
   // Calon siswa
@@ -46,6 +46,10 @@ const empty: FormState = {
 }
 
 export default function PPDBForm() {
+  const { data, addPPDBApplicant } = useCMS()
+  const site = data.site
+  const programs = data.programs.length > 0 ? data.programs : defaultPrograms
+
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [form, setForm] = useState<FormState>(empty)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -94,6 +98,26 @@ export default function PPDBForm() {
     const randomCode = Math.floor(1000 + Math.random() * 9000)
     const progCode = form.program.toUpperCase()
     const no = `PPDB-MSTM-${new Date().getFullYear()}-${progCode}-${randomCode}`
+    
+    // Save to CMS Store
+    addPPDBApplicant({
+      id: no,
+      name: form.nama,
+      nik: form.nik,
+      birthPlace: form.tempatLahir,
+      birthDate: form.tanggalLahir,
+      gender: form.jenisKelamin,
+      address: form.alamatOrtu || form.alamat,
+      previousSchool: form.asalSekolah,
+      program: selectedProgramName,
+      track: form.jalur,
+      parentFather: form.namaAyah,
+      parentMother: form.namaIbu,
+      whatsapp: form.whatsapp,
+      email: form.email,
+      status: 'Baru',
+    })
+
     setRegNo(no)
   }
 

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { Mail, MapPin, Phone, ArrowUpRight, Award, ShieldCheck, Heart } from 'lucide-react'
 import Logo, { LogoEmblem } from './Logo'
 import { InstagramIcon, FacebookIcon, YoutubeIcon } from './SocialIcons'
-import { site } from '../data/site'
+import { useCMS } from '../hooks/useCMS'
 
 const footerColumns = [
   {
@@ -52,6 +52,8 @@ const footerColumns = [
 ]
 
 export default function Footer() {
+  const { data } = useCMS()
+  const site = data.site
   return (
     <footer className="relative mt-auto overflow-hidden bg-primary-deep text-white">
       {/* Ambient background glows */}
@@ -122,7 +124,7 @@ export default function Footer() {
                 </h3>
                 <ul className="space-y-2.5">
                   {col.links.map((l) => (
-                    <li key={l.href}>
+                    <li key={l.label}>
                       <Link
                         to={l.href}
                         className="group inline-flex items-center gap-1 text-xs text-white/70 transition-colors hover:text-gold sm:text-sm"
