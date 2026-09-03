@@ -16,13 +16,10 @@ export default function Hero() {
           
           {/* ===== Kiri: Copywriting & CTAs ===== */}
           <Reveal className="flex flex-col items-start gap-6 sm:gap-7">
-            {/* Accreditation Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-white/90 px-4 py-1.5 shadow-soft backdrop-blur-md">
-              <span className="h-2 w-2 rounded-full bg-gold" />
-              <span className="text-xs font-extrabold tracking-wide text-primary sm:text-sm">
-                Terakreditasi A (Unggul) • NPSN: {site.npsn}
-              </span>
-            </div>
+            {/* Accreditation Eyebrow */}
+            <p className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-primary/75">
+              Terakreditasi A (Unggul) • NPSN: {site.npsn}
+            </p>
 
             {/* Main Headline */}
             <h1 className="font-heading text-[2.4rem] font-extrabold leading-[1.12] text-primary sm:text-5xl lg:text-[3.8rem]">

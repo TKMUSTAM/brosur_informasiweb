@@ -22,14 +22,13 @@ export default function SectionHeading({
   return (
     <Reveal className={`max-w-2xl flex flex-col gap-4 ${alignCls} ${className}`}>
       {eyebrow && (
-        <span
-          className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider ${
-            light ? 'bg-white/10 text-gold-light' : 'bg-softgreen text-primary'
+        <p
+          className={`text-xs sm:text-sm font-black uppercase tracking-[0.2em] ${
+            light ? 'text-gold-light' : 'text-primary/75'
           }`}
         >
-          <span className={`h-1.5 w-1.5 rounded-full ${light ? 'bg-gold' : 'bg-gold-dark'}`} />
           {eyebrow}
-        </span>
+        </p>
       )}
       <h2
         className={`text-3xl font-extrabold leading-tight sm:text-4xl lg:text-[2.75rem] lg:leading-[1.15] ${

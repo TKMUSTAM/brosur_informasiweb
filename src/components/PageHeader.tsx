@@ -55,10 +55,9 @@ export default function PageHeader({ eyebrow, title, description, crumbs, varian
 
         <Reveal className="max-w-3xl">
           {eyebrow && (
-            <span className={`mb-4 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider ${isGreen ? 'bg-gold text-primary' : 'bg-softgreen text-primary'}`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${isGreen ? 'bg-primary' : 'bg-gold-dark'}`} />
+            <p className={`mb-3 text-xs sm:text-sm font-black uppercase tracking-[0.2em] ${isGreen ? 'text-gold-light' : 'text-primary/75'}`}>
               {eyebrow}
-            </span>
+            </p>
           )}
           <h1 className="text-4xl font-extrabold leading-[1.1] sm:text-5xl">{title}</h1>
           {description && <p className={`mt-5 max-w-2xl text-base leading-relaxed sm:text-lg ${isGreen ? 'text-white/75' : 'text-ink-soft'}`}>{description}</p>}

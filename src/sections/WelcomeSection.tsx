@@ -1,4 +1,3 @@
-import { Award, CheckCircle2, Quote } from 'lucide-react'
 import Reveal from '../components/Reveal'
 import { LogoEmblem } from '../components/Logo'
 import { site } from '../data/site'
@@ -29,10 +28,10 @@ export default function WelcomeSection() {
                 <div className="absolute inset-0 bg-gradient-to-t from-primary-deep/75 via-transparent to-transparent" />
                 
                 <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-gold px-3 py-1 text-[11px] font-extrabold text-primary-deep shadow-soft">
-                    <Award className="h-3.5 w-3.5" /> Pembina Yayasan
+                  <span className="rounded-md bg-gold px-2.5 py-1 text-[11px] font-black uppercase tracking-wider text-primary-deep">
+                    Pembina Yayasan
                   </span>
-                  <p className="mt-1 font-heading text-lg font-extrabold">KH. Ahmad Mustam, S.Ag., M.Pd.I.</p>
+                  <p className="mt-2 font-heading text-lg font-extrabold">KH. Ahmad Mustam, S.Ag., M.Pd.I.</p>
                   <p className="text-xs text-white/80">Ulama &amp; Praktisi Pendidikan Islam</p>
                 </div>
               </div>
@@ -49,15 +48,10 @@ export default function WelcomeSection() {
           <Reveal delay={120}>
             <div className="flex flex-col gap-6">
               
-              {/* Header pill */}
-              <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-gold">
-                  <Quote className="h-5 w-5" />
-                </span>
-                <span className="text-xs font-extrabold uppercase tracking-wider text-primary">
-                  Sambutan Pimpinan Yayasan
-                </span>
-              </div>
+              {/* Header Eyebrow */}
+              <p className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-primary/75">
+                Sambutan Pimpinan Yayasan
+              </p>
 
               {/* Quote Main */}
               <blockquote className="font-heading text-2xl font-extrabold leading-[1.35] text-primary sm:text-3xl lg:text-[2.2rem]">
@@ -79,19 +73,19 @@ export default function WelcomeSection() {
               {/* Poin Komitmen */}
               <div className="grid gap-2.5 sm:grid-cols-2">
                 <div className="flex items-center gap-2 text-xs font-bold text-primary sm:text-sm">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-primary-mint" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
                   <span>Metode Belajar Sentra (BCCT) Terstandar</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-bold text-primary sm:text-sm">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-primary-mint" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
                   <span>Laporan Tumbuh Kembang Berkala</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-bold text-primary sm:text-sm">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-primary-mint" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
                   <span>Lingkungan Aman, Bersih &amp; Terpantau CCTV</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-bold text-primary sm:text-sm">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-primary-mint" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
                   <span>Kemitraan Hangat Bersama Orang Tua</span>
                 </div>
               </div>
