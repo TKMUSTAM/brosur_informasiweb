@@ -39,10 +39,6 @@ export default function Kurikulum() {
                     className="h-full w-full object-cover"
                   />
                 </div>
-                <div className="absolute -bottom-5 -right-3 animate-float rounded-2xl border border-primary/10 bg-white p-4 shadow-lift sm:-right-6">
-                  <p className="text-xs font-extrabold text-primary">Kurikulum Merdeka + Diniyah</p>
-                  <p className="text-[11px] font-semibold text-ink-mute">Pembelajaran Berpusat Pada Anak</p>
-                </div>
               </div>
             </Reveal>
 

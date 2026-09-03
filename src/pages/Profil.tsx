@@ -1,4 +1,3 @@
-import { Award, CheckCircle2, Heart, ShieldCheck, Sparkles } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import SectionHeading from '../components/SectionHeading'
 import Reveal from '../components/Reveal'
@@ -38,19 +37,6 @@ export default function Profil() {
                     className="h-full w-full object-cover"
                   />
                 </div>
-                
-                {/* Floating Accreditation Badge */}
-                <div className="absolute -bottom-6 -right-3 animate-float rounded-2xl border border-primary/10 bg-white p-4 shadow-lift sm:-right-6">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold text-primary-deep">
-                      <Award className="h-5 w-5" />
-                    </span>
-                    <div>
-                      <p className="text-xs font-extrabold text-primary">{site.accreditation}</p>
-                      <p className="text-[11px] font-semibold text-ink-mute">BAN PAUD &amp; PNF Kemendikbud</p>
-                    </div>
-                  </div>
-                </div>
               </div>
             </Reveal>
 
@@ -72,21 +58,21 @@ export default function Profil() {
               </div>
 
               {/* Keunggulan Inti */}
-              <div className="grid gap-2 sm:grid-cols-2">
+              <div className="grid gap-2.5 sm:grid-cols-2">
                 <div className="flex items-center gap-2 text-xs font-bold text-primary sm:text-sm">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-primary-mint" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
                   <span>Rasio Guru : Siswa Nyaman (1:7)</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-bold text-primary sm:text-sm">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-primary-mint" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
                   <span>Metode Tilawati Tahfidz Bersanad</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-bold text-primary sm:text-sm">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-primary-mint" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
                   <span>Gedung Aman &amp; Ber-AC Terpantau CCTV</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-bold text-primary sm:text-sm">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-primary-mint" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
                   <span>Beasiswa Yatim &amp; Dhuafa 100% Penuh</span>
                 </div>
               </div>
@@ -129,17 +115,17 @@ export default function Profil() {
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {[
               {
-                icon: Heart,
+                num: '01',
                 title: 'Keteladanan & Kasih Sayang',
                 desc: 'Anak meniru apa yang dilihat. Kami mendidik dengan keteladanan akhlak, tutur kata santun, dan pelukan hangat.',
               },
               {
-                icon: Sparkles,
+                num: '02',
                 title: 'Eksplorasi yang Menyenangkan',
                 desc: 'Bermain adalah fitrah belajar anak. Kami menghadirkan media pembelajaran interaktif yang memantik daya kritis.',
               },
               {
-                icon: ShieldCheck,
+                num: '03',
                 title: 'Amanah & Transparansi',
                 desc: 'Menjaga kepercayaan orang tua dan donatur melalui tata kelola terbuka dan komunikasi dua arah yang harmonis.',
               },
@@ -147,10 +133,10 @@ export default function Profil() {
               <Reveal key={b.title} delay={i * 90} className="h-full">
                 <div className="flex h-full flex-col justify-between rounded-3xl border border-primary/10 bg-white p-8 shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lift">
                   <div>
-                    <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-softgreen text-primary">
-                      <b.icon className="h-7 w-7" />
+                    <span className="font-heading text-2xl font-black text-primary/30">
+                      {b.num}
                     </span>
-                    <h3 className="mt-5 font-heading text-xl font-extrabold text-primary">{b.title}</h3>
+                    <h3 className="mt-4 font-heading text-xl font-extrabold text-primary">{b.title}</h3>
                     <p className="mt-2.5 text-sm leading-relaxed text-ink-soft">{b.desc}</p>
                   </div>
                 </div>

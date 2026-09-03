@@ -1,6 +1,5 @@
 import Reveal from '../components/Reveal'
 import { LogoEmblem } from '../components/Logo'
-import { site } from '../data/site'
 
 export default function WelcomeSection() {
   return (
@@ -34,12 +33,6 @@ export default function WelcomeSection() {
                   <p className="mt-2 font-heading text-lg font-extrabold">KH. Ahmad Mustam, S.Ag., M.Pd.I.</p>
                   <p className="text-xs text-white/80">Ulama &amp; Praktisi Pendidikan Islam</p>
                 </div>
-              </div>
-
-              {/* Floating Badge */}
-              <div className="absolute -bottom-5 right-2 z-10 hidden animate-float rounded-2xl border border-primary/10 bg-white px-5 py-3 shadow-lift sm:block">
-                <p className="text-xs font-extrabold text-primary">Sejak Tahun {site.foundedYear}</p>
-                <p className="text-[11px] font-semibold text-ink-mute">Menebar Amanah &amp; Akhlak</p>
               </div>
             </div>
           </Reveal>
