@@ -1,4 +1,3 @@
-import Icon from './Icon'
 import Reveal from './Reveal'
 import { ButtonLink } from './Buttons'
 import { LogoEmblem } from './Logo'
@@ -31,8 +30,8 @@ export default function CTASection({
       </div>
 
       <Reveal className="relative mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
-        <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-gold-light">
-          <Icon name="heart" className="h-3.5 w-3.5" /> Bergabung Bersama Kami
+        <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-gold-light">
+          Bergabung Bersama Kami
         </span>
         <h2 className="text-3xl font-extrabold leading-[1.15] text-white sm:text-4xl lg:text-5xl">{title}</h2>
         {description && <p className="max-w-xl text-base leading-relaxed text-white/75 sm:text-lg">{description}</p>}

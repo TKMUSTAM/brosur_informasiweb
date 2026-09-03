@@ -1,4 +1,4 @@
-import { Award, CheckCircle, Heart, MessageCircle, ShieldCheck, Sparkles, Star } from 'lucide-react'
+import { MessageCircle } from 'lucide-react'
 import { ButtonLink } from '../components/Buttons'
 import Reveal from '../components/Reveal'
 import { site } from '../data/site'
@@ -18,9 +18,7 @@ export default function Hero() {
           <Reveal className="flex flex-col items-start gap-6 sm:gap-7">
             {/* Accreditation Badge */}
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-white/90 px-4 py-1.5 shadow-soft backdrop-blur-md">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gold text-primary-deep">
-                <Award className="h-3.5 w-3.5" />
-              </span>
+              <span className="h-2 w-2 rounded-full bg-gold" />
               <span className="text-xs font-extrabold tracking-wide text-primary sm:text-sm">
                 Terakreditasi A (Unggul) • NPSN: {site.npsn}
               </span>
@@ -45,22 +43,22 @@ export default function Hero() {
               Memadukan <strong>Kurikulum Merdeka</strong> dengan <strong>Tahfidz Juz 30</strong> dan <strong>7 Pilar Karakter Islami</strong>.
             </p>
 
-            {/* Quick Benefits Bullet points */}
-            <div className="grid grid-cols-2 gap-3 text-xs font-semibold text-ink-soft sm:text-sm">
+            {/* Quick Benefits Points */}
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-xs font-semibold text-ink-soft sm:text-sm">
               <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-primary-mint" />
+                <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
                 Rasio Kelas Nyaman 1:7
               </span>
               <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-primary-mint" />
+                <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
                 Metode Sentra (BCCT) Terpadu
               </span>
               <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-primary-mint" />
+                <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
                 Guru S1 PAUD &amp; Hafidzah
               </span>
               <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-primary-mint" />
+                <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
                 Beasiswa Yatim &amp; Dhuafa 100%
               </span>
             </div>
@@ -104,57 +102,43 @@ export default function Hero() {
           <Reveal delay={150} className="relative mx-auto w-full max-w-[540px] lg:max-w-none">
             <div className="relative">
               
-              {/* Outer Decorative Ring */}
-              <div className="absolute -inset-3 rounded-[2.5rem] bg-gradient-to-tr from-gold/30 via-primary/10 to-primary-mint/20 blur-xl" />
+              {/* Outer Decorative Glow Ring */}
+              <div className="absolute -inset-4 rounded-[2.75rem] bg-gradient-to-tr from-gold/30 via-primary/10 to-primary-mint/25 blur-2xl opacity-70" />
               
-              {/* Main Image Container */}
-              <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] border-4 border-white bg-white shadow-lift ring-1 ring-primary/10">
+              {/* Main Image Container with double border ring */}
+              <div className="relative aspect-[4/3] overflow-hidden rounded-[2.25rem] border-4 border-white/90 bg-white shadow-lift ring-1 ring-primary/15">
                 <img
                   src="/images/content/hero-school.jpg"
                   alt="Suasana ceria belajar anak-anak di TK Islam Al-Mustam bersama guru yang ramah"
                   className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-primary-deep/60 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-primary-deep/70 via-transparent to-transparent" />
                 
                 {/* Bottom caption over photo */}
                 <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white">
-                  <div className="flex items-center gap-2 rounded-xl bg-primary-deep/80 px-3.5 py-1.5 backdrop-blur-md">
-                    <Sparkles className="h-4 w-4 text-gold" />
+                  <div className="flex items-center gap-2 rounded-xl bg-primary-deep/85 px-3.5 py-1.5 shadow-soft backdrop-blur-md border border-white/10">
+                    <span className="h-1.5 w-1.5 rounded-full bg-gold" />
                     <span className="text-xs font-bold">Ruang Belajar Ceria &amp; Ber-AC</span>
                   </div>
-                  <span className="text-xs font-semibold text-white/90">TK Islam Al-Mustam</span>
+                  <span className="text-xs font-semibold text-white/90 drop-shadow">TK Islam Al-Mustam</span>
                 </div>
               </div>
 
               {/* Floating Badge 1: Top Left */}
-              <div className="absolute -left-3 -top-5 z-20 animate-float rounded-2xl border border-primary/10 bg-white/95 p-3.5 shadow-lift backdrop-blur-md sm:-left-6">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-softgreen text-primary">
-                    <Star className="h-5 w-5 fill-gold text-gold" />
-                  </span>
-                  <div>
-                    <p className="text-xs font-extrabold text-primary">Tahfidz Juz 30</p>
-                    <p className="text-[11px] font-semibold text-ink-mute">Metode Tilawati Ramah Anak</p>
-                  </div>
-                </div>
+              <div className="absolute -left-3 -top-5 z-20 animate-float rounded-2xl border border-primary/10 bg-white/95 px-4 py-3 shadow-lift backdrop-blur-md sm:-left-6">
+                <p className="text-xs font-extrabold text-primary">Tahfidz Juz 30</p>
+                <p className="text-[11px] font-semibold text-ink-mute">Metode Tilawati Ramah Anak</p>
               </div>
 
               {/* Floating Badge 2: Bottom Right */}
-              <div className="absolute -bottom-6 -right-3 z-20 animate-float-slow rounded-2xl border border-primary/10 bg-white/95 p-3.5 shadow-lift backdrop-blur-md sm:-right-5">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-softred text-warmred">
-                    <Heart className="h-5 w-5 fill-warmred text-warmred" />
-                  </span>
-                  <div>
-                    <p className="text-xs font-extrabold text-primary">Peduli Anak Yatim</p>
-                    <p className="text-[11px] font-semibold text-ink-mute">Beasiswa Penuh Pendidikan</p>
-                  </div>
-                </div>
+              <div className="absolute -bottom-6 -right-3 z-20 animate-float-slow rounded-2xl border border-primary/10 bg-white/95 px-4 py-3 shadow-lift backdrop-blur-md sm:-right-5">
+                <p className="text-xs font-extrabold text-primary">Peduli Anak Yatim</p>
+                <p className="text-[11px] font-semibold text-ink-mute">Beasiswa Penuh Pendidikan</p>
               </div>
 
               {/* Floating Badge 3: Top Right Pill */}
-              <div className="absolute -right-2 top-8 z-20 hidden rounded-full border border-primary/10 bg-primary px-3.5 py-1.5 text-white shadow-soft backdrop-blur-md sm:flex sm:items-center sm:gap-2">
-                <ShieldCheck className="h-4 w-4 text-gold" />
+              <div className="absolute -right-2 top-8 z-20 hidden rounded-full border border-white/20 bg-primary/95 px-4 py-2 text-white shadow-lift backdrop-blur-md sm:flex sm:items-center sm:gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-gold" />
                 <span className="text-xs font-bold">CCTV &amp; Lingkungan Aman</span>
               </div>
             </div>

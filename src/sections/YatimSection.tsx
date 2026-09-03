@@ -1,13 +1,13 @@
-import { Heart, Sparkles, Award, Phone } from 'lucide-react'
+import { Phone } from 'lucide-react'
 import SectionHeading from '../components/SectionHeading'
 import Reveal from '../components/Reveal'
 import { ButtonLink } from '../components/Buttons'
 import { site } from '../data/site'
 
 const stats = [
-  { value: '100%', label: 'Bebas Biaya Yatim', icon: Award },
-  { value: '35+', label: 'Santri Binaan', icon: Heart },
-  { value: '12', label: 'Tenaga Pendidik', icon: Sparkles },
+  { value: '100%', label: 'Bebas Biaya Yatim' },
+  { value: '35+', label: 'Santri Binaan' },
+  { value: '12', label: 'Tenaga Pendidik' },
 ]
 
 export default function YatimSection() {
@@ -41,7 +41,6 @@ export default function YatimSection() {
               {stats.map((s, i) => (
                 <Reveal key={s.label} delay={i * 100} className="h-full">
                   <div className="flex h-full flex-col justify-center rounded-3xl border border-white/15 bg-white/10 p-5 text-center backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:bg-white/15">
-                    <s.icon className="mx-auto mb-2 h-5 w-5 text-gold" />
                     <p className="font-heading text-2xl font-black text-white sm:text-3xl">{s.value}</p>
                     <p className="mt-1 text-[11px] font-bold text-white/75 sm:text-xs">{s.label}</p>
                   </div>
@@ -64,9 +63,8 @@ export default function YatimSection() {
               </a>
             </div>
 
-            <p className="mt-6 flex items-center gap-2 text-xs text-white/70">
-              <Heart className="h-4 w-4 fill-gold text-gold" />
-              <span>Program beasiswa mencakup SPP, seragam lengkap, buku materi, dan konseling tumbuh kembang.</span>
+            <p className="mt-6 text-xs text-white/70">
+              Program beasiswa mencakup SPP, seragam lengkap, buku materi, dan konseling tumbuh kembang.
             </p>
           </div>
 

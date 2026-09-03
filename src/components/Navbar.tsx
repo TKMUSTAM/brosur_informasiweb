@@ -11,7 +11,6 @@ import {
   MessageCircle,
   Phone,
   Search,
-  Sparkles,
   X,
 } from 'lucide-react'
 import Logo from './Logo'
@@ -201,9 +200,8 @@ export default function Navbar() {
                         
                         {/* Header Mini Dropdown */}
                         <div className="mb-2 flex items-center justify-between border-b border-primary/10 pb-2.5 px-2">
-                          <span className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-primary">
-                            <Sparkles className="h-3.5 w-3.5 text-gold-dark" />
-                            <span>{item.label}</span>
+                          <span className="text-xs font-black uppercase tracking-wider text-primary">
+                            {item.label}
                           </span>
                           <span className="text-[11px] font-semibold text-ink-mute">
                             {item.children?.length} Menu

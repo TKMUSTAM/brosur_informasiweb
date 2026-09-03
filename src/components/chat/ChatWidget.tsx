@@ -267,18 +267,30 @@ export default function ChatWidget() {
         </div>
       )}
 
-      {/* ===== Tombol buka ===== */}
+      {/* ===== Tombol buka + Tooltip Callout ===== */}
       {!open && (
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="chat-pop group fixed bottom-24 right-4 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-light text-white shadow-lift ring-4 ring-white/70 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_45px_-12px_rgb(18_75_58/0.4)] sm:bottom-6 sm:right-6"
-          aria-label="Buka Pusat Informasi"
-          aria-expanded={false}
-        >
-          <MessageCircle className="h-6 w-6 transition-transform duration-300 group-hover:rotate-12" />
-          <span className="absolute inset-0 rounded-none bg-gold/20 opacity-0 blur-md transition-opacity duration-300 group-hover:opacity-100" />
-        </button>
+        <div className="fixed bottom-24 right-4 z-[70] flex items-center gap-3 sm:bottom-6 sm:right-6">
+          <div className="hidden items-center gap-2 rounded-2xl border border-primary/15 bg-white/95 px-3.5 py-2 shadow-lift backdrop-blur-md transition-all sm:flex animate-float">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-mint opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-primary-mint" />
+            </span>
+            <span className="text-xs font-bold text-primary">Tanya PPDB &amp; Info Sekolah</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="chat-pop group relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-light text-white shadow-lift ring-4 ring-white/80 transition-all duration-300 hover:-translate-y-1 hover:shadow-gold"
+            aria-label="Buka Pusat Informasi"
+            aria-expanded={false}
+          >
+            <MessageCircle className="h-6 w-6 transition-transform duration-300 group-hover:scale-110" />
+            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-gold text-[10px] font-black text-primary-deep shadow-soft">
+              1
+            </span>
+          </button>
+        </div>
       )}
     </div>
   )

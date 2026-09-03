@@ -41,7 +41,7 @@ loadEnv()
 
 const PORT = Number(process.env.PORT || 8787)
 const GROQ_API_KEY = process.env.GROQ_API_KEY || ''
-const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile'
+const GROQ_MODEL = process.env.GROQ_MODEL || 'groq/compound-mini'
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions'
 
 const DIST_DIR = join(__dirname, '..', 'dist')
@@ -125,8 +125,9 @@ async function askGroq(messages) {
       throw new Error(`Groq API ${res.status}: ${body.slice(0, 200)}`)
     }
     const data = await res.json()
-    const reply = data?.choices?.[0]?.message?.content?.trim()
+    let reply = data?.choices?.[0]?.message?.content?.trim()
     if (!reply) throw new Error('Groq API: balasan kosong')
+    reply = reply.replace(/<think>[\s\S]*?<\/think>/gi, '').trim()
     return reply
   } finally {
     clearTimeout(timer)
@@ -301,6 +302,6 @@ const server = createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`[server] Pusat Informasi server jalan di http://localhost:${PORT}`)
-  console.log(`[server] Model: ${GROQ_MODEL} | API key: ${GROQ_API_KEY ? '✅ terpasang' : '❌ belum dikonfigurasi'}`)
+  console.log(`[server] Model: ${GROQ_MODEL} | API key: ${GROQ_API_KEY ? '[terpasang]' : '[belum dikonfigurasi]'}`)
   console.log(`[server] Mode: ${process.argv.includes('--serve-dist') ? 'produksi (serves dist/)' : 'API only (Vite proxy /api)'}`)
 })
