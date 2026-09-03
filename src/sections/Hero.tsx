@@ -109,6 +109,18 @@ export default function Hero() {
                   className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
                 />
               </div>
+
+              {/* Highlight Card 1: Top Left */}
+              <div className="absolute -left-3 -top-5 z-20 rounded-2xl border border-primary/10 bg-white/95 px-4 py-3 shadow-lift backdrop-blur-md sm:-left-6">
+                <p className="text-xs font-extrabold text-primary">Tahfidz Juz 30</p>
+                <p className="text-[11px] font-semibold text-ink-mute">Metode Tilawati Ramah Anak</p>
+              </div>
+
+              {/* Highlight Card 2: Bottom Right */}
+              <div className="absolute -bottom-6 -right-3 z-20 rounded-2xl border border-primary/10 bg-white/95 px-4 py-3 shadow-lift backdrop-blur-md sm:-right-5">
+                <p className="text-xs font-extrabold text-primary">Peduli Anak Yatim</p>
+                <p className="text-[11px] font-semibold text-ink-mute">Beasiswa Penuh Pendidikan</p>
+              </div>
             </div>
           </Reveal>
 
