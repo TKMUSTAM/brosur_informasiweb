@@ -34,7 +34,7 @@ export default function AdminLoginModal() {
           </div>
           <h1 className="font-heading text-2xl font-black text-primary">Portal Admin CMS</h1>
           <p className="mt-1.5 text-xs text-ink-mute">
-            {data.site.name} — Masuk untuk mengelola seluruh data website
+            {data.site.name}. Masuk untuk mengelola seluruh data website
           </p>
         </div>
 
@@ -109,11 +109,49 @@ export default function AdminLoginModal() {
           <button
             type="submit"
             disabled={isLoading || !username || !password}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-sm font-extrabold text-white shadow-soft transition-all hover:bg-primary-light hover:shadow-lift disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-sm font-extrabold text-white shadow-soft transition-all hover:bg-primary-light hover:shadow-lift disabled:opacity-50 cursor-pointer"
           >
             <span>{isLoading ? 'Memverifikasi...' : 'Masuk ke Dashboard'}</span>
             <ArrowRight className="h-4 w-4" />
           </button>
+
+          {/* Quick Demo Credentials Helper */}
+          <div className="rounded-2xl border border-primary/15 bg-softgreen/40 p-4 text-left">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-primary">Akun Simulasi CMS</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setUsername('admin')
+                  setPassword('admin123')
+                  setError(false)
+                }}
+                className="rounded-lg bg-gold/20 px-2.5 py-1 text-xs font-black text-primary-deep hover:bg-gold/40 cursor-pointer transition-colors"
+              >
+                Gunakan Akun Demo
+              </button>
+            </div>
+            <p className="mt-1.5 text-xs text-ink-mute">
+              User: <span className="font-mono font-bold text-ink">admin</span> &bull; Pass: <span className="font-mono font-bold text-ink">admin123</span>
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between pt-2 text-xs">
+            <a
+              href="/"
+              className="font-bold text-primary hover:underline"
+            >
+              &larr; Halaman Publik
+            </a>
+            <a
+              href="http://localhost:3000"
+              target="_blank"
+              rel="noreferrer"
+              className="font-bold text-ink-mute hover:text-primary"
+            >
+              Sistem Admin Sekolah &rarr;
+            </a>
+          </div>
         </form>
       </div>
     </div>

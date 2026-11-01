@@ -8,7 +8,7 @@ import { site } from '../data/site'
 
 export default function Kontak() {
   useSEO({
-    title: `Hubungi Kami — ${site.name}`,
+    title: `Hubungi Kami | ${site.name}`,
     description: `Kontak resmi ${site.name}: alamat kampus, WhatsApp PPDB, email, dan peta lokasi Google Maps.`,
     path: '/kontak',
   })

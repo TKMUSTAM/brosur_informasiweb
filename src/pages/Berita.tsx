@@ -8,7 +8,7 @@ import { newsCategories } from '../data/news'
 
 export default function Berita() {
   const { data } = useCMS()
-  const news = data.news
+  const news = data.news.filter((item) => item.status !== 'DRAFT')
 
   useSEO({
     title: 'Berita & Kegiatan',

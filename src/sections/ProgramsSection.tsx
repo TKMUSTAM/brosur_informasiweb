@@ -1,11 +1,13 @@
 import SectionHeading from '../components/SectionHeading'
 import ProgramCard from '../components/cards/ProgramCard'
 import { ButtonLink } from '../components/Buttons'
-import { programs } from '../data/programs'
+import { useCMS } from '../hooks/useCMS'
 
 export default function ProgramsSection() {
+  const { data } = useCMS()
+  const programs = data.programs
   return (
-    <section className="bg-gradient-to-b from-white to-cream px-4 py-20 sm:px-6 sm:py-24" aria-label="Program pendidikan">
+    <section className="border-b border-primary/10 bg-white px-4 py-16 sm:px-6 sm:py-20" aria-label="Program pendidikan">
       <div className="mx-auto max-w-[1440px]">
         <SectionHeading
           eyebrow="Program Pendidikan"
@@ -13,7 +15,7 @@ export default function ProgramsSection() {
           subtitle="Program pendidikan dirancang untuk mengembangkan kemampuan anak sekaligus membangun karakter Islami."
         />
 
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
           {programs.map((p, i) => (
             <ProgramCard key={p.slug} program={p} index={i} />
           ))}

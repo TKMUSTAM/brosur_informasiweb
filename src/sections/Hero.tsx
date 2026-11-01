@@ -1,130 +1,64 @@
 import { MessageCircle } from 'lucide-react'
 import { ButtonLink } from '../components/Buttons'
 import Reveal from '../components/Reveal'
-import { site } from '../data/site'
+import { useCMS } from '../hooks/useCMS'
 
 export default function Hero() {
+  const { data } = useCMS()
+  const { site } = data
+  const hero = data.pageContent.hero
+
   return (
-    <section className="relative overflow-hidden pb-16 pt-8 sm:pt-14 lg:pb-24" aria-label="Hero">
-      {/* Background ambient blurs & patterns */}
-      <div className="dot-grid pointer-events-none absolute left-0 top-0 h-96 w-96 opacity-40" />
-      <div className="pointer-events-none absolute -right-20 top-20 h-96 w-96 rounded-full bg-softgreen/80 blur-3xl" />
-      <div className="pointer-events-none absolute -left-20 bottom-10 h-80 w-80 rounded-full bg-softyellow/80 blur-3xl" />
+    <section className="border-b border-primary/10 bg-cream px-4 py-12 sm:px-6 sm:py-16 lg:py-20" aria-labelledby="hero-title">
+      <div className="mx-auto grid max-w-[1440px] items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(25rem,0.85fr)] lg:gap-16">
+        <Reveal className="max-w-2xl">
+          <p className="flex items-center gap-3 text-xs font-extrabold uppercase tracking-[0.16em] text-primary/75 sm:text-sm">
+            <span className="h-px w-10 bg-gold" aria-hidden="true" />
+            {hero.eyebrow}
+          </p>
 
-      <div className="relative mx-auto max-w-[1440px] px-4 sm:px-6">
-        <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-10">
-          
-          {/* ===== Kiri: Copywriting & CTAs ===== */}
-          <Reveal className="flex flex-col items-start gap-6 sm:gap-7">
-            {/* Accreditation Eyebrow */}
-            <p className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-primary/75">
-              Terakreditasi A (Unggul) • NPSN: {site.npsn}
-            </p>
+          <h1 id="hero-title" className="mt-6 text-balance font-heading text-[2.45rem] font-extrabold leading-[1.08] text-primary sm:text-5xl lg:text-[3.65rem]">
+            {hero.title} <span className="text-gold-dark">{hero.highlight}</span> {hero.titleSuffix}
+          </h1>
 
-            {/* Main Headline */}
-            <h1 className="font-heading text-[2.4rem] font-extrabold leading-[1.12] text-primary sm:text-5xl lg:text-[3.8rem]">
-              Membentuk Generasi{' '}
-              <span className="relative inline-block text-gradient-gold">
-                Qur’ani
-                <svg className="absolute -bottom-1 left-0 w-full" viewBox="0 0 200 10" preserveAspectRatio="none" aria-hidden="true">
-                  <path d="M2 8 Q100 -2 198 6" stroke="#E5B235" strokeWidth="4" fill="none" strokeLinecap="round" />
-                </svg>
-              </span>
-              , Beradab, &amp;{' '}
-              <span className="text-primary-light">Cerdas Holistik</span>.
-            </h1>
+          <p className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-ink-soft sm:text-lg">{hero.description}</p>
 
-            {/* Sub-headline */}
-            <p className="max-w-xl text-base leading-relaxed text-ink-soft sm:text-lg">
-              Rumah kedua yang hangat dan terpercaya bagi tumbuh kembang anak usia dini (KB, TK A, TK B, &amp; TPA). 
-              Memadukan <strong>Kurikulum Merdeka</strong> dengan <strong>Tahfidz Juz 30</strong> dan <strong>7 Pilar Karakter Islami</strong>.
-            </p>
+          <ul className="mt-7 grid gap-x-8 gap-y-3 border-y border-primary/10 py-5 text-sm font-semibold text-ink-soft sm:grid-cols-2">
+            {hero.benefits.map((benefit) => (
+              <li key={benefit} className="flex items-start gap-3">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 bg-gold" aria-hidden="true" />
+                <span>{benefit}</span>
+              </li>
+            ))}
+          </ul>
 
-            {/* Quick Benefits Points */}
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-xs font-semibold text-ink-soft sm:text-sm">
-              <span className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
-                Rasio Kelas Nyaman 1:7
-              </span>
-              <span className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
-                Metode Sentra (BCCT) Terpadu
-              </span>
-              <span className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
-                Guru S1 PAUD &amp; Hafidzah
-              </span>
-              <span className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
-                Beasiswa Yatim &amp; Dhuafa 100%
-              </span>
-            </div>
-
-            {/* CTAs */}
-            <div className="mt-2 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
-              <ButtonLink to="/ppdb/daftar" variant="primary" size="lg" withArrow className="shadow-lift">
-                Daftar PPDB 2026/2027
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+            {data.pageContent.ppdb.registrationOpen && (
+              <ButtonLink to="/ppdb/daftar" variant="primary" size="lg" withArrow>
+                {hero.primaryLabel} {data.pageContent.ppdb.academicYear}
               </ButtonLink>
-              <a
-                href={`https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent('Assalamualaikum, saya ingin konsultasi pendaftaran TK Islam Al-Mustam.')}`}
-                target="_blank"
-                rel="noreferrer"
-                className="group inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary/20 bg-white px-6 py-3.5 text-sm font-bold text-primary shadow-soft transition-all duration-300 hover:border-primary hover:bg-softgreen/50 hover:shadow-lift"
-              >
-                <MessageCircle className="h-4.5 w-4.5 text-primary transition-transform group-hover:scale-110" />
-                Konsultasi WhatsApp
-              </a>
-            </div>
+            )}
+            <a
+              href={`https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent('Assalamualaikum, saya ingin konsultasi pendaftaran TK Islam Al-Mustam.')}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-primary/20 bg-white px-6 text-sm font-bold text-primary transition-colors hover:border-primary hover:bg-softgreen focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+            >
+              <MessageCircle className="h-4.5 w-4.5" aria-hidden="true" />
+              Konsultasi WhatsApp
+            </a>
+          </div>
+        </Reveal>
 
-            {/* Quick Stat Bar */}
-            <div className="mt-4 flex w-full flex-wrap items-center justify-between gap-4 border-t border-primary/10 pt-5 sm:justify-start sm:gap-10">
-              <div>
-                <p className="font-heading text-2xl font-black text-primary sm:text-3xl">180+</p>
-                <p className="text-xs font-semibold text-ink-mute">Siswa Aktif</p>
-              </div>
-              <div className="h-8 w-px bg-primary/10" aria-hidden="true" />
-              <div>
-                <p className="font-heading text-2xl font-black text-primary sm:text-3xl">100%</p>
-                <p className="text-xs font-semibold text-ink-mute">Kesiapan Masuk SD</p>
-              </div>
-              <div className="h-8 w-px bg-primary/10" aria-hidden="true" />
-              <div>
-                <p className="font-heading text-2xl font-black text-primary sm:text-3xl">35+</p>
-                <p className="text-xs font-semibold text-ink-mute">Anak Yatim Terbina</p>
-              </div>
-            </div>
-          </Reveal>
-
-          {/* ===== Kanan: High-End Photography Frame ===== */}
-          <Reveal delay={150} className="relative mx-auto w-full max-w-[540px] lg:max-w-none">
-            <div className="relative">
-              {/* Outer Subtle Ambient Glow */}
-              <div className="absolute -inset-4 rounded-[2.5rem] bg-gradient-to-tr from-gold/20 via-primary/10 to-primary-mint/15 blur-2xl opacity-60" />
-              
-              {/* Main Image Container */}
-              <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] border-4 border-white bg-white shadow-lift ring-1 ring-primary/15">
-                <img
-                  src="/images/content/hero-school.jpg"
-                  alt="Suasana ceria belajar anak-anak di TK Islam Al-Mustam bersama guru yang ramah"
-                  className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
-                />
-              </div>
-
-              {/* Highlight Card 1: Top Left */}
-              <div className="absolute -left-3 -top-5 z-20 rounded-2xl border border-primary/10 bg-white/95 px-4 py-3 shadow-lift backdrop-blur-md sm:-left-6">
-                <p className="text-xs font-extrabold text-primary">Tahfidz Juz 30</p>
-                <p className="text-[11px] font-semibold text-ink-mute">Metode Tilawati Ramah Anak</p>
-              </div>
-
-              {/* Highlight Card 2: Bottom Right */}
-              <div className="absolute -bottom-6 -right-3 z-20 rounded-2xl border border-primary/10 bg-white/95 px-4 py-3 shadow-lift backdrop-blur-md sm:-right-5">
-                <p className="text-xs font-extrabold text-primary">Peduli Anak Yatim</p>
-                <p className="text-[11px] font-semibold text-ink-mute">Beasiswa Penuh Pendidikan</p>
-              </div>
-            </div>
-          </Reveal>
-
-        </div>
+        <Reveal delay={120} className="lg:justify-self-end">
+          <figure className="overflow-hidden border border-primary/15 bg-white p-2 shadow-soft">
+            <img src={hero.image} alt={hero.imageAlt} width="720" height="540" fetchPriority="high" className="aspect-[4/3] w-full object-cover" />
+            <figcaption className="flex flex-col gap-1 px-3 py-3 text-xs text-ink-mute sm:flex-row sm:items-center sm:justify-between">
+              <span>{site.name}</span>
+              <span>{site.accreditation}</span>
+            </figcaption>
+          </figure>
+        </Reveal>
       </div>
     </section>
   )

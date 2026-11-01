@@ -8,9 +8,7 @@ export default function NotFound() {
 
   return (
     <section className="relative flex min-h-[70vh] flex-col items-center justify-center overflow-hidden px-4 py-20 text-center">
-      <div className="pointer-events-none absolute -left-20 top-10 h-64 w-64 rounded-none bg-softyellow blur-3xl" />
-      <div className="pointer-events-none absolute -right-20 bottom-10 h-64 w-64 rounded-none bg-softgreen blur-3xl" />
-      <div className="pointer-events-none absolute left-1/2 top-8 opacity-10">
+      <div className="pointer-events-none absolute left-1/2 top-8 -translate-x-1/2 opacity-10">
         <LogoEmblem size={160} />
       </div>
 

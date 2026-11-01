@@ -21,10 +21,7 @@ export default function CTASection({
 }: Props) {
   return (
     <section className="relative overflow-hidden bg-primary px-4 py-20 sm:px-6 sm:py-28">
-      {/* dekorasi */}
-      <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-none bg-primary-light/30 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-28 -right-20 h-96 w-96 rounded-none bg-gold/15 blur-3xl" />
-      <div className="blob-shape pointer-events-none absolute right-[8%] top-10 hidden h-40 w-40 bg-white/5 md:block" />
+      {/* Authentic subtle emblem watermark */}
       <div className="pointer-events-none absolute left-[6%] top-16 hidden opacity-[0.07] md:block">
         <LogoEmblem size={160} light />
       </div>

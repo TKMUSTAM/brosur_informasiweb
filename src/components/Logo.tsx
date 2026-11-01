@@ -27,7 +27,7 @@ export function LogoEmblem({ size = 42, light = false }: { size?: number; light?
 
 export default function Logo({ light = false, compact = false }: { light?: boolean; compact?: boolean }) {
   return (
-    <Link to="/" className="group flex items-center gap-3" aria-label={`${site.name} — Beranda`}>
+    <Link to="/" className="group flex items-center gap-3" aria-label={`${site.name}: Beranda`}>
       <span className="relative shrink-0">
         <span
           aria-hidden="true"

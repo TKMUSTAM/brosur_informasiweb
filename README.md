@@ -62,7 +62,7 @@ src/
 - **Chatbot Pusat Informasi** — jawaban natural via AI (Groq API) dengan fallback otomatis ke engine lokal, tombol navigasi akurat, dan knowledge base yayasan
 - **Admin Dashboard** — `/admin` dengan sidebar, statistik, chart SVG ringan, tabel PPDB & donasi
 - **Ilustrasi 100% offline** — ilustrasi SVG custom (tanpa foto anak asli, privasi aman)
-- **Animasi subtle** — fade-up on scroll, floating shapes, hover micro-interactions (IntersectionObserver, tanpa library animasi)
+- **Animasi subtle** — fade-up on scroll, tactile hover micro-interactions (IntersectionObserver, tanpa library berat)
 - **SEO** — metadata dinamis per halaman, Open Graph, JSON-LD, sitemap.xml, robots.txt
 
 ## Kustomisasi Cepat

@@ -3,6 +3,7 @@ import { Edit3, Check, Clock, Users, X } from 'lucide-react'
 import { useCMS } from '../../../hooks/useCMS'
 import type { ProgramItem } from '../../../types/cms'
 import { formatRupiah } from '../../../lib/format'
+import ImageUploadField from './ImageUploadField'
 
 export default function ProgramsManagementTab() {
   const { data, updateProgram } = useCMS()
@@ -22,6 +23,8 @@ export default function ProgramsManagementTab() {
       monthlyFee: p.monthlyFee || 300000,
       entryFee: p.entryFee || 3000000,
       highlights: [...p.highlights],
+      image: p.image,
+      imageAlt: p.imageAlt || p.name,
     })
   }
 
@@ -76,6 +79,7 @@ export default function ProgramsManagementTab() {
             className="flex flex-col justify-between rounded-3xl border border-primary/10 bg-white p-6 shadow-soft transition-all hover:border-primary/25 hover:shadow-lift"
           >
             <div className="space-y-4">
+              {prog.image && <img src={prog.image} alt={prog.imageAlt || prog.name} className="aspect-[16/8] w-full rounded-2xl object-cover" />}
               <div className="flex items-center justify-between">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-softgreen font-heading text-sm font-black text-primary">
                   {prog.code}
@@ -251,6 +255,8 @@ export default function ProgramsManagementTab() {
                   className="w-full rounded-xl border border-primary/15 bg-cream/40 px-4 py-3 text-sm text-ink outline-none focus:border-primary"
                 />
               </div>
+
+              <ImageUploadField label="Gambar program" value={formData.image || ''} onChange={(image) => setFormData((prev) => ({ ...prev, image }))} altValue={formData.imageAlt || ''} onAltChange={(imageAlt) => setFormData((prev) => ({ ...prev, imageAlt }))} recommended="Rasio 16:9 disarankan." />
 
               {/* HIGHLIGHTS */}
               <div>

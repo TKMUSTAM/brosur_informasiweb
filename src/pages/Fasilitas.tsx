@@ -7,10 +7,9 @@ import CTASection from '../components/CTASection'
 import { ButtonLink } from '../components/Buttons'
 import { useSEO } from '../hooks/useSEO'
 import { useCMS } from '../hooks/useCMS'
-import { fasilitas as defaultFasilitas } from '../data/content'
 
 const safetyStandards = [
-  { icon: Video, title: 'CCTV 24 Jam Terpadu', desc: 'Kamera pengawas di setiap sudut kelas, lorong, dan area bermain luar.' },
+  { icon: Video, title: 'Pemantauan Area Sekolah', desc: 'Area utama sekolah dipantau selama kegiatan operasional sesuai kebijakan lembaga.' },
   { icon: Wind, title: 'Sirkulasi Udara & AC Bersih', desc: 'Ruang kelas sejuk dengan filter udara rutin dibersihkan dan pencahayaan matahari.' },
   { icon: ShieldCheck, title: 'Soft Flooring & P3K Ramah Balita', desc: 'Lantai karet peredam benturan di area playground serta perlengkapan P3K anak.' },
   { icon: Sparkles, title: 'Standar Kebersihan & Sanitasi', desc: 'Pembersihan dan disinfeksi mainan dan alat peraga edukatif setiap hari.' },
@@ -19,10 +18,10 @@ const safetyStandards = [
 export default function Fasilitas() {
   const { data } = useCMS()
   const site = data.site
-  const fasilitas = data.facilities.length > 0 ? data.facilities : defaultFasilitas
+  const fasilitas = data.facilities
   useSEO({
-    title: 'Fasilitas Kampus Ramah Anak — TK Islam Al-Mustam',
-    description: 'Fasilitas belajar yang nyaman, aman, ber-AC, terpantau CCTV 24 jam dan mendukung tumbuh kembang anak di TK Islam Al-Mustam.',
+    title: 'Fasilitas Kampus Ramah Anak | TK Islam Al-Mustam',
+    description: 'Informasi ruang belajar, area bermain, sarana ibadah, dan fasilitas pendukung di TK Islam Al-Mustam.',
     path: '/fasilitas',
   })
 
@@ -47,8 +46,9 @@ export default function Fasilitas() {
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {fasilitas.map((f, i) => (
               <Reveal key={f.title} delay={i * 80} className="h-full">
-                <div className="group flex h-full flex-col justify-between rounded-3xl border border-primary/10 bg-white p-8 shadow-soft transition-all duration-300 hover:-translate-y-2 hover:border-gold/60 hover:shadow-lift">
+                <div className="group flex h-full flex-col justify-between rounded-2xl border border-primary/15 bg-white p-7 transition-colors duration-200 hover:border-primary/35">
                   <div>
+                    {f.image && <img src={f.image} alt={f.imageAlt || f.title} className="mb-5 aspect-[16/9] w-full rounded-2xl object-cover" loading="lazy" />}
                     <div className="flex items-center justify-between">
                       <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-softgreen text-primary transition-all duration-300 group-hover:scale-110 group-hover:bg-primary group-hover:text-gold">
                         <Icon name={f.icon} className="h-7 w-7" />
@@ -69,6 +69,7 @@ export default function Fasilitas() {
               </Reveal>
             ))}
           </div>
+          {fasilitas.length === 0 && <p className="mt-10 rounded-2xl border border-primary/10 bg-cream p-6 text-center text-sm text-ink-mute">Informasi fasilitas sedang diperbarui.</p>}
         </div>
       </section>
 

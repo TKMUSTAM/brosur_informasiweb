@@ -3,25 +3,30 @@ import { Check, Copy, Sparkles } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import Reveal from '../components/Reveal'
 import { useSEO } from '../hooks/useSEO'
-import { doas } from '../data/content'
+import { useCMS } from '../hooks/useCMS'
 
 export default function Doa() {
+  const { data } = useCMS()
+  const doas = data.doas.filter((item) => item.status !== 'DRAFT')
   useSEO({
-    title: 'Kumpulan Doa Harian Anak — TK Islam Al-Mustam',
+    title: 'Kumpulan Doa Harian Anak | TK Islam Al-Mustam',
     description: 'Kumpulan doa harian anak muslim lengkap dengan tulisan Arab berharakat, transliterasi latin, arti bahasa Indonesia dan keutamaannya.',
     path: '/doa',
   })
 
-  const [active, setActive] = useState(doas[0].slug)
+  const [active, setActive] = useState(doas[0]?.slug ?? '')
   const [copied, setCopied] = useState(false)
   const doa = doas.find((d) => d.slug === active) ?? doas[0]
 
   const copyText = () => {
+    if (!doa) return
     const textToCopy = `${doa.title}\n\n${doa.arabic}\n\nLatin: ${doa.latin}\nArtinya: ${doa.meaning}`
     navigator.clipboard?.writeText(textToCopy)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
+
+  if (!doa) return <><PageHeader eyebrow="Khazanah Doa" title="Koleksi Doa Harian" description="Konten doa sedang disiapkan." crumbs={[{ label: 'Konten Islami', href: '/konten-islami' }, { label: 'Doa Harian' }]} /><p className="px-4 py-20 text-center text-ink-mute">Belum ada doa yang dipublikasikan.</p></>
 
   return (
     <>

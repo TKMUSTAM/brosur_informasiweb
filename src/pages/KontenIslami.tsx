@@ -6,11 +6,14 @@ import Reveal from '../components/Reveal'
 import { PrayerTimesGrid } from '../components/PrayerSchedule'
 import CTASection from '../components/CTASection'
 import { useSEO } from '../hooks/useSEO'
-import { islamicArticles, haditsList } from '../data/content'
+import { haditsList } from '../data/content'
+import { useCMS } from '../hooks/useCMS'
 
 export default function KontenIslami() {
+  const { data } = useCMS()
+  const islamicArticles = data.islamicArticles.filter((item) => item.status !== 'DRAFT')
   useSEO({
-    title: 'Konten Islami & Mutiara Sunnah — Yayasan & TK Islam Al-Mustam',
+    title: 'Konten Islami & Mutiara Sunnah: Yayasan & TK Islam Al-Mustam',
     description: 'Kumpulan doa harian anak, hadits adab pilihan, jadwal sholat, dan artikel parenting Islami dari TK Islam Al-Mustam.',
     path: '/konten-islami',
   })
@@ -126,6 +129,7 @@ export default function KontenIslami() {
               <Reveal key={a.slug} delay={i * 90} className="h-full">
                 <article className="group flex h-full flex-col justify-between rounded-3xl border border-primary/10 bg-white p-7 shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lift">
                   <div>
+                    {a.image && <img src={a.image} alt={a.imageAlt || a.title} className="mb-5 aspect-[16/9] w-full rounded-2xl object-cover" loading="lazy" />}
                     <div className="mb-4 flex items-center justify-between">
                       <span className="rounded-full bg-softgreen px-3 py-1 text-[11px] font-extrabold text-primary">{a.category}</span>
                       <span className="text-xs font-semibold text-ink-mute">{a.readTime} baca</span>
@@ -156,7 +160,7 @@ export default function KontenIslami() {
           <BookOpen className="mx-auto mb-5 h-10 w-10 text-gold" />
           <blockquote className="font-heading text-xl font-extrabold leading-relaxed sm:text-2xl">
             “Sebaik-baik kalian adalah yang mempelajari Al-Qur'an dan mengajarkannya.”
-            <span className="mt-3 block text-xs font-semibold text-gold-light">— Hadits Riwayat Imam Bukhari</span>
+            <span className="mt-3 block text-xs font-semibold text-gold-light">Hadits Riwayat Imam Bukhari</span>
           </blockquote>
         </Reveal>
       </section>

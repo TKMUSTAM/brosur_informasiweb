@@ -7,7 +7,7 @@ import { site } from '../data/site'
 const milestones = [
   {
     year: '2012',
-    title: 'Awal Mula — Majelis Taklim & TPQ Kecil',
+    title: 'Awal Mula: Majelis Taklim & TPQ Kecil',
     desc: 'Bermula dari majelis taklim dan TPQ kecil dengan 15 santri, semangat mengajarkan baca-tulis Al-Qur’an dan adab kepada anak-anak sekitar mulai bersemi.',
   },
   {
@@ -27,19 +27,19 @@ const milestones = [
   },
   {
     year: '2022',
-    title: 'Peluncuran Beasiswa Penuh 100% Yatim Piatu',
-    desc: 'Meluncurkan program beasiswa penuh bebas biaya pendidikan bagi anak-anak yatim dhuafa sebagai wujud kepedulian sosial yayasan.',
+    title: 'Pengembangan Program Dukungan Pendidikan',
+    desc: 'Yayasan mulai mengembangkan jalur bantuan pendidikan bagi anak yatim dan keluarga yang membutuhkan.',
   },
   {
     year: '2026',
-    title: 'Akreditasi A & 180+ Santri Aktif Berprestasi',
-    desc: 'Kini menaungi 180+ siswa aktif dengan rasio pendampingan ideal 1:7, dipercaya ratusan keluarga sebagai mitra utama pendidikan usia dini.',
+    title: 'Penguatan Mutu dan Layanan Pendidikan',
+    desc: 'Sekolah melanjutkan pengembangan program, tata kelola, dan layanan informasi bagi keluarga.',
   },
 ]
 
 export default function Sejarah() {
   useSEO({
-    title: `Sejarah & Perjalanan — ${site.name}`,
+    title: `Sejarah & Perjalanan | ${site.name}`,
     description: `Perjalanan ${site.name} dari majelis taklim kecil hingga menjadi yayasan pendidikan Islam modern terakreditasi A.`,
     path: '/sejarah',
   })
@@ -63,7 +63,7 @@ export default function Sejarah() {
                   <span className="relative z-10 mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary font-heading text-xs font-extrabold text-gold shadow-soft ring-4 ring-cream">
                     {String(i + 1).padStart(2, '0')}
                   </span>
-                  <div className={`flex-1 rounded-3xl border border-primary/10 bg-white p-7 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-gold/50 hover:shadow-lift ${i % 2 === 1 ? 'sm:text-left' : ''}`}>
+                  <div className={`flex-1 rounded-2xl border border-primary/15 bg-white p-7 transition-colors duration-200 hover:border-primary/35 ${i % 2 === 1 ? 'sm:text-left' : ''}`}>
                     <span className="inline-block rounded-full bg-softgreen px-3.5 py-1 font-heading text-sm font-extrabold text-primary">{m.year}</span>
                     <h2 className="mt-3 font-heading text-lg font-extrabold text-primary sm:text-xl">{m.title}</h2>
                     <p className="mt-2 text-sm leading-relaxed text-ink-soft">{m.desc}</p>

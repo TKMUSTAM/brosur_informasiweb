@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { Plus, Search, Edit3, Trash2, Calendar, Sparkles, X } from 'lucide-react'
 import { useCMS } from '../../../hooks/useCMS'
 import type { NewsItem } from '../../../types/cms'
+import ImageUploadField from './ImageUploadField'
 
 const CATEGORIES = ['Semua', 'PHBI', 'Kegiatan Anak', 'Kajian', 'Yatim', 'Pendidikan']
 
@@ -23,6 +24,8 @@ export default function NewsManagementTab() {
     color: 'green',
     featured: false,
     image: '',
+    imageAlt: '',
+    status: 'PUBLISHED',
   })
 
   // Delete Confirm State
@@ -50,6 +53,8 @@ export default function NewsManagementTab() {
       color: 'green',
       featured: false,
       image: '',
+      imageAlt: '',
+      status: 'PUBLISHED',
     })
     setIsModalOpen(true)
   }
@@ -67,6 +72,8 @@ export default function NewsManagementTab() {
       color: item.color,
       featured: item.featured || false,
       image: item.image || '',
+      imageAlt: item.imageAlt || '',
+      status: item.status || 'PUBLISHED',
     })
     setIsModalOpen(true)
   }
@@ -186,6 +193,7 @@ export default function NewsManagementTab() {
                   <span className="flex items-center gap-1 text-[11px] text-ink-mute">
                     <Calendar className="h-3 w-3" /> {item.date}
                   </span>
+                  <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${item.status === 'DRAFT' ? 'bg-cream text-ink-mute' : 'bg-softgreen text-primary'}`}>{item.status === 'DRAFT' ? 'Draft' : 'Publik'}</span>
                 </div>
                 <h4 className="font-heading text-base font-extrabold text-ink group-hover:text-primary transition-colors truncate">
                   {item.title}
@@ -283,6 +291,20 @@ export default function NewsManagementTab() {
                   onChange={(e) => setFormData((prev) => ({ ...prev, excerpt: e.target.value }))}
                   className="w-full rounded-xl border border-primary/15 bg-cream/40 px-4 py-3 text-sm text-ink outline-none focus:border-primary"
                 />
+              </div>
+
+              <ImageUploadField
+                label="Gambar utama berita"
+                value={formData.image || ''}
+                onChange={(image) => setFormData((prev) => ({ ...prev, image }))}
+                altValue={formData.imageAlt || ''}
+                onAltChange={(imageAlt) => setFormData((prev) => ({ ...prev, imageAlt }))}
+                recommended="Rasio 16:9 disarankan."
+              />
+
+              <div>
+                <label className="mb-1 block text-xs font-bold text-ink">Status tayang</label>
+                <select value={formData.status || 'PUBLISHED'} onChange={(e) => setFormData((prev) => ({ ...prev, status: e.target.value as 'DRAFT' | 'PUBLISHED' }))} className="w-full rounded-xl border border-primary/15 bg-cream/40 px-4 py-3 text-sm text-ink outline-none focus:border-primary"><option value="PUBLISHED">Publikasikan</option><option value="DRAFT">Simpan sebagai draft</option></select>
               </div>
 
               <div>

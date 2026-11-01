@@ -11,12 +11,15 @@ import type {
   OrphanBeneficiary,
   DonationItem,
   FacilityItem,
+  PageContent,
+  DoaItem,
+  IslamicArticle,
 } from '../types/cms'
 import { site as initialSite } from '../data/site'
 import { news as initialNews } from '../data/news'
 import { programs as initialPrograms } from '../data/programs'
 import { gallery as initialGallery } from '../data/gallery'
-import { organization, fasilitas, pillars as initialPillars } from '../data/content'
+import { organization, fasilitas, pillars as initialPillars, doas, islamicArticles } from '../data/content'
 import { adminPpdb, adminDonations } from '../data/donations'
 
 const STORAGE_KEY = 'WEBMUSTAM_CMS_DATA_V1'
@@ -57,6 +60,45 @@ export const initialCMSData: CMSData = {
     education: o.note.includes('S1') ? 'S1 PAUD' : o.note.includes('M.') ? 'S2 Pendidikan' : 'Sarjana',
   })),
   gallery: initialGallery,
+  doas,
+  islamicArticles,
+  pageContent: {
+    hero: {
+      eyebrow: `Terakreditasi A (Unggul) • NPSN: ${initialSite.npsn}`,
+      title: 'Membentuk Generasi',
+      highlight: 'Qur’ani',
+      titleSuffix: 'Beradab, & Cerdas Holistik.',
+      description:
+        'Rumah kedua yang hangat untuk tumbuh kembang anak usia dini melalui Kurikulum Merdeka, Tahfidz Juz 30, dan pembiasaan karakter Islami.',
+      image: '/images/content/hero-school.jpg',
+      imageAlt: 'Kegiatan belajar anak bersama guru di TK Islam Al-Mustam',
+      primaryLabel: 'Daftar PPDB',
+      benefits: ['Kelompok belajar dengan pendampingan', 'Metode Sentra (BCCT)', 'Guru pendamping terlatih', 'Program bantuan yatim dan dhuafa'],
+    },
+    welcome: {
+      eyebrow: 'Sambutan Kepala Sekolah',
+      title: 'Mendampingi Anak Tumbuh dengan Iman, Adab, dan Rasa Ingin Tahu',
+      quote: 'Setiap anak adalah amanah dengan irama tumbuhnya sendiri.',
+      body: 'Kami membangun lingkungan belajar yang hangat, aman, dan dekat dengan keluarga agar anak berani mencoba, senang belajar, serta terbiasa berbuat baik.',
+      personName: 'Kepala TK Islam Al-Mustam',
+      personRole: 'Pimpinan Satuan Pendidikan',
+      image: '/images/content/ketua-yayasan.jpg',
+      imageAlt: 'Kepala TK Islam Al-Mustam',
+    },
+    ppdb: {
+      academicYear: '2026/2027',
+      registrationOpen: true,
+      title: 'Bergabung Bersama Keluarga Besar TK Islam Al-Mustam',
+      description: 'Penerimaan peserta didik baru untuk KB, TK A, TK B, dan TPA.',
+      notice: 'Pendaftaran diproses sesuai ketersediaan kuota pada gelombang aktif.',
+      requirements: [
+        'Fotokopi Kartu Keluarga (KK)',
+        'Fotokopi Akta Kelahiran Anak',
+        'Pas foto berwarna anak ukuran 3×4',
+        'Fotokopi KTP orang tua atau wali',
+      ],
+    },
+  },
   ppdbApplicants: adminPpdb.map((p, idx) => ({
     id: p.id,
     name: p.name,
@@ -175,8 +217,8 @@ export const initialCMSData: CMSData = {
     {
       id: 'faq-2',
       category: 'PPDB',
-      question: 'Apakah ada beasiswa penuh untuk anak yatim dan dhuafa?',
-      answer: 'Ya, Yayasan Al-Mustam menyediakan program beasiswa 100% bebas uang pangkal dan SPP untuk santri yatim dan dhuafa yang lolos seleksi berkas.',
+      question: 'Apakah ada bantuan pendidikan untuk anak yatim dan dhuafa?',
+      answer: 'Yayasan Al-Mustam menyediakan bantuan pendidikan bagi santri yatim dan dhuafa yang lolos verifikasi. Bentuk bantuan mengikuti ketentuan program dan ketersediaan dana pada periode berjalan.',
     },
     {
       id: 'faq-3',
@@ -206,6 +248,7 @@ export type CMSContextType = {
 
   // Site Actions
   updateSite: (partial: Partial<SiteData>) => void
+  updatePageContent: <K extends keyof PageContent>(section: K, partial: Partial<PageContent[K]>) => void
 
   // News Actions
   addNews: (item: Omit<NewsItem, 'slug'> & { slug?: string }) => void
@@ -224,6 +267,14 @@ export type CMSContextType = {
   addGalleryItem: (item: Omit<GalleryItem, 'id'>) => void
   updateGalleryItem: (id: number, item: Partial<GalleryItem>) => void
   deleteGalleryItem: (id: number) => void
+
+  // Khazanah Actions
+  addDoa: (item: DoaItem) => void
+  updateDoa: (slug: string, item: Partial<DoaItem>) => void
+  deleteDoa: (slug: string) => void
+  addIslamicArticle: (item: IslamicArticle) => void
+  updateIslamicArticle: (slug: string, item: Partial<IslamicArticle>) => void
+  deleteIslamicArticle: (slug: string) => void
 
   // PPDB Actions
   addPPDBApplicant: (applicant: Omit<PPDBApplicant, 'id' | 'date' | 'status'> & { id?: string; status?: PPDBApplicant['status'] }) => string
@@ -258,11 +309,52 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
         const parsed = JSON.parse(stored)
+        const storedHero = parsed.pageContent?.hero || {}
+        const migratedBenefits = Array.isArray(storedHero.benefits)
+          ? storedHero.benefits.map((benefit: string) => {
+              if (benefit === 'Rasio kelas nyaman 1:7') return 'Kelompok belajar dengan pendampingan'
+              if (benefit === 'Program beasiswa yatim dan dhuafa') return 'Program bantuan yatim dan dhuafa'
+              return benefit
+            })
+          : initialCMSData.pageContent.hero.benefits
+        const migratedPrograms = Array.isArray(parsed.programs)
+          ? parsed.programs.map((program: ProgramItem) => ({
+              ...program,
+              highlights: program.highlights?.map((highlight) =>
+                highlight === 'Program setor hafalan mandiri bersanad'
+                  ? 'Pendampingan setoran hafalan secara bertahap'
+                  : highlight === '100% siswa lulusan siap dan percaya diri menempuh tes masuk SD favorit'
+                    ? 'Pendampingan kesiapan sekolah dasar sesuai tahap perkembangan setiap anak'
+                    : highlight,
+              ),
+            }))
+          : initialCMSData.programs
+        const migratedSite = {
+          ...initialCMSData.site,
+          ...parsed.site,
+          description: parsed.site?.description === 'Lembaga Pendidikan Islam Terakreditasi A yang menaungi Playgroup (KB), TK A, TK B, TPA Tahfidz, serta program pembinaan beasiswa penuh bagi santri yatim dan dhuafa.'
+            ? initialCMSData.site.description
+            : parsed.site?.description || initialCMSData.site.description,
+        }
         // Merge to ensure backwards compatibility with any newly added properties
         return {
           ...initialCMSData,
           ...parsed,
-          site: { ...initialCMSData.site, ...parsed.site },
+          programs: migratedPrograms,
+          site: migratedSite,
+          pageContent: {
+            ...initialCMSData.pageContent,
+            ...(parsed.pageContent || {}),
+            hero: { ...initialCMSData.pageContent.hero, ...storedHero, benefits: migratedBenefits },
+            welcome: {
+              ...initialCMSData.pageContent.welcome,
+              ...(parsed.pageContent?.welcome || {}),
+              image: parsed.pageContent?.welcome?.image === '/images/content/kepala-sekolah.jpg'
+                ? '/images/content/ketua-yayasan.jpg'
+                : parsed.pageContent?.welcome?.image || initialCMSData.pageContent.welcome.image,
+            },
+            ppdb: { ...initialCMSData.pageContent.ppdb, ...(parsed.pageContent?.ppdb || {}) },
+          },
         }
       }
     } catch (e) {
@@ -271,16 +363,17 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return initialCMSData
   })
 
-  // Auth State: Purely in-memory (starts false every time /admin is opened anew)
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
-
-  // Clear any legacy auth keys from storage on mount
-  useEffect(() => {
-    try {
-      sessionStorage.removeItem(AUTH_KEY)
-      localStorage.removeItem(AUTH_KEY)
-    } catch {}
-  }, [])
+  // Auth State: Persisted in sessionStorage across refresh during the active browser session
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        return sessionStorage.getItem(AUTH_KEY) === 'true'
+      } catch {
+        return false
+      }
+    }
+    return false
+  })
 
   // Toast Notifications
   const [toasts, setToasts] = useState<ToastNotification[]>([])
@@ -331,6 +424,9 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
 
       if (isValid) {
+        try {
+          sessionStorage.setItem(AUTH_KEY, 'true')
+        } catch {}
         setIsLoggedIn(true)
         showToast('Login berhasil. Selamat datang di CMS!', 'success')
         return true
@@ -365,6 +461,21 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         lastUpdated: new Date().toISOString(),
       }))
       showToast('Informasi yayasan berhasil diperbarui!')
+    },
+    [showToast]
+  )
+
+  const updatePageContent = useCallback(
+    <K extends keyof PageContent>(section: K, partial: Partial<PageContent[K]>) => {
+      setData((prev) => ({
+        ...prev,
+        pageContent: {
+          ...prev.pageContent,
+          [section]: { ...prev.pageContent[section], ...partial },
+        },
+        lastUpdated: new Date().toISOString(),
+      }))
+      showToast('Konten halaman berhasil diperbarui!')
     },
     [showToast]
   )
@@ -511,6 +622,45 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     },
     [showToast]
   )
+
+  // ===== KHAZANAH ACTIONS =====
+  const addDoa = useCallback((item: DoaItem) => {
+    setData((prev) => ({ ...prev, doas: [item, ...prev.doas], lastUpdated: new Date().toISOString() }))
+    showToast('Doa baru berhasil ditambahkan!')
+  }, [showToast])
+
+  const updateDoa = useCallback((slug: string, item: Partial<DoaItem>) => {
+    setData((prev) => ({
+      ...prev,
+      doas: prev.doas.map((doa) => (doa.slug === slug ? { ...doa, ...item } : doa)),
+      lastUpdated: new Date().toISOString(),
+    }))
+    showToast('Konten doa berhasil diperbarui!')
+  }, [showToast])
+
+  const deleteDoa = useCallback((slug: string) => {
+    setData((prev) => ({ ...prev, doas: prev.doas.filter((doa) => doa.slug !== slug), lastUpdated: new Date().toISOString() }))
+    showToast('Konten doa berhasil dihapus.', 'info')
+  }, [showToast])
+
+  const addIslamicArticle = useCallback((item: IslamicArticle) => {
+    setData((prev) => ({ ...prev, islamicArticles: [item, ...prev.islamicArticles], lastUpdated: new Date().toISOString() }))
+    showToast('Artikel Khazanah berhasil ditambahkan!')
+  }, [showToast])
+
+  const updateIslamicArticle = useCallback((slug: string, item: Partial<IslamicArticle>) => {
+    setData((prev) => ({
+      ...prev,
+      islamicArticles: prev.islamicArticles.map((article) => article.slug === slug ? { ...article, ...item } : article),
+      lastUpdated: new Date().toISOString(),
+    }))
+    showToast('Artikel Khazanah berhasil diperbarui!')
+  }, [showToast])
+
+  const deleteIslamicArticle = useCallback((slug: string) => {
+    setData((prev) => ({ ...prev, islamicArticles: prev.islamicArticles.filter((article) => article.slug !== slug), lastUpdated: new Date().toISOString() }))
+    showToast('Artikel Khazanah berhasil dihapus.', 'info')
+  }, [showToast])
 
   // ===== PPDB ACTIONS =====
   const addPPDBApplicant = useCallback(
@@ -715,7 +865,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         })
         showToast('Data CMS berhasil dipulihkan dari file backup!', 'success')
         return true
-      } catch (err) {
+      } catch {
         showToast('Gagal memulihkan data: Format JSON tidak sesuai.', 'error')
         return false
       }
@@ -739,6 +889,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       showToast,
       removeToast,
       updateSite,
+      updatePageContent,
       addNews,
       updateNews,
       deleteNews,
@@ -749,6 +900,12 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       addGalleryItem,
       updateGalleryItem,
       deleteGalleryItem,
+      addDoa,
+      updateDoa,
+      deleteDoa,
+      addIslamicArticle,
+      updateIslamicArticle,
+      deleteIslamicArticle,
       addPPDBApplicant,
       updatePPDBApplicantStatus,
       deletePPDBApplicant,
@@ -774,6 +931,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       showToast,
       removeToast,
       updateSite,
+      updatePageContent,
       addNews,
       updateNews,
       deleteNews,
@@ -784,6 +942,12 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       addGalleryItem,
       updateGalleryItem,
       deleteGalleryItem,
+      addDoa,
+      updateDoa,
+      deleteDoa,
+      addIslamicArticle,
+      updateIslamicArticle,
+      deleteIslamicArticle,
       addPPDBApplicant,
       updatePPDBApplicantStatus,
       deletePPDBApplicant,

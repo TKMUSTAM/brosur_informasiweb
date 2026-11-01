@@ -4,11 +4,11 @@ import Reveal from '../components/Reveal'
 import CTASection from '../components/CTASection'
 import { ButtonLink } from '../components/Buttons'
 import { useSEO } from '../hooks/useSEO'
-import { quickStats, site } from '../data/site'
+import { site } from '../data/site'
 
 export default function Profil() {
   useSEO({
-    title: `Tentang Kami — ${site.name}`,
+    title: `Tentang Kami | ${site.name}`,
     description: `Mengenal ${site.name}: Lembaga pendidikan Islam Terakreditasi A yang menaungi KB, TK A, TK B, TPA Tahfidz dan pembinaan yatim dhuafa.`,
     path: '/profil',
   })
@@ -61,19 +61,19 @@ export default function Profil() {
               <div className="grid gap-2.5 sm:grid-cols-2">
                 <div className="flex items-center gap-2 text-xs font-bold text-primary sm:text-sm">
                   <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
-                  <span>Rasio Guru : Siswa Nyaman (1:7)</span>
+                  <span>Kapasitas kelas tercantum per program</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-bold text-primary sm:text-sm">
                   <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
-                  <span>Metode Tilawati Tahfidz Bersanad</span>
+                  <span>Pembelajaran Al-Qur’an bertahap</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-bold text-primary sm:text-sm">
                   <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
-                  <span>Gedung Aman &amp; Ber-AC Terpantau CCTV</span>
+                  <span>Informasi fasilitas dapat diperiksa langsung</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-bold text-primary sm:text-sm">
                   <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
-                  <span>Beasiswa Yatim &amp; Dhuafa 100% Penuh</span>
+                  <span>Jalur pengajuan bantuan pendidikan</span>
                 </div>
               </div>
 
@@ -85,21 +85,6 @@ export default function Profil() {
             </Reveal>
 
           </div>
-        </div>
-      </section>
-
-      {/* ===== STATISTIK INSTITUSI ===== */}
-      <section className="bg-primary px-4 py-14 sm:px-6" aria-label="Statistik yayasan">
-        <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-6 lg:grid-cols-4">
-          {quickStats.map((s, i) => (
-            <Reveal key={s.label} delay={i * 90}>
-              <div className="rounded-2xl bg-white/5 p-6 text-center backdrop-blur-md">
-                <p className="font-heading text-3xl font-extrabold text-gold sm:text-4xl">{s.value}</p>
-                <p className="mt-1 font-bold text-white text-sm sm:text-base">{s.label}</p>
-                <p className="mt-0.5 text-xs font-medium text-white/70">{s.note}</p>
-              </div>
-            </Reveal>
-          ))}
         </div>
       </section>
 
@@ -131,7 +116,7 @@ export default function Profil() {
               },
             ].map((b, i) => (
               <Reveal key={b.title} delay={i * 90} className="h-full">
-                <div className="flex h-full flex-col justify-between rounded-3xl border border-primary/10 bg-white p-8 shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lift">
+                <div className="flex h-full flex-col justify-between border-l-4 border-primary/20 bg-white p-8">
                   <div>
                     <span className="font-heading text-2xl font-black text-primary/30">
                       {b.num}

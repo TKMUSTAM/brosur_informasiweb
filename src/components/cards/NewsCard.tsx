@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight, CalendarDays } from 'lucide-react'
-import type { NewsItem } from '../../data/news'
+import type { NewsItem } from '../../types/cms'
 
 const categoryColors: Record<string, string> = {
   Pendidikan: 'bg-softgreen text-primary',
@@ -13,13 +13,15 @@ const categoryColors: Record<string, string> = {
 
 export default function NewsCard({ item }: { item: NewsItem }) {
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-primary/10 bg-white shadow-soft transition-all duration-300 hover:-translate-y-2 hover:border-gold/50 hover:shadow-lift">
+    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-primary/15 bg-white transition-colors duration-200 hover:border-primary/35">
       <Link to={`/berita/${item.slug}`} className="relative block aspect-[16/10] w-full overflow-hidden bg-cream" aria-label={item.title}>
         <img
           src={item.image ?? '/images/content/news-isra-miraj.jpg'}
-          alt={item.title}
+          alt={item.imageAlt || item.title}
+          width="640"
+          height="400"
           loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-108"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.025] motion-reduce:transform-none"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-primary-deep/40 via-transparent to-transparent" />
         <span className={`absolute left-4 top-4 rounded-full px-3 py-1 text-[11px] font-extrabold shadow-soft backdrop-blur-md ${categoryColors[item.category] ?? 'bg-softgreen text-primary'}`}>

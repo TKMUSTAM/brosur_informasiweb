@@ -56,7 +56,7 @@ export default function Donasi() {
                   <h3 className="font-heading text-base font-extrabold">Transfer Manual</h3>
                   <p className="mt-1 text-xs text-white/70">Konfirmasi setelah transfer ke WhatsApp kami.</p>
                   <div className="mt-4 rounded-xl bg-white/10 px-4 py-3">
-                    <p className="text-[11px] uppercase tracking-wider text-white/60">BSI — a.n. Yayasan Mustam</p>
+                    <p className="text-[11px] uppercase tracking-wider text-white/60">BSI, a.n. Yayasan Mustam</p>
                     <p className="font-heading text-xl font-extrabold tabular-nums text-gold">1234 5678 90</p>
                   </div>
                 </div>

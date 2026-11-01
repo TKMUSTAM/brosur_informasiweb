@@ -19,16 +19,9 @@ export default function HeroArt({ className }: { className?: string }) {
       role="img"
       aria-label="Ilustrasi anak-anak belajar Al-Qur'an dengan guru di lingkungan Islami"
     >
-      {/* blob organik latar */}
-      <path
-        d="M280 18 C410 8 548 120 552 258 C556 396 448 508 306 512 C168 516 34 424 26 292 C18 164 150 28 280 18 Z"
-        fill={greenSoft}
-        opacity={0.5}
-      />
-      <path
-        d="M288 44 C400 40 520 136 524 258 C528 380 436 480 312 484 C196 488 80 406 74 292 C68 186 176 48 288 44 Z"
-        fill="#DCEFE4"
-      />
+      {/* latar arsitektural kubah geometris */}
+      <rect x="28" y="24" width="504" height="472" rx="40" fill={greenSoft} opacity={0.35} />
+      <rect x="44" y="40" width="472" height="440" rx="32" fill="#DCEFE4" />
 
       {/* bentuk geometris dekoratif */}
       <circle cx={86} cy={108} r={34} fill={gold} opacity={0.9} />

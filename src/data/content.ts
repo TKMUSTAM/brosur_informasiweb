@@ -320,7 +320,7 @@ export const legalitas = [
   },
   {
     title: 'Rekening Resmi Yayasan',
-    value: 'Bank Syariah Indonesia (BSI) — 1234-5678-90',
+    value: 'Bank Syariah Indonesia (BSI): 1234-5678-90',
     note: 'a.n. Yayasan Pendidikan Islam Al-Mustam',
   },
   {
@@ -353,7 +353,7 @@ export const fasilitas = [
   {
     icon: 'book',
     title: 'Pojok Literasi & Mini Library',
-    desc: 'Koleksi 600+ buku bergambar cerita Islami, pop-up book sirah nabi, ensiklopedia sains anak, dan bean bag santai untuk membaca ceria.',
+    desc: 'Koleksi buku cerita Islami, pop-up book sirah nabi, ensiklopedia sains anak, dan area duduk santai untuk kegiatan literasi.',
     tag: 'Literasi',
   },
   {

@@ -5,15 +5,16 @@ import GalleryCard from '../components/cards/GalleryCard'
 import Reveal from '../components/Reveal'
 import { useSEO } from '../hooks/useSEO'
 import { useCMS } from '../hooks/useCMS'
-import { galleryCategories, type GalleryItem } from '../data/gallery'
+import { galleryCategories } from '../data/gallery'
+import type { GalleryItem } from '../types/cms'
 
 export default function Galeri() {
   const { data } = useCMS()
   const site = data.site
-  const gallery = data.gallery
+  const gallery = data.gallery.filter((item) => item.status !== 'DRAFT')
 
   useSEO({
-    title: `Galeri Foto Dokumentasi — ${site.name}`,
+    title: `Galeri Foto Dokumentasi | ${site.name}`,
     description: `Galeri dokumentasi kegiatan pembelajaran, murojaah tahfidz, praktik ibadah, dan outing santri di ${site.name}.`,
     path: '/galeri',
   })
@@ -167,7 +168,7 @@ export default function Galeri() {
             <div className="overflow-hidden rounded-3xl border border-white/20 bg-black/40 shadow-2xl">
               <img
                 src={selected.image ?? '/images/content/galeri-1.jpg'}
-                alt={selected.title}
+                alt={selected.imageAlt || selected.title}
                 className="max-h-[75vh] w-full object-contain mx-auto"
               />
             </div>

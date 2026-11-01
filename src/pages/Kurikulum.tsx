@@ -10,7 +10,7 @@ import { curriculumGroups, curriculumItems, sentraList, dailyRoutines } from '..
 
 export default function Kurikulum() {
   useSEO({
-    title: 'Kurikulum & Metode Sentra (BCCT) — TK Islam Al-Mustam',
+    title: 'Kurikulum & Metode Sentra (BCCT) | TK Islam Al-Mustam',
     description: 'Kurikulum Merdeka integratif dengan nilai Qur’ani, 5 Sentra Pembelajaran (BCCT), Tahfidz Juz 30, dan persiapan transisi SD unggulan.',
     path: '/kurikulum',
   })

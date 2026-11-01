@@ -8,7 +8,7 @@ export const site = {
   legalName: 'Yayasan Pendidikan Islam Al-Mustam',
   tagline: 'Membentuk Generasi Qur’ani, Beradab, & Cerdas Holistik',
   description:
-    'Lembaga Pendidikan Islam Terakreditasi A yang menaungi Playgroup (KB), TK A, TK B, TPA Tahfidz, serta program pembinaan beasiswa penuh bagi santri yatim dan dhuafa.',
+    'Informasi program Playgroup (KB), TK A, TK B, TPA Tahfidz, kegiatan sekolah, PPDB, serta bantuan pendidikan yatim dan dhuafa.',
   accreditation: 'Terakreditasi A (Unggul)',
   npsn: '69876543',
   skKemenkumham: 'AHU-0012345.AH.01.04.Tahun 2016',
@@ -67,7 +67,7 @@ export const navItems: NavItem[] = [
       { label: 'Sejarah Perjalanan', href: '/sejarah', desc: 'Jejak langkah pengabdian sejak 2016' },
       { label: 'Pendidik & Struktur Organisasi', href: '/organisasi', desc: 'Guru berijazah S1 PAUD & konselor anak' },
       { label: 'Legalitas & Akreditasi A', href: '/legalitas', desc: 'SK Kemenkumham, NPSN, & izin operasional resmi', badge: 'Akreditasi A' },
-      { label: 'Fasilitas Kampus', href: '/fasilitas', desc: 'Kelas ber-AC, CCTV 24 jam & playground aman' },
+      { label: 'Fasilitas Kampus', href: '/fasilitas', desc: 'Ruang belajar, area bermain, dan fasilitas pendukung' },
     ],
   },
   {
@@ -77,7 +77,7 @@ export const navItems: NavItem[] = [
       { label: 'Semua Jenjang Kelas', href: '/program', desc: 'Ikhtisar jenjang KB, TK A, TK B, dan TPA' },
       { label: 'Playgroup / KB (3–4 Tahun)', href: '/program/kb', desc: 'Stimulasi sensori-motorik & sosialisasi ceria' },
       { label: 'TK A (4–5 Tahun)', href: '/program/tk-a', desc: 'Kemandirian, tahfidz awal & calistung fun' },
-      { label: 'TK B Persiapan SD (5–6 Tahun)', href: '/program/tk-b', desc: 'Kesiapan akademis & adab masuk SD unggulan', badge: 'Populer' },
+      { label: 'TK B Persiapan SD (5–6 Tahun)', href: '/program/tk-b', desc: 'Kesiapan belajar, kemandirian, dan adab untuk transisi ke SD', badge: 'Populer' },
       { label: 'TPA & Tahfidz Cilik', href: '/program/tpa', desc: 'Bimbingan baca Al-Qur’an metode Tilawati' },
       { label: 'Kurikulum & 5 Sentra Belajar', href: '/kurikulum', desc: 'Metode BCCT, jadwal rutinitas & kompetensi' },
     ],
@@ -88,8 +88,8 @@ export const navItems: NavItem[] = [
     children: [
       { label: 'Informasi & Alur PPDB', href: '/ppdb', desc: 'Tahapan pendaftaran, gelombang & kuota kelas' },
       { label: 'Rincian Biaya & Syarat', href: '/ppdb#syarat', desc: 'Transparansi uang pangkal, SPP & formulir', badge: 'Transparan' },
-      { label: 'Formulir Pendaftaran Online', href: '/ppdb/daftar', desc: 'Daftar online 3 menit langsung konfirmasi WA', badge: 'Dibuka' },
-      { label: 'Beasiswa Yatim & Dhuafa (100% Gratis)', href: '/yatim', desc: 'Program beasiswa penuh bebas seluruh biaya' },
+      { label: 'Formulir Pendaftaran Online', href: '/ppdb/daftar', desc: 'Isi data calon siswa dan lanjutkan konfirmasi melalui WhatsApp', badge: 'Dibuka' },
+      { label: 'Bantuan Pendidikan Yatim & Dhuafa', href: '/yatim', desc: 'Dukungan biaya sesuai hasil verifikasi dan ketersediaan program' },
     ],
   },
   {
@@ -105,14 +105,4 @@ export const navItems: NavItem[] = [
     ],
   },
   { label: 'Kontak', href: '/kontak' },
-]
-
-// ============================================================
-// STATISTIK INSTITUSI
-// ============================================================
-export const quickStats = [
-  { value: '180+', label: 'Siswa Aktif', note: 'KB, TK A, TK B & TPA' },
-  { value: '1:7', label: 'Rasio Guru-Siswa', note: 'Pendampingan Maksimal' },
-  { value: '35+', label: 'Anak Yatim Dibina', note: 'Beasiswa Penuh 100%' },
-  { value: 'A', label: 'Akreditasi Unggul', note: 'Kemendikbudristek RI' },
 ]

@@ -119,7 +119,7 @@ export default function Navbar() {
               className="flex items-center gap-1.5 rounded-full bg-gold px-3.5 py-0.5 text-[11px] font-black text-primary-deep shadow-soft transition-all hover:bg-gold-light"
             >
               <CalendarDays className="h-3 w-3" />
-              <span>PPDB 2026/2027 Dibuka</span>
+              <span>PPDB {data.pageContent.ppdb.academicYear} {data.pageContent.ppdb.registrationOpen ? 'Dibuka' : 'Info'}</span>
             </Link>
             
             <div className="flex items-center gap-2">
@@ -251,7 +251,7 @@ export default function Navbar() {
               type="button"
               onClick={openSearch}
               aria-label="Cari di website"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-primary/15 bg-white text-ink-soft shadow-soft transition-all hover:border-gold hover:bg-softyellow hover:text-primary"
+              className="flex h-10 w-10 items-center justify-center rounded-lg border border-primary/15 bg-white text-ink-soft transition-colors hover:border-gold hover:bg-softyellow hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
               <Search className="h-4.5 w-4.5" />
             </button>
@@ -261,7 +261,7 @@ export default function Navbar() {
               href={`https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent('Assalamualaikum Admin, saya ingin bertanya seputar TK Islam Al-Mustam.')}`}
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-2 rounded-full border border-primary/20 bg-softgreen px-4 py-2 text-xs font-extrabold text-primary transition-all hover:bg-softgreen/80"
+              className="flex min-h-10 items-center gap-2 rounded-lg border border-primary/20 bg-softgreen px-4 py-2 text-xs font-extrabold text-primary transition-colors hover:bg-softgreen/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
               <MessageCircle className="h-4 w-4 text-primary" />
               <span>WhatsApp</span>
@@ -270,7 +270,7 @@ export default function Navbar() {
             {/* PPDB Action Button */}
             <Link
               to="/ppdb/daftar"
-              className="group flex items-center gap-2 rounded-full bg-gold px-5 py-2.5 text-xs sm:text-sm font-black text-primary-deep shadow-soft transition-all hover:-translate-y-0.5 hover:bg-gold-light hover:shadow-gold"
+              className="group flex min-h-10 items-center gap-2 rounded-lg bg-gold px-5 py-2.5 text-xs font-black text-primary-deep transition-colors hover:bg-gold-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:text-sm"
             >
               <span>Daftar PPDB</span>
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -400,16 +400,35 @@ export default function Navbar() {
                 className="flex items-center justify-center gap-2 rounded-2xl border-2 border-primary/20 bg-softgreen px-4 py-3.5 text-xs font-extrabold text-primary shadow-soft"
               >
                 <Phone className="h-4 w-4 text-primary" />
-                <span>Chat Admin</span>
+                <span>WhatsApp Admin</span>
               </a>
 
               <Link
                 to="/ppdb/daftar"
+                onClick={() => setMobileOpen(false)}
                 className="flex items-center justify-center gap-2 rounded-2xl bg-gold px-4 py-3.5 text-xs font-black text-primary-deep shadow-gold"
               >
                 <span>Daftar PPDB</span>
                 <ArrowRight className="h-4 w-4" />
               </Link>
+            </div>
+
+            <div className="mt-3 flex items-center justify-between px-1 text-xs">
+              <Link
+                to="/admin"
+                onClick={() => setMobileOpen(false)}
+                className="font-bold text-primary hover:underline"
+              >
+                Portal Admin CMS &rarr;
+              </Link>
+              <a
+                href="http://localhost:3000"
+                target="_blank"
+                rel="noreferrer"
+                className="font-semibold text-ink-mute hover:text-primary"
+              >
+                Sistem Sekolah &rarr;
+              </a>
             </div>
 
             {/* School Contact Quick Info */}

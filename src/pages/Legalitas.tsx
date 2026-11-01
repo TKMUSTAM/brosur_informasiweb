@@ -8,7 +8,7 @@ import { site } from '../data/site'
 
 export default function Legalitas() {
   useSEO({
-    title: 'Legalitas & Akreditasi Resmi — Yayasan & TK Islam Al-Mustam',
+    title: 'Legalitas & Akreditasi Resmi | Yayasan & TK Islam Al-Mustam',
     description: 'Dokumen legalitas dan akreditasi resmi Yayasan Pendidikan Islam Al-Mustam: Akreditasi A, NPSN, SK Kemenkumham, dan Izin Operasional Disdik.',
     path: '/legalitas',
   })

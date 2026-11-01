@@ -1,26 +1,33 @@
 import SectionHeading from '../components/SectionHeading'
-import PillarCard from '../components/cards/PillarCard'
-import { pillars } from '../data/content'
+import Reveal from '../components/Reveal'
+import { useCMS } from '../hooks/useCMS'
 
 export default function Pillars() {
+  const { data } = useCMS()
+
   return (
-    <section className="relative overflow-hidden bg-cream px-4 py-20 sm:px-6 sm:py-24" aria-label="Pilar karakter unggulan">
-      <div className="dot-grid pointer-events-none absolute right-0 top-10 h-72 w-72 opacity-40" />
-      <div className="dot-grid pointer-events-none absolute bottom-0 left-0 h-64 w-64 opacity-40" />
+    <section className="bg-cream px-4 py-16 sm:px-6 sm:py-20" aria-label="Pilar karakter">
+      <div className="mx-auto max-w-[1440px]">
+        <div className="grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16">
+          <SectionHeading
+            eyebrow="Pendekatan Pendidikan"
+            title="Pembiasaan karakter yang hadir dalam kegiatan harian"
+            subtitle="Pilar digunakan sebagai panduan guru saat merancang aktivitas, berkomunikasi dengan anak, dan bekerja sama dengan orang tua."
+          />
 
-      <div className="relative mx-auto max-w-[1440px]">
-        <SectionHeading
-          eyebrow="Fondasi Karakter Qur’ani"
-          title="7 Pilar Keunggulan Pendidikan Karakter Al-Mustam"
-          subtitle="Mengintegrasikan adab, pembiasaan ibadah, kecerdasan sensori, dan kemandirian anak dalam setiap detak kegiatan sekolah."
-        />
-
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {pillars.map((p, i) => (
-            <div key={p.number} className={i === 6 ? 'sm:col-span-2 lg:col-span-3 xl:col-span-1' : ''}>
-              <PillarCard index={i} />
-            </div>
-          ))}
+          <ol className="grid gap-x-10 sm:grid-cols-2">
+            {data.pillars.map((pillar, index) => (
+              <Reveal as="li" key={pillar.number} delay={index * 45} className="border-t border-primary/15 py-5">
+                <div className="flex gap-4">
+                  <span className="font-heading text-sm font-extrabold text-gold-dark">{pillar.number}</span>
+                  <div>
+                    <h3 className="font-heading text-base font-extrabold text-primary">{pillar.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-ink-soft">{pillar.description}</p>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </ol>
         </div>
       </div>
     </section>

@@ -9,10 +9,6 @@ export default function Curriculum() {
 
   return (
     <section className="relative overflow-hidden bg-white px-4 py-20 sm:px-6 sm:py-24" aria-label="Kurikulum dan Pembelajaran">
-      {/* Background ambient accents */}
-      <div className="pointer-events-none absolute -right-28 top-20 h-96 w-96 rounded-full bg-softgreen/50 blur-3xl" />
-      <div className="pointer-events-none absolute -left-28 bottom-10 h-96 w-96 rounded-full bg-softyellow/50 blur-3xl" />
-
       <div className="relative mx-auto max-w-[1440px]">
         {/* Section Header */}
         <SectionHeading
@@ -71,7 +67,7 @@ export default function Curriculum() {
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {sentraList.map((s, i) => (
               <Reveal key={s.id} delay={i * 80} className="h-full">
-                <div className="group flex h-full flex-col justify-between rounded-3xl border border-primary/10 bg-cream p-6 shadow-soft transition-all duration-300 hover:-translate-y-2 hover:border-gold/60 hover:bg-white hover:shadow-lift">
+                <div className="group flex h-full flex-col justify-between rounded-2xl border border-primary/15 bg-cream p-6 transition-colors duration-200 hover:border-primary/35 hover:bg-white">
                   <div>
                     <span className="inline-block rounded-full bg-softgreen px-3 py-1 text-[11px] font-extrabold text-primary">
                       {s.badge}
@@ -133,7 +129,7 @@ export default function Curriculum() {
 
             <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
               {curriculumItems.map((item, i) => (
-                <Reveal as="li" key={item.label} delay={i * 40} className="group flex flex-col justify-between rounded-3xl border border-primary/10 bg-cream p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-gold/50 hover:bg-white hover:shadow-lift">
+                <Reveal as="li" key={item.label} delay={i * 40} className="group flex flex-col justify-between rounded-2xl border border-primary/15 bg-cream p-5 transition-colors duration-200 hover:border-primary/35 hover:bg-white">
                   <div className="flex items-center justify-between">
                     <span className="font-heading text-xs font-black text-primary/40">
                       #{String(i + 1).padStart(2, '0')}

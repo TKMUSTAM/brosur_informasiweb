@@ -5,42 +5,37 @@ import Reveal from '../components/Reveal'
 import CTASection from '../components/CTASection'
 import { ButtonLink } from '../components/Buttons'
 import { useSEO } from '../hooks/useSEO'
-import { site } from '../data/site'
+import { useCMS } from '../hooks/useCMS'
 
 const programs = [
   {
     icon: GraduationCap,
-    title: 'Beasiswa Pendidikan 100%',
-    desc: 'Membiayai penuh seluruh kebutuhan sekolah anak yatim: SPP bulanan, uang pangkal, 4 setel seragam, dan buku sentra pembelajaran.',
+    title: 'Dukungan Biaya Pendidikan',
+    desc: 'Bentuk dan nilai bantuan mengikuti hasil verifikasi dokumen serta ketersediaan dana program.',
   },
   {
     icon: Utensils,
-    title: 'Snack & Nutrisi Sehat Harian',
-    desc: 'Memastikan asupan gizi seimbang melalui menu snack higienis dan susu setiap hari belajar di sekolah.',
+    title: 'Dukungan Kebutuhan Belajar',
+    desc: 'Bantuan perlengkapan atau kebutuhan belajar dapat diberikan sesuai program yang sedang berjalan.',
   },
   {
     icon: HeartHandshake,
-    title: 'Pendampingan Psikologis & Karakter',
-    desc: 'Pemantauan perkembangan emosional dan pembinaan karakter Qur’ani oleh ustadzah dan psikolog anak berlisensi.',
+    title: 'Pendampingan Karakter',
+    desc: 'Anak mengikuti kegiatan pembelajaran dan pembiasaan karakter bersama guru di kelas.',
   },
   {
     icon: Calendar,
-    title: 'Santunan & Kebahagiaan PHBI',
-    desc: 'Bingkisan hari raya Idul Fitri, santunan 10 Muharram, dan kegiatan ceria bersama keluarga besar yayasan.',
+    title: 'Kegiatan Sosial Yayasan',
+    desc: 'Penerima dapat dilibatkan dalam kegiatan sosial sesuai agenda dan ketentuan yayasan.',
   },
 ]
 
-const stats = [
-  { value: '35+', label: 'Santri Yatim Aktif' },
-  { value: '100%', label: 'Bebas Biaya Sekolah' },
-  { value: '12', label: 'Tenaga Pengajar Peduli' },
-  { value: '7', label: 'Pilar Karakter Diniyah' },
-]
-
 export default function Yatim() {
+  const { data } = useCMS()
+  const site = data.site
   useSEO({
-    title: `Program Beasiswa Yatim & Dhuafa — ${site.name}`,
-    description: `Program pembinaan dan beasiswa penuh 100% bebas biaya pendidikan untuk anak yatim piatu di ${site.name}.`,
+    title: `Program Beasiswa Yatim & Dhuafa | ${site.name}`,
+    description: `Informasi pengajuan dukungan pendidikan untuk anak yatim dan keluarga yang membutuhkan di ${site.name}.`,
     path: '/yatim',
   })
 
@@ -68,20 +63,6 @@ export default function Yatim() {
         </div>
       </PageHeader>
 
-      {/* STATISTIK PROGRAM */}
-      <section className="px-4 py-14 sm:px-6">
-        <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-4 lg:grid-cols-4">
-          {stats.map((s, i) => (
-            <Reveal key={s.label} delay={i * 80} className="h-full">
-              <div className="flex h-full flex-col justify-center rounded-3xl border border-primary/10 bg-white p-6 text-center shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-gold/50 hover:shadow-lift">
-                <p className="font-heading text-3xl font-black text-primary">{s.value}</p>
-                <p className="mt-1 text-xs font-extrabold uppercase tracking-wider text-ink-mute">{s.label}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
       {/* 4 PILAR LAYANAN BINAAN */}
       <section className="bg-cream px-4 py-16 sm:px-6 sm:py-20" aria-label="Layanan program yatim">
         <div className="mx-auto max-w-[1440px]">
@@ -94,7 +75,7 @@ export default function Yatim() {
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {programs.map((p, i) => (
               <Reveal key={p.title} delay={i * 90} className="h-full">
-                <div className="group flex h-full flex-col justify-between rounded-3xl border border-primary/10 bg-white p-7 shadow-soft transition-all duration-300 hover:-translate-y-2 hover:border-gold/50 hover:shadow-lift">
+                <div className="group flex h-full flex-col justify-between rounded-2xl border border-primary/15 bg-white p-7 transition-colors duration-200 hover:border-primary/35">
                   <div>
                     <span className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-softgreen text-primary transition-transform duration-300 group-hover:scale-110">
                       <p.icon className="h-7 w-7" />
@@ -141,16 +122,16 @@ export default function Yatim() {
               
               <blockquote className="rounded-2xl border-l-4 border-gold bg-cream p-5 text-sm italic leading-relaxed text-ink font-medium">
                 “Aku dan orang yang menanggung anak yatim akan berada di surga seperti ini,” seraya beliau ﷺ mengisyaratkan jari telunjuk dan jari tengahnya.
-                <span className="mt-2 block text-xs not-italic font-bold text-primary">— Hadits Riwayat Imam Bukhari</span>
+                <span className="mt-2 block text-xs not-italic font-bold text-primary">Hadits Riwayat Imam Bukhari</span>
               </blockquote>
               
               <p className="text-sm leading-relaxed text-ink-soft">
-                Yayasan &amp; TK Islam Al-Mustam berkomitmen membuka pintu seluas-luasnya bagi anak-anak yatim dhuafa untuk mengenyam pendidikan berkualitas tinggi tanpa kendala biaya sedikitpun.
+                Yayasan menerima pengajuan bantuan pendidikan melalui proses administrasi dan verifikasi. Keputusan bantuan disampaikan oleh sekretariat melalui kanal resmi.
               </p>
 
               <div className="flex items-center gap-3 rounded-2xl bg-softgreen p-4 text-xs font-bold text-primary sm:text-sm">
                 <ShieldCheck className="h-5 w-5 shrink-0 text-primary" />
-                <span>Seluruh penerima beasiswa terverifikasi langsung oleh tim sosial yayasan.</span>
+                <span>Persyaratan dan hasil verifikasi dikonfirmasi langsung oleh sekretariat yayasan.</span>
               </div>
             </Reveal>
 

@@ -16,6 +16,7 @@ import {
   Building,
   Database,
   Lock,
+  PanelsTopLeft,
 } from 'lucide-react'
 import { LogoEmblem } from '../../components/Logo'
 import { useSEO } from '../../hooks/useSEO'
@@ -33,6 +34,8 @@ import PPDBManagementTab from './components/PPDBManagementTab'
 import DonasiManagementTab from './components/DonasiManagementTab'
 import FacilitiesManagementTab from './components/FacilitiesManagementTab'
 import DataBackupTab from './components/DataBackupTab'
+import PageContentManagementTab from './components/PageContentManagementTab'
+import KhazanahManagementTab from './components/KhazanahManagementTab'
 
 type PanelId =
   | 'dashboard'
@@ -41,6 +44,8 @@ type PanelId =
   | 'guru'
   | 'berita'
   | 'galeri'
+  | 'khazanah'
+  | 'halaman'
   | 'donasi'
   | 'fasilitas'
   | 'pengaturan'
@@ -313,6 +318,8 @@ export default function AdminDashboard() {
       { id: 'guru', label: 'Guru & Tenaga Pendidik', icon: Users, badge: String(data.teachers.length) },
       { id: 'berita', label: 'Berita & Kegiatan', icon: Sparkles, badge: String(data.news.length) },
       { id: 'galeri', label: 'Galeri Foto', icon: GalleryHorizontalEnd, badge: String(data.gallery.length) },
+      { id: 'khazanah', label: 'Khazanah Islami', icon: BookOpen, badge: String(data.doas.length + data.islamicArticles.length) },
+      { id: 'halaman', label: 'Konten Halaman', icon: PanelsTopLeft },
       { id: 'donasi', label: 'Santri Yatim & Donasi', icon: Heart },
       { id: 'fasilitas', label: 'Fasilitas Kampus', icon: Building },
       { id: 'pengaturan', label: 'Identitas & Kontak', icon: Settings },
@@ -321,12 +328,7 @@ export default function AdminDashboard() {
     [data]
   )
 
-  // Auto-logout whenever leaving / navigating away from the admin route
-  useEffect(() => {
-    return () => {
-      logout()
-    }
-  }, [logout])
+
 
   useEffect(() => {
     if (!sidebarOpen) return
@@ -361,6 +363,10 @@ export default function AdminDashboard() {
         return <NewsManagementTab />
       case 'galeri':
         return <GalleryManagementTab />
+      case 'khazanah':
+        return <KhazanahManagementTab />
+      case 'halaman':
+        return <PageContentManagementTab />
       case 'donasi':
         return <DonasiManagementTab />
       case 'fasilitas':
@@ -508,7 +514,7 @@ export default function AdminDashboard() {
         <main className="flex-1 p-4 sm:p-7">
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
             <p className="text-xs text-ink-mute">
-              Panel Pengelolaan Konten Terpusat (CMS) — Yayasan Pendidikan Islam Al-Mustam
+              Panel Pengelolaan Konten Terpusat (CMS), Yayasan Pendidikan Islam Al-Mustam
             </p>
             <span className="rounded-full bg-softyellow px-4 py-1.5 text-xs font-bold text-gold-ink shadow-soft">
               {new Intl.DateTimeFormat('id-ID', {

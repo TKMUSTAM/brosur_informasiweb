@@ -25,7 +25,7 @@ export function usePrayer(): PrayerState {
         setTimes(computePrayerTimes(loc.lat, loc.lng, loc.city, now))
         setUsingFallback(loc.fallback)
         setLoading(false)
-        setError(loc.fallback ? 'Lokasi tidak terdeteksi — menampilkan jadwal Jakarta.' : null)
+        setError(loc.fallback ? 'Lokasi tidak terdeteksi. Jadwal Jakarta ditampilkan.' : null)
       })
     }
 

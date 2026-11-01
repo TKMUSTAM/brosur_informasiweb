@@ -12,7 +12,7 @@ const misi = [
   'Menyelenggarakan pendidikan anak usia dini (PAUD/TK) Islam berkualitas berpusat pada anak dengan pendekatan kasih sayang dan keteladanan.',
   'Menanamkan aqidah yang lurus, pembiasaan sholat dhuha, tahfidz Juz 30, serta hafalan doa harian sejak dini.',
   'Mengembangkan potensi fitrah anak secara holistik: kecerdasan intelektual, kemandirian motorik, dan kepekaan sosial.',
-  'Menyelenggarakan program beasiswa penuh 100% dan pembinaan berkelanjutan bagi anak-anak yatim piatu dan dhuafa.',
+  'Menyelenggarakan jalur pengajuan bantuan pendidikan bagi anak yatim dan keluarga yang membutuhkan sesuai kemampuan program.',
   'Membangun kemitraan harmonis dan transparan dengan orang tua sebagai pilar utama pendidikan anak.',
   'Mengelola yayasan secara amanah, profesional, taat hukum, dan berstandar mutu nasional.',
 ]
@@ -37,7 +37,7 @@ const filosofi = [
 
 export default function VisiMisi() {
   useSEO({
-    title: `Visi, Misi & 7 Pilar Karakter — ${site.name}`,
+    title: `Visi, Misi & 7 Pilar Karakter | ${site.name}`,
     description: `Visi, misi, dan filosofi pendidikan ${site.name}: membentuk generasi Qur’ani yang beradab, berakhlak mulia, dan cerdas holistik.`,
     path: '/visi-misi',
   })
@@ -76,7 +76,7 @@ export default function VisiMisi() {
 
               <div className="flex items-center gap-2 text-xs font-bold text-gold-light">
                 <ShieldCheck className="h-4 w-4" />
-                <span>Terakreditasi A &amp; Berorientasi Mutu Global</span>
+                <span>{site.accreditation}</span>
               </div>
             </Reveal>
 
@@ -120,9 +120,9 @@ export default function VisiMisi() {
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {filosofi.map((f, i) => (
               <Reveal key={f.title} delay={i * 100} className="h-full">
-                <div className="group flex h-full flex-col justify-between rounded-3xl border border-primary/10 bg-white p-8 shadow-soft transition-all duration-300 hover:-translate-y-2 hover:border-gold/50 hover:shadow-lift">
+                <div className="flex h-full flex-col justify-between border-t-2 border-gold/60 bg-white p-8">
                   <div>
-                    <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-softgreen text-primary transition-transform duration-300 group-hover:scale-110">
+                    <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-softgreen text-primary">
                       <f.icon className="h-7 w-7" />
                     </span>
                     <h3 className="mt-5 font-heading text-xl font-extrabold text-primary">{f.title}</h3>

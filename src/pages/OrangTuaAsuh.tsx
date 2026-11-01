@@ -25,7 +25,7 @@ const benefits = [
 
 export default function OrangTuaAsuh() {
   useSEO({
-    title: `Program Orang Tua Asuh — ${site.name}`,
+    title: `Program Orang Tua Asuh | ${site.name}`,
     description: 'Program orang tua asuh: dukung pendidikan dan tumbuh kembang anak yatim secara berkelanjutan.',
     path: '/yatim/orangtua-asuh',
   })
@@ -34,7 +34,7 @@ export default function OrangTuaAsuh() {
     <>
       <PageHeader
         eyebrow="Kepedulian Santri Yatim"
-        title="Program Orang Tua Asuh — Menjadi Pelita Harapan"
+        title="Program Orang Tua Asuh: Menjadi Pelita Harapan"
         description="Melalui program wali asuh, Anda ikut membiayai kelangsungan pendidikan, pemenuhan gizi, dan masa depan seorang santri yatim."
         crumbs={[{ label: 'Program Yatim', href: '/yatim' }, { label: 'Orang Tua Asuh' }]}
       >

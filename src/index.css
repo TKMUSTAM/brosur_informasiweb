@@ -111,11 +111,10 @@ h6 {
 /* ===== Scroll Reveal Animations ===== */
 .reveal {
   opacity: 0;
-  transform: translateY(22px);
+  transform: translateY(10px);
   transition:
-    opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform;
+    opacity 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .reveal.reveal-visible {
   opacity: 1;
@@ -133,53 +132,9 @@ h6 {
   }
 }
 
-/* ===== Decorative Helpers ===== */
-.text-gradient-gold {
-  background: linear-gradient(135deg, #c69214 0%, #e5b235 40%, #f7db7d 70%, #d49f1d 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.text-gradient-primary {
-  background: linear-gradient(135deg, #092e24 0%, #0f4435 50%, #165b47 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
 .dot-grid {
   background-image: radial-gradient(rgb(15 68 53 / 0.12) 1.5px, transparent 1.5px);
   background-size: 20px 20px;
-}
-
-.islamic-pattern {
-  background-color: var(--color-cream);
-  background-image: radial-gradient(circle at 50% 50%, rgb(229 178 53 / 0.08) 1px, transparent 1px),
-    radial-gradient(circle at 0 0, rgb(15 68 53 / 0.05) 1px, transparent 1px);
-  background-size: 24px 24px, 48px 48px;
-}
-
-/* Glassmorphism card surface with crisp border & subtle inner sheen */
-.glass-card {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(15, 68, 53, 0.1);
-  box-shadow: 0 10px 30px -10px rgba(15, 68, 53, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-}
-
-.glass-card-dark {
-  background: rgba(9, 46, 36, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-}
-
-.badge-gold-sheen {
-  background: linear-gradient(135deg, rgba(245, 203, 92, 0.25) 0%, rgba(229, 178, 53, 0.15) 100%);
-  border: 1px solid rgba(229, 178, 53, 0.4);
 }
 
 /* ===== Chat widget animations ===== */

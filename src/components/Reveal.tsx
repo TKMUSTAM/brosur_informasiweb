@@ -8,10 +8,6 @@ type RevealProps = {
   id?: string
 }
 
-/**
- * Fade-up on scroll. Menggunakan IntersectionObserver + CSS transition
- * agar ringan (tanpa library animasi).
- */
 export default function Reveal({ children, className = '', delay = 0, as: Tag = 'div', id }: RevealProps) {
   const ref = useRef<HTMLElement | null>(null)
   const [visible, setVisible] = useState(false)
@@ -39,7 +35,7 @@ export default function Reveal({ children, className = '', delay = 0, as: Tag = 
       id={id}
       ref={ref as never}
       className={`reveal ${visible ? 'reveal-visible' : ''} ${className}`}
-      style={delay ? { transitionDelay: `${delay}ms` } : undefined}
+      style={delay ? { transitionDelay: `${Math.min(delay, 160)}ms` } : undefined}
     >
       {children}
     </Tag>

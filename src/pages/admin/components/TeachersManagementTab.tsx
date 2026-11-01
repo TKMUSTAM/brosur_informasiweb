@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Plus, Edit3, Trash2, X } from 'lucide-react'
 import { useCMS } from '../../../hooks/useCMS'
 import type { TeacherItem } from '../../../types/cms'
+import ImageUploadField from './ImageUploadField'
 
 export default function TeachersManagementTab() {
   const { data, addTeacher, updateTeacher, deleteTeacher } = useCMS()
@@ -12,6 +13,8 @@ export default function TeachersManagementTab() {
     role: '',
     note: '',
     education: 'S1 PAUD',
+    avatar: '',
+    avatarAlt: '',
   })
 
   const openCreateModal = () => {
@@ -21,6 +24,8 @@ export default function TeachersManagementTab() {
       role: '',
       note: '',
       education: 'S1 PAUD',
+      avatar: '',
+      avatarAlt: '',
     })
     setIsModalOpen(true)
   }
@@ -32,6 +37,8 @@ export default function TeachersManagementTab() {
       role: t.role,
       note: t.note,
       education: t.education || 'S1 PAUD',
+      avatar: t.avatar || '',
+      avatarAlt: t.avatarAlt || t.name,
     })
     setIsModalOpen(true)
   }
@@ -73,9 +80,7 @@ export default function TeachersManagementTab() {
           >
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-softgreen font-heading text-sm font-black text-primary">
-                  {t.name.split(' ').map((n) => n[0]).slice(0, 2).join('')}
-                </span>
+                {t.avatar ? <img src={t.avatar} alt={t.avatarAlt || t.name} className="h-12 w-12 rounded-xl object-cover" /> : <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-softgreen font-heading text-sm font-black text-primary">{t.name.split(' ').map((n) => n[0]).slice(0, 2).join('')}</span>}
                 <span className="rounded-full bg-cream px-2.5 py-0.5 text-[10px] font-bold text-ink-soft">
                   {t.education}
                 </span>
@@ -171,6 +176,8 @@ export default function TeachersManagementTab() {
                   className="w-full rounded-xl border border-primary/15 bg-cream/40 px-4 py-3 text-sm text-ink outline-none focus:border-primary"
                 />
               </div>
+
+              <ImageUploadField label="Foto guru atau staf" value={formData.avatar || ''} onChange={(avatar) => setFormData((prev) => ({ ...prev, avatar }))} altValue={formData.avatarAlt || ''} onAltChange={(avatarAlt) => setFormData((prev) => ({ ...prev, avatarAlt }))} recommended="Gunakan foto potret dengan rasio 1:1 atau 3:4." />
 
               <div className="flex justify-end gap-3 border-t border-primary/5 pt-4">
                 <button

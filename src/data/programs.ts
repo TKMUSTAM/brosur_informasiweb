@@ -100,7 +100,7 @@ export const programs: Program[] = [
     ratio: '1 : 7',
     image: '/images/content/prog-tk-b.jpg',
     objectives: [
-      '100% siswa lulusan siap dan percaya diri menempuh tes masuk SD favorit',
+      'Pendampingan kesiapan sekolah dasar sesuai tahap perkembangan setiap anak',
       'Memiliki adab Islami yang kokoh kepada guru, orang tua, dan sesama',
       'Mampu menyelesaikan masalah sederhana dan bekerja sama dalam tim',
     ],
@@ -119,7 +119,7 @@ export const programs: Program[] = [
     highlights: [
       'Metode Tilawati berjenjang dari jilid 1 hingga Al-Qur’an tartil',
       'Bimbingan tahsin makharijul huruf & hukum tajwid',
-      'Program setor hafalan mandiri bersanad',
+      'Pendampingan setoran hafalan secara bertahap',
       'Kisah teladan 25 Nabi dan Sahabat Rasulullah SAW',
       'Laporan perkembangan muraja’ah berkala untuk orang tua',
     ],

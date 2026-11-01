@@ -5,15 +5,14 @@ import Reveal from '../components/Reveal'
 import CTASection from '../components/CTASection'
 import { useSEO } from '../hooks/useSEO'
 import { useCMS } from '../hooks/useCMS'
-import { organization as defaultOrg } from '../data/content'
 
 export default function Organisasi() {
   const { data } = useCMS()
-  const teachers = data.teachers.length > 0 ? data.teachers : defaultOrg
+  const teachers = data.teachers
 
   useSEO({
-    title: 'Struktur Organisasi & Tenaga Pendidik — Yayasan & TK Islam Al-Mustam',
-    description: 'Profil dewan pembina, kepala sekolah, guru S1 PAUD, ustadz hafidz, dan psikolog anak di Yayasan & TK Islam Al-Mustam.',
+    title: 'Struktur Organisasi & Tenaga Pendidik | Yayasan & TK Islam Al-Mustam',
+    description: 'Profil dewan pembina, kepala sekolah, guru, dan tenaga kependidikan Yayasan & TK Islam Al-Mustam.',
     path: '/organisasi',
   })
 
@@ -25,7 +24,7 @@ export default function Organisasi() {
       <PageHeader
         eyebrow="Struktur Organisasi"
         title="Dewan Pembina, Pengurus &amp; Tenaga Pendidik"
-        description="Para asatidz dan pendidik berdedikasi tinggi, berlatar belakang S1 PAUD, bersertifikasi tahfidz, dan berpengalaman dalam psikologi perkembangan anak usia dini."
+        description="Informasi pengurus, peran, latar belakang pendidikan, dan pengalaman tenaga pendidik yang tercatat di sekolah."
         crumbs={[{ label: 'Profil Yayasan', href: '/profil' }, { label: 'Struktur Organisasi' }]}
       />
 
@@ -42,9 +41,7 @@ export default function Organisasi() {
             <div className="mt-12 flex justify-center">
               <Reveal className="w-full max-w-md">
                 <div className="rounded-3xl border border-primary/20 bg-primary p-8 text-center text-white shadow-lift">
-                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 text-gold">
-                    <ShieldCheck className="h-8 w-8" />
-                  </div>
+                  {leader.avatar ? <img src={leader.avatar} alt={leader.avatarAlt || leader.name} className="mx-auto h-24 w-24 rounded-2xl object-cover" /> : <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 text-gold"><ShieldCheck className="h-8 w-8" /></div>}
                   <span className="mt-4 inline-block rounded-full bg-gold px-3.5 py-1 text-xs font-extrabold text-primary-deep">
                     {leader.role}
                   </span>
@@ -61,8 +58,9 @@ export default function Organisasi() {
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {restTeachers.map((o, i) => (
               <Reveal key={o.role} delay={i * 70} className="h-full">
-                <div className="group flex h-full flex-col justify-between rounded-3xl border border-primary/10 bg-white p-7 shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:border-gold/50 hover:shadow-lift">
+                <div className="group flex h-full flex-col justify-between rounded-2xl border border-primary/15 bg-white p-7 transition-colors duration-200 hover:border-primary/35">
                   <div>
+                    {o.avatar && <img src={o.avatar} alt={o.avatarAlt || o.name} className="mb-4 h-20 w-20 rounded-2xl object-cover" loading="lazy" />}
                     <div className="flex items-center justify-between">
                       <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-softgreen text-primary transition-transform duration-300 group-hover:scale-110">
                         <GraduationCap className="h-6 w-6" />
@@ -86,6 +84,7 @@ export default function Organisasi() {
               </Reveal>
             ))}
           </div>
+          {teachers.length === 0 && <p className="mt-10 rounded-2xl border border-primary/10 bg-cream p-6 text-center text-sm text-ink-mute">Profil tenaga pendidik sedang diperbarui.</p>}
         </div>
       </section>
 
@@ -95,30 +94,30 @@ export default function Organisasi() {
           <SectionHeading
             eyebrow="Standar Pendidik"
             title="Kompetensi &amp; Kualifikasi Tenaga Pendidik"
-            subtitle="Kami memastikan ananda didampingi oleh figur guru yang memiliki integritas keilmuan dan keteladanan akhlak."
+            subtitle="Standar pendampingan dijelaskan melalui data peran, pendidikan, dan pengalaman yang dikelola sekolah."
           />
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {[
               {
                 icon: GraduationCap,
-                title: '100% Sarjana (S1/S2)',
-                desc: 'Lulusan perguruan tinggi terakreditasi jurusan PG-PAUD, Tarbiyah Islamiyah, dan Psikologi.',
+                title: 'Latar Belakang Pendidikan',
+                desc: 'Profil pendidikan dan bidang keahlian setiap guru dapat dilihat pada daftar tenaga pendidik di atas.',
               },
               {
                 icon: BadgeCheck,
-                title: 'Hafidzah & Bersertifikat',
-                desc: 'Pengajar Al-Qur’an bersyahadah metode Tilawati/Ummi dengan makhraj fasih.',
+                title: 'Pendampingan Al-Qur’an',
+                desc: 'Pembelajaran Al-Qur’an disesuaikan dengan tingkat kemampuan dan tahap perkembangan anak.',
               },
               {
                 icon: Heart,
-                title: 'Pelatihan Keibuan & Parenting',
-                desc: 'Mendapat pembinaan rutin terkait psikologi perkembangan anak usia dini dan *positive discipline*.',
+                title: 'Pengembangan Kompetensi',
+                desc: 'Sekolah mendorong guru mengikuti pembinaan sesuai kebutuhan pembelajaran dan perkembangan anak.',
               },
               {
                 icon: Sparkles,
-                title: 'Rasio Pendampingan 1:7',
-                desc: 'Setiap kelas didampingi 2 guru utama untuk memastikan perhatian penuh pada setiap anak.',
+                title: 'Pendampingan Kelas',
+                desc: 'Pengaturan kelas mengikuti kapasitas program yang tercantum pada halaman masing-masing jenjang.',
               },
             ].map((k, i) => (
               <Reveal key={k.title} delay={i * 80} className="h-full">

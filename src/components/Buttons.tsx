@@ -6,17 +6,17 @@ type Variant = 'primary' | 'gold' | 'outline' | 'ghost' | 'white' | 'soft'
 type Size = 'sm' | 'md' | 'lg'
 
 const base =
-  'group inline-flex items-center justify-center gap-2 rounded-full font-bold transition-all duration-300 will-change-transform active:scale-[0.97]'
+  'group inline-flex min-h-11 items-center justify-center gap-2 rounded-xl font-bold transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold'
 
 const variants: Record<Variant, string> = {
   primary:
-    'bg-primary text-white hover:bg-primary-light hover:-translate-y-0.5 shadow-soft hover:shadow-lift',
-  gold: 'bg-gold text-primary hover:bg-gold-light hover:-translate-y-0.5 shadow-gold',
+    'bg-primary text-white hover:bg-primary-light',
+  gold: 'bg-gold text-primary hover:bg-gold-light',
   outline:
-    'border-2 border-primary/25 bg-transparent text-primary hover:border-primary hover:bg-softgreen hover:-translate-y-0.5',
+    'border border-primary/25 bg-transparent text-primary hover:border-primary hover:bg-softgreen',
   ghost: 'bg-transparent text-primary hover:bg-softgreen',
-  white: 'bg-white text-primary hover:bg-cream hover:-translate-y-0.5 shadow-soft',
-  soft: 'bg-softgreen text-primary hover:bg-primary hover:text-white hover:-translate-y-0.5',
+  white: 'bg-white text-primary hover:bg-cream',
+  soft: 'bg-softgreen text-primary hover:bg-primary hover:text-white',
 }
 
 const sizes: Record<Size, string> = {

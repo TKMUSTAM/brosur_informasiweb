@@ -1,101 +1,32 @@
 import Reveal from '../components/Reveal'
-import { LogoEmblem } from '../components/Logo'
+import { useCMS } from '../hooks/useCMS'
 
 export default function WelcomeSection() {
+  const { data } = useCMS()
+  const welcome = data.pageContent.welcome
+
   return (
-    <section className="relative overflow-hidden bg-cream-dark/50 px-4 py-20 sm:px-6 sm:py-24" aria-label="Sambutan pimpinan yayasan">
-      <div className="dot-grid pointer-events-none absolute right-0 top-10 h-64 w-64 opacity-30" />
-      <div className="dot-grid pointer-events-none absolute bottom-0 left-0 h-64 w-64 opacity-30" />
+    <section className="border-y border-primary/10 bg-cream-dark/45 px-4 py-16 sm:px-6 sm:py-20" aria-labelledby="welcome-title">
+      <div className="mx-auto grid max-w-[1440px] items-center gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16">
+        <Reveal>
+          <figure className="border border-primary/15 bg-white p-2">
+            <img src={welcome.image} alt={welcome.imageAlt} width="560" height="700" loading="lazy" className="aspect-[4/5] w-full object-cover" />
+            <figcaption className="px-3 py-3">
+              <p className="font-heading text-sm font-extrabold text-primary">{welcome.personName}</p>
+              <p className="mt-1 text-xs text-ink-mute">{welcome.personRole}</p>
+            </figcaption>
+          </figure>
+        </Reveal>
 
-      <div className="relative mx-auto max-w-[1440px]">
-        <div className="grid items-center gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14">
-          
-          {/* ===== Foto Pimpinan Yayasan (Fotografi Resmi) ===== */}
-          <Reveal className="relative mx-auto w-full max-w-sm lg:max-w-none">
-            <div className="relative">
-              {/* Outer decorative gold border */}
-              <div className="absolute -inset-3 rounded-[2.5rem] bg-gradient-to-br from-gold/30 via-primary/10 to-transparent blur-md" />
-              
-              {/* Photo Frame */}
-              <div className="relative aspect-[3/4] overflow-hidden rounded-[2rem] border-4 border-white bg-white shadow-lift ring-1 ring-primary/10">
-                <img
-                  src="/images/content/ketua-yayasan.jpg"
-                  alt="KH. Ahmad Mustam, S.Ag., M.Pd.I. - Pembina & Pendiri Yayasan Pendidikan Islam Al-Mustam"
-                  className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-primary-deep/75 via-transparent to-transparent" />
-                
-                <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <span className="rounded-md bg-gold px-2.5 py-1 text-[11px] font-black uppercase tracking-wider text-primary-deep">
-                    Pembina Yayasan
-                  </span>
-                  <p className="mt-2 font-heading text-lg font-extrabold">KH. Ahmad Mustam, S.Ag., M.Pd.I.</p>
-                  <p className="text-xs text-white/80">Ulama &amp; Praktisi Pendidikan Islam</p>
-                </div>
-              </div>
-            </div>
-          </Reveal>
-
-          {/* ===== Kutipan & Pesan Pimpinan ===== */}
-          <Reveal delay={120}>
-            <div className="flex flex-col gap-6">
-              
-              {/* Header Eyebrow */}
-              <p className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-primary/75">
-                Sambutan Pimpinan Yayasan
-              </p>
-
-              {/* Quote Main */}
-              <blockquote className="font-heading text-2xl font-extrabold leading-[1.35] text-primary sm:text-3xl lg:text-[2.2rem]">
-                “Anak-anak bukan sekadar bejana kosong untuk diisi ilmu, melainkan{' '}
-                <span className="text-gradient-gold">amanah suci</span> yang harus dibimbing fitrahnya agar tumbuh menjadi pribadi yang{' '}
-                <span className="text-gradient-gold">beradab, berakhlaq mulia, dan beraqidah kokoh</span>.”
-              </blockquote>
-
-              {/* Description body */}
-              <div className="space-y-3.5 text-sm leading-relaxed text-ink-soft sm:text-base">
-                <p>
-                  Di <strong>TK Islam Al-Mustam</strong>, kami memandang setiap anak sebagai individu istimewa yang memiliki potensi fitrah tak terbatas. Melalui perpaduan Kurikulum Merdeka yang menyenangkan, pembiasaan ibadah praktis, dan pendekatan kasih sayang guru, kami memastikan masa kanak-kanak buah hati Anda dipenuhi kegembiraan belajar dan keteladanan yang luhur.
-                </p>
-                <p>
-                  Yayasan kami juga berkomitmen membuka akses seluas-luasnya melalui program pembinaan dan <strong>beasiswa 100% penuh bagi anak-anak yatim piatu dan dhuafa</strong>, agar mereka mendapatkan hak pendidikan terbaik berstandar unggul.
-                </p>
-              </div>
-
-              {/* Poin Komitmen */}
-              <div className="grid gap-2.5 sm:grid-cols-2">
-                <div className="flex items-center gap-2 text-xs font-bold text-primary sm:text-sm">
-                  <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
-                  <span>Metode Belajar Sentra (BCCT) Terstandar</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs font-bold text-primary sm:text-sm">
-                  <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
-                  <span>Laporan Tumbuh Kembang Berkala</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs font-bold text-primary sm:text-sm">
-                  <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
-                  <span>Lingkungan Aman, Bersih &amp; Terpantau CCTV</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs font-bold text-primary sm:text-sm">
-                  <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
-                  <span>Kemitraan Hangat Bersama Orang Tua</span>
-                </div>
-              </div>
-
-              {/* Signature Card */}
-              <div className="mt-2 flex items-center gap-4 border-t border-primary/10 pt-5">
-                <LogoEmblem size={44} />
-                <div>
-                  <p className="font-heading text-base font-extrabold text-primary">KH. Ahmad Mustam, S.Ag., M.Pd.I.</p>
-                  <p className="text-xs font-semibold text-ink-mute">Pembina Yayasan Pendidikan Islam Al-Mustam</p>
-                </div>
-              </div>
-
-            </div>
-          </Reveal>
-
-        </div>
+        <Reveal delay={100}>
+          <p className="flex items-center gap-3 text-xs font-extrabold uppercase tracking-[0.14em] text-primary/75">
+            <span className="h-px w-8 bg-gold-dark" aria-hidden="true" />
+            {welcome.eyebrow}
+          </p>
+          <h2 id="welcome-title" className="mt-5 max-w-3xl text-balance font-heading text-3xl font-extrabold leading-tight text-primary sm:text-4xl">{welcome.title}</h2>
+          <blockquote className="mt-7 border-l-2 border-gold pl-5 font-heading text-xl font-bold leading-relaxed text-primary sm:text-2xl">“{welcome.quote}”</blockquote>
+          <p className="mt-6 max-w-2xl text-pretty text-base leading-relaxed text-ink-soft">{welcome.body}</p>
+        </Reveal>
       </div>
     </section>
   )

@@ -17,7 +17,7 @@ export default function ProgramDetail() {
   const program = programs.find((p) => p.slug === slug)
 
   useSEO({
-    title: program ? (program.code === program.name ? program.code : `${program.code} — ${program.name}`) : 'Program',
+    title: program ? (program.code === program.name ? program.code : `${program.code}: ${program.name}`) : 'Program',
     description: program?.description ?? 'Program pendidikan Yayasan Mustam.',
     path: `/program/${slug}`,
   })
@@ -51,7 +51,7 @@ export default function ProgramDetail() {
           <div className="grid items-start gap-12 lg:grid-cols-2">
             {/* visual */}
             <Reveal className="lg:sticky lg:top-28">
-              <div className="blob-shape overflow-hidden shadow-lift">
+              <div className="overflow-hidden rounded-[2rem] border-4 border-white bg-white shadow-lift ring-1 ring-primary/15">
                 <ContentImage
                   image={program.image}
                   scene={iconToScene(program.icon)}

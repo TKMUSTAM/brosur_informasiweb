@@ -58,6 +58,8 @@ export type NewsItem = {
   color: 'green' | 'blue' | 'gold' | 'red'
   featured?: boolean
   image?: string
+  imageAlt?: string
+  status?: 'DRAFT' | 'PUBLISHED'
 }
 
 export type ProgramItem = {
@@ -75,6 +77,7 @@ export type ProgramItem = {
   capacity: string
   ratio: string
   image: string
+  imageAlt?: string
   objectives: string[]
   monthlyFee?: number
   entryFee?: number
@@ -87,6 +90,7 @@ export type TeacherItem = {
   note: string
   education?: string
   avatar?: string
+  avatarAlt?: string
 }
 
 export type GalleryItem = {
@@ -97,6 +101,64 @@ export type GalleryItem = {
   palette: 'green' | 'blue' | 'gold' | 'red' | 'mixed'
   tall?: boolean
   image?: string
+  imageAlt?: string
+  description?: string
+  status?: 'DRAFT' | 'PUBLISHED'
+}
+
+export type DoaItem = {
+  slug: string
+  title: string
+  arabic: string
+  latin: string
+  meaning: string
+  virtue?: string
+  category: string
+  status?: 'DRAFT' | 'PUBLISHED'
+}
+
+export type IslamicArticle = {
+  slug: string
+  title: string
+  excerpt: string
+  category: string
+  readTime: string
+  content: string[]
+  image?: string
+  imageAlt?: string
+  status?: 'DRAFT' | 'PUBLISHED'
+}
+
+export type PageContent = {
+  hero: {
+    eyebrow: string
+    title: string
+    highlight: string
+    titleSuffix: string
+    description: string
+    image: string
+    imageAlt: string
+    primaryLabel: string
+    benefits: string[]
+  }
+  welcome: {
+    eyebrow: string
+    title: string
+    quote: string
+    body: string
+    personName: string
+    personRole: string
+    image: string
+    imageAlt: string
+  }
+  ppdb: {
+    academicYear: string
+    registrationOpen: boolean
+    title: string
+    description: string
+    notice: string
+    requirements: string[]
+  }
 }
 
 export type PPDBApplicant = {
@@ -158,6 +220,7 @@ export type FacilityItem = {
   desc: string
   tag: string
   image?: string
+  imageAlt?: string
 }
 
 export type PillarItem = {
@@ -181,6 +244,9 @@ export type CMSData = {
   programs: ProgramItem[]
   teachers: TeacherItem[]
   gallery: GalleryItem[]
+  doas: DoaItem[]
+  islamicArticles: IslamicArticle[]
+  pageContent: PageContent
   ppdbApplicants: PPDBApplicant[]
   ppdbBatches: PPDBBatch[]
   orphans: OrphanBeneficiary[]

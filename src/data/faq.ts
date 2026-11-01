@@ -103,7 +103,7 @@ export const chatIntents: ChatIntent[] = [
     strong: ['program pendidikan', 'jenjang', 'kelas apa saja'],
     keywords: ['program', 'sekolah', 'tingkat', 'taman kanak', 'playgroup', 'paud'],
     answer:
-      'Yayasan Mustam memiliki 4 program pendidikan:\n\n1. TPA — Taman Pendidikan Al-Qur\'an (usia 4–12 tahun)\n2. KB — Kelompok Bermain (usia 3–4 tahun)\n3. TK A — usia 4–5 tahun\n4. TK B — usia 5–6 tahun\n\nSemua program memadukan Kurikulum Merdeka dengan muatan diniyah.',
+      'Yayasan Mustam memiliki 4 program pendidikan:\n\n1. TPA: Taman Pendidikan Al-Qur\'an (usia 4–12 tahun)\n2. KB: Kelompok Bermain (usia 3–4 tahun)\n3. TK A: usia 4–5 tahun\n4. TK B: usia 5–6 tahun\n\nSemua program memadukan Kurikulum Merdeka dengan muatan diniyah.',
     links: [{ label: 'Lihat Semua Program', href: '/program' }],
     suggestions: ['Apa yang dipelajari di TK A?', 'Berapa usia minimal masuk KB?', 'Apa itu kurikulum diniyah?'],
   },
@@ -146,7 +146,7 @@ export const chatIntents: ChatIntent[] = [
     strong: ['kurikulum', 'kurikulum merdeka', 'muatan diniyah', 'diniyah'],
     keywords: ['materi', 'pelajaran', 'hafalan', 'doa harian', 'akhlak', 'adab', 'calistung', 'numerasi', 'pembelajaran'],
     answer:
-      'Kami memadukan dua kurikulum:\n\n1. Kurikulum Merdeka — kerangka belajar nasional yang berpusat pada anak.\n2. Muatan Diniyah — pembiasaan ibadah dan akhlak sebagai pondasi karakter.\n\nMateri unggulan: Al-Qur\'an & Iqra, hafalan doa harian, hafalan surat pendek, akhlak & adab, praktik ibadah, bahasa, numerasi dasar, seni, motorik, serta sosial-emosional.',
+      'Kami memadukan dua kurikulum:\n\n1. Kurikulum Merdeka, kerangka belajar nasional yang berpusat pada anak.\n2. Muatan Diniyah, pembiasaan ibadah dan akhlak sebagai pondasi karakter.\n\nMateri unggulan: Al-Qur\'an & Iqra, hafalan doa harian, hafalan surat pendek, akhlak & adab, praktik ibadah, bahasa, numerasi dasar, seni, motorik, serta sosial-emosional.',
     links: [{ label: 'Detail Kurikulum', href: '/kurikulum' }],
   },
 
@@ -176,7 +176,7 @@ export const chatIntents: ChatIntent[] = [
     strong: ['anak yatim', 'yatim piatu', 'program yatim'],
     keywords: ['yatim', 'piatu', 'pembinaan', 'santunan'],
     answer:
-      'Program Yatim Piatu kami mencakup beasiswa pendidikan, makan sehat harian, pendampingan psikososial, serta kegiatan Ramadhan dan hari besar. Saat ini 30+ anak yatim aktif dibina dengan dukungan 80+ donatur.\n\nAnak yatim juga mendapat beasiswa gratis biaya pendidikan di TPA/KB/TK.',
+      'Program Yatim Piatu mencakup bantuan pendidikan dan kegiatan pembinaan sesuai hasil verifikasi serta ketersediaan dana program. Informasi penerima dan bentuk bantuan dikonfirmasi oleh pengelola pada setiap periode.',
     links: [
       { label: 'Program Yatim', href: '/yatim' },
       { label: 'Jadi Orang Tua Asuh', href: '/yatim/orangtua-asuh' },
@@ -226,7 +226,7 @@ export const chatIntents: ChatIntent[] = [
     strong: ['doa harian', 'kumpulan doa'],
     keywords: ['doa', 'artinya', 'latin', 'hafalan doa'],
     answer:
-      'Kami menyediakan kumpulan doa harian lengkap dengan tulisan Arab, latin, dan artinya — mulai dari doa sebelum belajar, sebelum makan, sebelum tidur, hingga doa untuk kedua orang tua.',
+      'Kami menyediakan kumpulan doa harian lengkap dengan tulisan Arab, latin, dan artinya, mulai dari doa sebelum belajar, sebelum makan, sebelum tidur, hingga doa untuk kedua orang tua.',
     links: [{ label: 'Kumpulan Doa Harian', href: '/doa' }],
   },
   {
@@ -279,7 +279,7 @@ export const chatIntents: ChatIntent[] = [
     id: 'berita',
     keywords: ['berita', 'kegiatan', 'acara', 'event', 'agenda', 'pengumuman'],
     answer:
-      'Kabar terbaru Yayasan Mustam dapat Anda ikuti di halaman Berita & Kegiatan — mulai dari kegiatan pembelajaran, kajian, PHBI, hingga penyaluran bantuan.',
+      'Kabar terbaru Yayasan Mustam dapat Anda ikuti di halaman Berita & Kegiatan, termasuk kegiatan pembelajaran, kajian, PHBI, dan penyaluran bantuan.',
     links: [{ label: 'Berita & Kegiatan', href: '/berita' }],
   },
   {

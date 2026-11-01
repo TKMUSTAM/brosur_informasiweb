@@ -144,7 +144,7 @@ export default function ChatWidget() {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-mint opacity-60" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-primary-mint" />
                 </span>
-                Admin online — balasan cepat
+                Admin online, balasan cepat
               </p>
             </div>
             <button
@@ -269,23 +269,20 @@ export default function ChatWidget() {
 
       {/* ===== Tombol buka + Tooltip Callout ===== */}
       {!open && (
-        <div className="fixed bottom-24 right-4 z-[70] flex items-center gap-3 sm:bottom-6 sm:right-6">
-          <div className="hidden items-center gap-2 rounded-2xl border border-primary/15 bg-white/95 px-3.5 py-2 shadow-lift backdrop-blur-md transition-all sm:flex animate-float">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-mint opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-primary-mint" />
-            </span>
+        <div className="fixed bottom-6 right-6 z-[70] hidden items-center gap-3 sm:flex">
+          <div className="hidden items-center gap-2 rounded-lg border border-primary/15 bg-white px-3.5 py-2 shadow-soft sm:flex">
+            <span className="h-2 w-2 rounded-full bg-primary-mint" aria-hidden="true" />
             <span className="text-xs font-bold text-primary">Tanya PPDB &amp; Info Sekolah</span>
           </div>
 
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="chat-pop group relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-light text-white shadow-lift ring-4 ring-white/80 transition-all duration-300 hover:-translate-y-1 hover:shadow-gold"
+            className="chat-pop relative flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-soft ring-4 ring-white/80 transition-colors hover:bg-primary-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             aria-label="Buka Pusat Informasi"
             aria-expanded={false}
           >
-            <MessageCircle className="h-6 w-6 transition-transform duration-300 group-hover:scale-110" />
+            <MessageCircle className="h-6 w-6" />
             <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-gold text-[10px] font-black text-primary-deep shadow-soft">
               1
             </span>

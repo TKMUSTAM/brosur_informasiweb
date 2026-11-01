@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Plus, Trash2, Edit3, Building, X } from 'lucide-react'
 import { useCMS } from '../../../hooks/useCMS'
 import type { FacilityItem } from '../../../types/cms'
+import ImageUploadField from './ImageUploadField'
 
 export default function FacilitiesManagementTab() {
   const { data, addFacility, updateFacility, deleteFacility } = useCMS()
@@ -12,6 +13,8 @@ export default function FacilitiesManagementTab() {
     desc: '',
     tag: 'Fasilitas Utama',
     icon: 'mosque',
+    image: '',
+    imageAlt: '',
   })
 
   const openCreateModal = () => {
@@ -21,6 +24,8 @@ export default function FacilitiesManagementTab() {
       desc: '',
       tag: 'Fasilitas Utama',
       icon: 'mosque',
+      image: '',
+      imageAlt: '',
     })
     setIsModalOpen(true)
   }
@@ -32,6 +37,8 @@ export default function FacilitiesManagementTab() {
       desc: f.desc,
       tag: f.tag,
       icon: f.icon,
+      image: f.image || '',
+      imageAlt: f.imageAlt || f.title,
     })
     setIsModalOpen(true)
   }
@@ -74,6 +81,7 @@ export default function FacilitiesManagementTab() {
               className="flex flex-col justify-between rounded-3xl border border-primary/10 bg-white p-5 shadow-soft transition-all hover:border-primary/25 hover:shadow-lift"
             >
               <div className="space-y-2">
+                {fac.image && <img src={fac.image} alt={fac.imageAlt || fac.title} className="aspect-[16/9] w-full rounded-2xl object-cover" />}
                 <div className="flex items-center justify-between">
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-softgreen text-primary">
                     <Building className="h-5 w-5" />
@@ -179,6 +187,8 @@ export default function FacilitiesManagementTab() {
                   className="w-full rounded-xl border border-primary/15 bg-cream/40 px-4 py-3 text-sm text-ink outline-none focus:border-primary"
                 />
               </div>
+
+              <ImageUploadField label="Foto fasilitas" value={formData.image || ''} onChange={(image) => setFormData((prev) => ({ ...prev, image }))} altValue={formData.imageAlt || ''} onAltChange={(imageAlt) => setFormData((prev) => ({ ...prev, imageAlt }))} recommended="Rasio 16:9 disarankan." />
 
               <div className="flex justify-end gap-3 border-t border-primary/5 pt-4">
                 <button

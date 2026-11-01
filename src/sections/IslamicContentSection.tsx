@@ -4,11 +4,13 @@ import Icon from '../components/Icon'
 import SectionHeading from '../components/SectionHeading'
 import Reveal from '../components/Reveal'
 import { PrayerTimesGrid } from '../components/PrayerSchedule'
-import { doas, islamicArticles } from '../data/content'
+import { useCMS } from '../hooks/useCMS'
 
 export default function IslamicContentSection() {
-  const doa = doas[0]
-  const article = islamicArticles[0]
+  const { data } = useCMS()
+  const doa = data.doas.find((item) => item.status !== 'DRAFT')
+  const article = data.islamicArticles.find((item) => item.status !== 'DRAFT')
+  if (!doa || !article) return null
 
   return (
     <section className="px-4 py-20 sm:px-6 sm:py-24" aria-label="Konten Islami">
@@ -22,7 +24,7 @@ export default function IslamicContentSection() {
         <div className="mt-12 grid gap-6 lg:grid-cols-3">
           {/* Doa hari ini */}
           <Reveal>
-            <Link to="/doa" className="group flex h-full flex-col overflow-hidden rounded-card bg-softgreen p-7 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lift">
+            <Link to="/doa" className="group flex h-full flex-col overflow-hidden rounded-2xl border border-primary/10 bg-softgreen p-7 transition-colors duration-200 hover:border-primary/30">
               <span className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-soft transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
                 <Icon name="pray" className="h-6 w-6 text-gold" />
               </span>
@@ -40,7 +42,7 @@ export default function IslamicContentSection() {
 
           {/* Jadwal sholat */}
           <Reveal delay={100}>
-            <Link to="/jadwal-sholat" className="group flex h-full flex-col rounded-card bg-softblue p-7 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lift">
+            <Link to="/jadwal-sholat" className="group flex h-full flex-col rounded-2xl border border-secondary/10 bg-softblue p-7 transition-colors duration-200 hover:border-secondary/30">
               <div className="flex items-center justify-between">
                 <span className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-white shadow-soft transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
                   <Icon name="moon" className="h-6 w-6" />
@@ -60,9 +62,9 @@ export default function IslamicContentSection() {
 
           {/* Artikel parenting */}
           <Reveal delay={200}>
-            <Link to="/konten-islami" className="group flex h-full flex-col overflow-hidden rounded-card bg-white shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lift">
+            <Link to="/konten-islami" className="group flex h-full flex-col overflow-hidden rounded-2xl border border-primary/15 bg-white transition-colors duration-200 hover:border-primary/35">
               <div className="relative overflow-hidden">
-                <svg viewBox="0 0 320 140" className="aspect-[16/7] w-full transition-transform duration-500 group-hover:scale-105" role="img" aria-label="Ilustrasi parenting">
+                {article.image ? <img src={article.image} alt={article.imageAlt || article.title} className="aspect-[16/7] w-full object-cover transition-transform duration-500 group-hover:scale-105" /> : <svg viewBox="0 0 320 140" className="aspect-[16/7] w-full transition-transform duration-500 group-hover:scale-105" role="img" aria-label="Ilustrasi parenting">
                   <rect width="320" height="140" fill="#FFF5C9" />
                   <circle cx="270" cy="30" r="24" fill="#F4C542" opacity="0.8" />
                   <circle cx="60" cy="112" r="16" fill="#F2C79B" />
@@ -75,7 +77,7 @@ export default function IslamicContentSection() {
                   <path d="M150 94 Q158 88 166 94" stroke="#C0544E" strokeWidth="2.4" fill="none" strokeLinecap="round" />
                   <circle cx="143" cy="90" r="2" fill="#2A1A0E" />
                   <circle cx="157" cy="90" r="2" fill="#2A1A0E" />
-                </svg>
+                </svg>}
               </div>
               <div className="flex flex-1 flex-col gap-3 p-7">
                 <span className="w-fit rounded-full bg-softyellow px-3 py-1 text-[11px] font-bold text-gold-ink">{article.category}</span>
@@ -92,7 +94,7 @@ export default function IslamicContentSection() {
         <div className="mt-10 text-center">
           <Link
             to="/konten-islami"
-            className="group inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-bold text-white shadow-soft transition-all hover:-translate-y-0.5 hover:bg-primary-light hover:shadow-lift sm:text-base"
+            className="group inline-flex min-h-11 items-center gap-2 rounded-xl bg-primary px-7 text-sm font-bold text-white transition-colors hover:bg-primary-light sm:text-base"
           >
             <Icon name="read" className="h-5 w-5 text-gold" />
             Jelajahi Konten Islami

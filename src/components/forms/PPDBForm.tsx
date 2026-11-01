@@ -49,6 +49,7 @@ export default function PPDBForm() {
   const { data, addPPDBApplicant } = useCMS()
   const site = data.site
   const programs = data.programs.length > 0 ? data.programs : defaultPrograms
+  const ppdb = data.pageContent.ppdb
 
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [form, setForm] = useState<FormState>(empty)
@@ -122,6 +123,10 @@ export default function PPDBForm() {
   }
 
   const selectedProgramName = programs.find((p) => p.slug === form.program)?.name ?? form.program
+
+  if (!ppdb.registrationOpen) {
+    return <div className="rounded-3xl border border-primary/10 bg-white p-8 text-center shadow-soft sm:p-12"><h2 className="font-heading text-2xl font-extrabold text-primary">Pendaftaran belum dibuka</h2><p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-ink-soft">{ppdb.notice}</p><a href={`https://wa.me/${site.contact.whatsapp}`} className="mt-6 inline-flex min-h-11 items-center rounded-full bg-primary px-6 text-sm font-bold text-white">Hubungi admin PPDB</a></div>
+  }
 
   // Hasil pendaftaran sukses
   if (regNo) {
@@ -260,7 +265,7 @@ export default function PPDBForm() {
               <label htmlFor="program" className={labelCls}>Pilihan Jenjang Kelas *</label>
               <select id="program" value={form.program} onChange={set('program')} className={inputCls('program')}>
                 {programs.map((p) => (
-                  <option key={p.slug} value={p.slug}>{p.code} — {p.name} ({p.age})</option>
+                  <option key={p.slug} value={p.slug}>{p.code}: {p.name} ({p.age})</option>
                 ))}
               </select>
             </div>
@@ -404,7 +409,7 @@ export default function PPDBForm() {
                 <span className={`h-4 w-4 rounded-full border-2 ${form.jalur === 'Beasiswa Yatim & Dhuafa' ? 'border-warmred bg-warmred' : 'border-ink-mute'}`} />
               </div>
               <p className="mt-2 text-xs text-ink-soft">
-                Bebas biaya 100% uang pangkal, SPP, dan seragam bagi anak yatim.
+                Cakupan bantuan ditentukan setelah dokumen pendaftar diverifikasi oleh sekretariat.
               </p>
             </div>
           </div>

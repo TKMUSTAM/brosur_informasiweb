@@ -3,6 +3,7 @@ import { Plus, Trash2, Edit3, Image as ImageIcon, X } from 'lucide-react'
 import { useCMS } from '../../../hooks/useCMS'
 import type { GalleryItem } from '../../../types/cms'
 import { galleryCategories } from '../../../data/gallery'
+import ImageUploadField from './ImageUploadField'
 
 export default function GalleryManagementTab() {
   const { data, addGalleryItem, updateGalleryItem, deleteGalleryItem } = useCMS()
@@ -15,6 +16,9 @@ export default function GalleryManagementTab() {
     scene: 'quran',
     palette: 'green',
     image: '',
+    imageAlt: '',
+    description: '',
+    status: 'PUBLISHED',
   })
 
   const filtered = useMemo(() => {
@@ -30,6 +34,9 @@ export default function GalleryManagementTab() {
       scene: 'quran',
       palette: 'green',
       image: '',
+      imageAlt: '',
+      description: '',
+      status: 'PUBLISHED',
     })
     setIsModalOpen(true)
   }
@@ -42,6 +49,9 @@ export default function GalleryManagementTab() {
       scene: item.scene,
       palette: item.palette,
       image: item.image || '',
+      imageAlt: item.imageAlt || '',
+      description: item.description || '',
+      status: item.status || 'PUBLISHED',
     })
     setIsModalOpen(true)
   }
@@ -100,13 +110,14 @@ export default function GalleryManagementTab() {
             key={item.id}
             className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-primary/10 bg-white shadow-soft transition-all hover:border-primary/25 hover:shadow-lift"
           >
-            <div className="relative flex aspect-video items-center justify-center bg-cream/70 p-4">
-              <div className="flex flex-col items-center gap-1.5 text-center">
+            <div className="relative flex aspect-video items-center justify-center overflow-hidden bg-cream/70 p-4">
+              {item.image ? <img src={item.image} alt={item.imageAlt || item.title} className="absolute inset-0 h-full w-full object-cover" /> : null}
+              {!item.image && <div className="flex flex-col items-center gap-1.5 text-center">
                 <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-primary shadow-soft">
                   <ImageIcon className="h-6 w-6" />
                 </span>
                 <span className="text-[10px] font-bold text-ink-mute">Scene: {item.scene}</span>
-              </div>
+              </div>}
               <span className="absolute right-3 top-3 rounded-full bg-primary/85 px-2.5 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm">
                 {item.category}
               </span>
@@ -221,6 +232,26 @@ export default function GalleryManagementTab() {
                     <option value="mixed">Kombinasi</option>
                   </select>
                 </div>
+              </div>
+
+              <ImageUploadField
+                label="Foto dokumentasi"
+                value={formData.image || ''}
+                onChange={(image) => setFormData((prev) => ({ ...prev, image }))}
+                altValue={formData.imageAlt || ''}
+                onAltChange={(imageAlt) => setFormData((prev) => ({ ...prev, imageAlt }))}
+                recommended="Rasio 4:3 disarankan."
+                required
+              />
+
+              <div>
+                <label className="mb-1 block text-xs font-bold text-ink">Deskripsi singkat</label>
+                <textarea rows={2} value={formData.description || ''} onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))} className="w-full rounded-xl border border-primary/15 bg-cream/40 px-4 py-3 text-sm text-ink outline-none focus:border-primary" />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-bold text-ink">Status tayang</label>
+                <select value={formData.status || 'PUBLISHED'} onChange={(e) => setFormData((p) => ({ ...p, status: e.target.value as 'DRAFT' | 'PUBLISHED' }))} className="w-full rounded-xl border border-primary/15 bg-cream/40 px-4 py-3 text-sm text-ink outline-none focus:border-primary"><option value="PUBLISHED">Publikasikan</option><option value="DRAFT">Simpan sebagai draft</option></select>
               </div>
 
               <div className="flex justify-end gap-3 border-t border-primary/5 pt-4">

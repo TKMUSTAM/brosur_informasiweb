@@ -16,7 +16,7 @@ type SEOOptions = {
  */
 export function useSEO({ title, description = BASE_DESC, path = '/' }: SEOOptions) {
   useEffect(() => {
-    document.title = title === BASE_TITLE ? BASE_TITLE : `${title} — ${BASE_TITLE}`
+    document.title = title === BASE_TITLE ? BASE_TITLE : `${title} | ${BASE_TITLE}`
 
     const setMeta = (attr: 'name' | 'property', key: string, content: string) => {
       let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`)

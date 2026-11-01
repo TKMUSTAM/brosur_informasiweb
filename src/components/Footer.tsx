@@ -32,7 +32,7 @@ const footerColumns = [
     links: [
       { label: 'Informasi PPDB 2026/2027', href: '/ppdb' },
       { label: 'Formulir Pendaftaran Online', href: '/ppdb/daftar' },
-      { label: 'Rincian Biaya Transparan', href: '/ppdb#syarat' },
+      { label: 'Rincian Biaya Transparan', href: '/ppdb#biaya' },
       { label: 'Jadwal Gelombang & Syarat', href: '/ppdb#syarat' },
       { label: 'Berita & Kegiatan', href: '/berita' },
       { label: 'Galeri Foto Aktivitas', href: '/galeri' },
@@ -41,7 +41,7 @@ const footerColumns = [
   {
     title: 'Program Sosial & Khazanah',
     links: [
-      { label: 'Beasiswa Penuh Yatim & Dhuafa', href: '/yatim' },
+      { label: 'Bantuan Pendidikan Yatim & Dhuafa', href: '/yatim' },
       { label: 'Program Orang Tua Asuh', href: '/yatim/orangtua-asuh' },
       { label: 'Khazanah Konten Islami', href: '/konten-islami' },
       { label: 'Kumpulan Doa Harian', href: '/doa' },
@@ -56,9 +56,7 @@ export default function Footer() {
   const site = data.site
   return (
     <footer className="relative mt-auto overflow-hidden bg-primary-deep text-white">
-      {/* Ambient background glows */}
-      <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-primary-light/20 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-32 -left-16 h-96 w-96 rounded-full bg-gold/10 blur-3xl" />
+      {/* Authentic subtle emblem watermark */}
       <div className="pointer-events-none absolute right-6 top-10 opacity-[0.04]">
         <LogoEmblem size={260} light />
       </div>
@@ -99,7 +97,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noreferrer"
                   aria-label={s.label}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white transition-all hover:-translate-y-0.5 hover:bg-gold hover:text-primary-deep"
+                  className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 text-white transition-colors hover:bg-gold hover:text-primary-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
                 >
                   <s.icon className="h-4.5 w-4.5" />
                 </a>
@@ -118,7 +116,7 @@ export default function Footer() {
           {/* Navigation Columns */}
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
             {footerColumns.map((col) => (
-              <nav key={col.title} aria-label={`Footer — ${col.title}`}>
+              <nav key={col.title} aria-label={`Footer: ${col.title}`}>
                 <h3 className="mb-4 text-xs font-black uppercase tracking-wider text-gold-light">
                   {col.title}
                 </h3>
@@ -129,8 +127,8 @@ export default function Footer() {
                         to={l.href}
                         className="group inline-flex items-center gap-1 text-xs text-white/70 transition-colors hover:text-gold sm:text-sm"
                       >
-                        <ArrowUpRight className="h-3 w-3 opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
-                        <span className="-ml-3.5 transition-all group-hover:ml-0">{l.label}</span>
+                        <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
+                        <span>{l.href === '/ppdb' ? `Informasi PPDB ${data.pageContent.ppdb.academicYear}` : l.label}</span>
                       </Link>
                     </li>
                   ))}
@@ -225,6 +223,22 @@ export default function Footer() {
           <p className="text-center text-xs text-white/60 sm:text-left">
             © {new Date().getFullYear()} {site.name}. Seluruh Hak Cipta Dilindungi.
           </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-semibold">
+            <Link to="/admin" className="text-white/70 hover:text-gold transition-colors">
+              Portal Admin CMS
+            </Link>
+            <span className="text-white/20">&bull;</span>
+            <a
+              href="http://localhost:3000"
+              target="_blank"
+              rel="noreferrer"
+              className="text-white/70 hover:text-gold transition-colors"
+            >
+              Sistem Admin Sekolah &rarr;
+            </a>
+          </div>
+
           <p className="flex items-center gap-1.5 text-xs text-gold-light">
             <span>{site.tagline}</span>
             <Heart className="h-3.5 w-3.5 fill-gold text-gold" />

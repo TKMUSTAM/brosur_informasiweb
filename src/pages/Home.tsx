@@ -10,15 +10,16 @@ import WelcomeSection from '../sections/WelcomeSection'
 import NewsSection from '../sections/NewsSection'
 import GallerySection from '../sections/GallerySection'
 import IslamicContentSection from '../sections/IslamicContentSection'
-import TestimonialsSection from '../sections/TestimonialsSection'
 import CTASection from '../components/CTASection'
-import { site } from '../data/site'
+import { useCMS } from '../hooks/useCMS'
 
 export default function Home() {
+  const { data } = useCMS()
+  const { site } = data
   useSEO({
-    title: `${site.name} — Membentuk Generasi Qur’ani, Beradab & Cerdas Holistik`,
+    title: `${site.name} | Membentuk Generasi Qur’ani, Beradab & Cerdas Holistik`,
     description:
-      'Lembaga Pendidikan Islam Terakreditasi A: Playgroup (KB), TK A, TK B, TPA Tahfidz, serta program beasiswa penuh yatim piatu. Daftarkan buah hati Anda sekarang.',
+      'Informasi program Playgroup (KB), TK A, TK B, TPA Tahfidz, kegiatan sekolah, PPDB, serta bantuan pendidikan yatim dan dhuafa di Yayasan Al-Mustam.',
     path: '/',
   })
 
@@ -35,14 +36,13 @@ export default function Home() {
       <NewsSection />
       <GallerySection />
       <IslamicContentSection />
-      <TestimonialsSection />
       <CTASection
         title={
           <>
             Mari Bentuk Generasi <span className="text-gold">Qur’ani &amp; Berakhlaqul Karimah.</span>
           </>
         }
-        description="Amankan kursi pendaftaran putra-putri Anda untuk Tahun Ajaran 2026/2027 atau dukung beasiswa anak yatim."
+        description={`Tanyakan ketersediaan kuota PPDB Tahun Ajaran ${data.pageContent.ppdb.academicYear} melalui kanal resmi sekolah.`}
         primaryLabel="Daftar PPDB Online"
         primaryTo="/ppdb/daftar"
         secondaryLabel="Konsultasi WhatsApp"

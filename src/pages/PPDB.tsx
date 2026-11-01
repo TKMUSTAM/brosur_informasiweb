@@ -6,8 +6,7 @@ import Reveal from '../components/Reveal'
 import CTASection from '../components/CTASection'
 import { ButtonLink } from '../components/Buttons'
 import { useSEO } from '../hooks/useSEO'
-import { programs } from '../data/programs'
-import { site } from '../data/site'
+import { useCMS } from '../hooks/useCMS'
 
 const timeline = [
   { no: '01', title: 'Isi Formulir Online', desc: 'Isi formulir online di website atau kunjungi sekretariat sekolah.' },
@@ -15,15 +14,6 @@ const timeline = [
   { no: '03', title: 'Observasi Ceria Anak', desc: 'Observasi ramah anak & konsultasi tumbuh kembang bersama psikolog/guru.' },
   { no: '04', title: 'Pengumuman & Daftar Ulang', desc: 'Pemberitahuan hasil penempatan kelas dan fitting seragam sekolah.' },
   { no: '05', title: 'Orientasi & Masuk Sekolah', desc: 'Kegiatan Masa Pengenalan Lingkungan Sekolah (MPLS) yang menyenangkan.' },
-]
-
-const requirements = [
-  'Fotokopi Kartu Keluarga (KK) 2 lembar',
-  'Fotokopi Akta Kelahiran Anak 2 lembar',
-  'Pas foto berwarna anak ukuran 3×4 (3 lembar)',
-  'Fotokopi KTP kedua orang tua / wali',
-  'Mengisi formulir pendaftaran dan surat pernyataan orang tua',
-  'Surat Keterangan Kematian Orang Tua (Khusus pendaftar Jalur Beasiswa Yatim)',
 ]
 
 const feeBreakdown = [
@@ -35,9 +25,14 @@ const feeBreakdown = [
 ]
 
 export default function PPDB() {
+  const { data } = useCMS()
+  const { site, programs } = data
+  const ppdb = data.pageContent.ppdb
+  const requirements = ppdb.requirements
+  const startYear = Number(ppdb.academicYear.split('/')[0]) || new Date().getFullYear()
   useSEO({
-    title: 'PPDB 2026/2027 — Pendaftaran Siswa Baru TK Islam Al-Mustam',
-    description: 'Penerimaan Peserta Didik Baru (PPDB) 2026/2027 KB, TK A, TK B, dan TPA Al-Mustam. Rincian biaya transparan dan beasiswa yatim penuh.',
+    title: `PPDB ${ppdb.academicYear}: Pendaftaran Siswa Baru TK Islam Al-Mustam`,
+    description: ppdb.description,
     path: '/ppdb',
   })
 
@@ -48,8 +43,7 @@ export default function PPDB() {
   const handleCalculateAge = () => {
     if (!birthDate) return
     const birth = new Date(birthDate)
-    // Hitung per 1 Juli 2026 (Tahun ajaran baru)
-    const targetDate = new Date('2026-07-01')
+    const targetDate = new Date(`${startYear}-07-01`)
     
     let years = targetDate.getFullYear() - birth.getFullYear()
     let months = targetDate.getMonth() - birth.getMonth()
@@ -87,15 +81,13 @@ export default function PPDB() {
   return (
     <>
       <PageHeader
-        eyebrow="PPDB Tahun Ajaran 2026/2027"
-        title="Bergabung Bersama Keluarga Besar TK Islam Al-Mustam"
-        description="Penerimaan Peserta Didik Baru (KB, TK A, TK B, & TPA) telah dibuka. Tempat terbatas untuk menjaga rasio pendampingan ideal 1:7."
-        crumbs={[{ label: 'PPDB 2026/2027' }]}
+        eyebrow={`PPDB Tahun Ajaran ${ppdb.academicYear}`}
+        title={ppdb.title}
+        description={ppdb.description}
+        crumbs={[{ label: `PPDB ${ppdb.academicYear}` }]}
       >
         <div className="mt-8 flex flex-wrap gap-3">
-          <ButtonLink to="/ppdb/daftar" variant="gold" size="lg" withArrow className="shadow-gold">
-            Daftar Online Sekarang
-          </ButtonLink>
+          {ppdb.registrationOpen && <ButtonLink to="/ppdb/daftar" variant="gold" size="lg" withArrow className="shadow-gold">Daftar Online Sekarang</ButtonLink>}
           <a
             href={`https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent('Assalamualaikum, saya ingin menanyakan brosur dan panduan PPDB TK Islam Al-Mustam.')}`}
             target="_blank"
@@ -121,7 +113,7 @@ export default function PPDB() {
                   Kalkulator Usia Masuk Sekolah
                 </h2>
                 <p className="text-xs text-ink-mute sm:text-sm">
-                  Cek jenjang kelas yang paling cocok untuk ananda per 1 Juli 2026
+                  Cek jenjang kelas yang paling cocok untuk ananda per 1 Juli {startYear}
                 </p>
               </div>
             </div>
@@ -154,7 +146,7 @@ export default function PPDB() {
               <div className="mt-6 rounded-2xl border border-primary-mint/30 bg-softgreen p-5">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-xs font-semibold text-ink-mute">Usia ananda per Juli 2026:</p>
+                    <p className="text-xs font-semibold text-ink-mute">Usia ananda per Juli {startYear}:</p>
                     <p className="font-heading text-lg font-extrabold text-primary">{calcResult.ageStr}</p>
                     <p className="mt-1 text-sm font-bold text-primary-light">{calcResult.recommendation}</p>
                   </div>
@@ -214,7 +206,7 @@ export default function PPDB() {
             {/* Tabel Rincian Biaya */}
             <Reveal className="overflow-hidden rounded-3xl border border-primary/10 bg-white shadow-soft">
               <div className="border-b border-primary/10 bg-primary px-6 py-4 text-white">
-                <h3 className="font-heading text-base font-extrabold">Struktur Biaya PPDB 2026/2027</h3>
+                <h3 className="font-heading text-base font-extrabold">Struktur Biaya PPDB {ppdb.academicYear}</h3>
                 <p className="text-xs text-white/80">Berlaku untuk jenjang KB, TK A, dan TK B</p>
               </div>
 
@@ -251,27 +243,27 @@ export default function PPDB() {
                       Program Sosial Yayasan
                     </span>
                     <h3 className="mt-1 font-heading text-xl font-extrabold text-warmred-dark">
-                      Beasiswa Penuh Yatim &amp; Dhuafa (100% Bebas Biaya)
+                      Jalur Bantuan Pendidikan Yatim &amp; Dhuafa
                     </h3>
                   </div>
                 </div>
 
                 <p className="mt-4 text-sm leading-relaxed text-ink-soft">
-                  Yayasan Al-Mustam berkomitmen bahwa <strong>tidak boleh ada anak yatim atau dhuafa yang putus sekolah</strong> karena keterbatasan biaya. Seluruh biaya pendaftaran, uang pangkal, seragam, buku, dan SPP bulanan ditanggung 100% penuh oleh dana beasiswa yayasan.
+                  Calon peserta dapat mengajukan bantuan pendidikan dengan melengkapi dokumen pendukung. Jenis bantuan ditentukan setelah verifikasi dan menyesuaikan ketersediaan dana program.
                 </p>
 
                 <ul className="mt-4 space-y-2 text-xs font-semibold text-ink">
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-warmred" />
-                    <span>Gratis Biaya Pendaftaran &amp; Observasi</span>
+                    <span>Pengajuan diperiksa oleh sekretariat</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-warmred" />
-                    <span>Gratis 100% Uang Pangkal &amp; SPP Bulanan</span>
+                    <span>Cakupan bantuan dijelaskan setelah verifikasi</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-warmred" />
-                    <span>Diberikan Paket 4 Setel Seragam &amp; Buku Gratis</span>
+                    <span>Keputusan disampaikan melalui kanal resmi sekolah</span>
                   </li>
                 </ul>
               </div>
@@ -347,7 +339,7 @@ export default function PPDB() {
           {/* Jadwal Gelombang */}
           <Reveal delay={100} className="rounded-3xl border border-primary/10 bg-white p-8 shadow-soft sm:p-10">
             <h2 className="font-heading text-xl font-extrabold text-primary">Jadwal Gelombang Pendaftaran</h2>
-            <p className="mt-1 text-xs text-ink-mute">Tahun Ajaran 2026/2027</p>
+            <p className="mt-1 text-xs text-ink-mute">Tahun Ajaran {ppdb.academicYear}</p>
 
             <dl className="mt-6 space-y-4">
               {[

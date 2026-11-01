@@ -19,9 +19,7 @@ export default function PageHeader({ eyebrow, title, description, crumbs, varian
   const isGreen = variant === 'green'
   return (
     <section className={`relative overflow-hidden ${isGreen ? 'bg-primary text-white' : 'bg-cream'}`}>
-      {/* dekorasi */}
-      <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-none bg-primary-light/25 blur-3xl" />
-      <div className="pointer-events-none absolute -left-24 bottom-0 h-64 w-64 rounded-none bg-gold/15 blur-3xl" />
+      {/* Authentic subtle emblem watermark */}
       <div className="pointer-events-none absolute right-[12%] top-10 hidden opacity-10 md:block">
         <LogoEmblem size={140} light={isGreen} />
       </div>

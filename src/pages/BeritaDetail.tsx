@@ -11,7 +11,7 @@ import { sceneForNewsSlug } from '../lib/scenes'
 
 export default function BeritaDetail() {
   const { data } = useCMS()
-  const news = data.news
+  const news = data.news.filter((item) => item.status !== 'DRAFT')
   const { slug } = useParams()
   const item = news.find((n) => n.slug === slug)
 
@@ -49,7 +49,7 @@ export default function BeritaDetail() {
               image={item.image}
               scene={sceneForNewsSlug(item.slug)}
               palette={item.color}
-              alt={item.title}
+              alt={item.imageAlt || item.title}
               className="aspect-[16/9] w-full"
             />
           </Reveal>
