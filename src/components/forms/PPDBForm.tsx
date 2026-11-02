@@ -3,6 +3,7 @@ import { Check, Copy, MessageCircle, ArrowRight, ShieldCheck, User, Users, FileC
 import { Button } from '../Buttons'
 import { useCMS } from '../../hooks/useCMS'
 import { programs as defaultPrograms } from '../../data/programs'
+import { submitPpdbRegistration } from '../../lib/ppdbApi'
 
 type FormState = {
   // Calon siswa
@@ -46,7 +47,7 @@ const empty: FormState = {
 }
 
 export default function PPDBForm() {
-  const { data, addPPDBApplicant } = useCMS()
+  const { data } = useCMS()
   const site = data.site
   const programs = data.programs.length > 0 ? data.programs : defaultPrograms
   const ppdb = data.pageContent.ppdb
@@ -55,6 +56,8 @@ export default function PPDBForm() {
   const [form, setForm] = useState<FormState>(empty)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [regNo, setRegNo] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const set = (key: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [key]: e.target.value }))
@@ -91,35 +94,35 @@ export default function PPDBForm() {
     }
   }
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!validateStep1() || !validateStep2()) return
+    if (isSubmitting || !validateStep1() || !validateStep2()) return
 
-    // Generate Nomor Pendaftaran
-    const randomCode = Math.floor(1000 + Math.random() * 9000)
-    const progCode = form.program.toUpperCase()
-    const no = `PPDB-MSTM-${new Date().getFullYear()}-${progCode}-${randomCode}`
-    
-    // Save to CMS Store
-    addPPDBApplicant({
-      id: no,
-      name: form.nama,
-      nik: form.nik,
-      birthPlace: form.tempatLahir,
-      birthDate: form.tanggalLahir,
-      gender: form.jenisKelamin,
-      address: form.alamatOrtu || form.alamat,
-      previousSchool: form.asalSekolah,
-      program: selectedProgramName,
-      track: form.jalur,
-      parentFather: form.namaAyah,
-      parentMother: form.namaIbu,
-      whatsapp: form.whatsapp,
-      email: form.email,
-      status: 'Baru',
-    })
-
-    setRegNo(no)
+    setIsSubmitting(true)
+    setSubmitError(null)
+    try {
+      const result = await submitPpdbRegistration({
+        name: form.nama,
+        nik: form.nik,
+        birthPlace: form.tempatLahir,
+        birthDate: form.tanggalLahir,
+        gender: form.jenisKelamin,
+        address: form.alamatOrtu || form.alamat,
+        previousSchool: form.asalSekolah,
+        program: selectedProgramName,
+        track: form.jalur,
+        parentFather: form.namaAyah,
+        parentMother: form.namaIbu,
+        whatsapp: form.whatsapp,
+        email: form.email,
+        guardianAddress: form.alamatOrtu,
+      })
+      setRegNo(result.applicationNumber)
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Pendaftaran belum dapat dikirim.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const selectedProgramName = programs.find((p) => p.slug === form.program)?.name ?? form.program
@@ -446,10 +449,21 @@ export default function PPDBForm() {
             <Button type="button" variant="ghost" size="lg" onClick={() => setStep(2)}>
               Kembali
             </Button>
-            <Button type="submit" variant="primary" size="lg" className="shadow-lift">
-              Kirim Formulir Pendaftaran
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              className="shadow-lift disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Menyimpan Pendaftaran...' : 'Kirim Formulir Pendaftaran'}
             </Button>
           </div>
+          {submitError && (
+            <p role="alert" className="rounded-2xl border border-warmred/30 bg-softred/40 px-4 py-3 text-sm font-semibold text-warmred">
+              {submitError}
+            </p>
+          )}
         </div>
       )}
 
