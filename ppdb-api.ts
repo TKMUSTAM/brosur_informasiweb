@@ -498,6 +498,20 @@ app.delete("/registrations/:id", async (c) => {
       await client.query("ROLLBACK");
       return c.json({ error: "Pendaftaran tidak ditemukan." }, 404);
     }
+    const placedStudent = await client.query(
+      "SELECT id FROM students WHERE source_application_id = $1",
+      [id],
+    );
+    for (const student of placedStudent.rows) {
+      await client.query("DELETE FROM class_enrollments WHERE student_id = $1", [student.id]);
+      await client.query("DELETE FROM student_guardians WHERE student_id = $1", [student.id]);
+      await client.query("DELETE FROM attendance_records WHERE student_id = $1", [student.id]);
+      await client.query("DELETE FROM student_assessments WHERE student_id = $1", [student.id]);
+      await client.query("DELETE FROM report_cards WHERE student_id = $1", [student.id]);
+      await client.query("DELETE FROM bills WHERE student_id = $1", [student.id]);
+      await client.query("DELETE FROM student_documents WHERE student_id = $1", [student.id]);
+      await client.query("DELETE FROM students WHERE id = $1", [student.id]);
+    }
     await client.query("DELETE FROM admission_status_histories WHERE application_id = $1", [id]);
     await client.query("DELETE FROM admission_documents WHERE application_id = $1", [id]);
     await client.query("DELETE FROM admission_applications WHERE id = $1", [id]);
