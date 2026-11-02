@@ -404,6 +404,48 @@ app.patch("/registrations/:id", async (c) => {
     const note = cleanText(body.decisionNote, 1000) || null;
     const metadata = JSON.stringify(body.metadata ?? {});
     if (body.action === "PLACE") {
+      const className = cleanText(body.metadata?.className, 80);
+      const classSlug = cleanText(body.metadata?.classSlug, 80);
+      const nisn = cleanText(body.metadata?.nisn, 40);
+      const nitkm = cleanText(body.metadata?.nitkm, 40);
+      if (!className || !nitkm) {
+        await client.query("ROLLBACK");
+        return c.json({ error: "Kelas dan nomor induk wajib diisi untuk penempatan." }, 400);
+      }
+      const details = await client.query(
+        `SELECT a.candidate_name, a.candidate_gender, a.candidate_birth_place, a.candidate_birth_date,
+                a.candidate_address, a.candidate_nik, a.primary_guardian_id, g.full_name, g.phone,
+                c.id AS class_id
+         FROM admission_applications a
+         JOIN guardians g ON g.id = a.primary_guardian_id
+         LEFT JOIN classes c ON c.class_name = $2 OR c.class_name = $3
+         WHERE a.id = $1 LIMIT 1`,
+        [id, className, classSlug],
+      );
+      if (!details.rows[0]?.class_id) {
+        await client.query("ROLLBACK");
+        return c.json({ error: "Kelas tujuan belum tersedia di master data." }, 409);
+      }
+      const student = await client.query(
+        `INSERT INTO students (student_number, source_application_id, full_name, gender, birth_place, birth_date, address, admission_date, notes)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, $8)
+         ON CONFLICT (source_application_id) DO UPDATE SET student_number = EXCLUDED.student_number, updated_at = NOW()
+         RETURNING id`,
+        [nitkm, id, details.rows[0].candidate_name, details.rows[0].candidate_gender, details.rows[0].candidate_birth_place,
+          details.rows[0].candidate_birth_date, details.rows[0].candidate_address, `NISN: ${nisn || "-"}`],
+      );
+      await client.query(
+        `INSERT INTO student_guardians (student_id, guardian_id, relationship, is_primary_contact)
+         VALUES ($1, $2, 'WALI', TRUE)
+         ON CONFLICT (student_id, guardian_id) DO UPDATE SET is_primary_contact = TRUE`,
+        [student.rows[0].id, details.rows[0].primary_guardian_id],
+      );
+      await client.query(
+        `INSERT INTO class_enrollments (student_id, class_id, enrolled_at, status)
+         VALUES ($1, $2, CURRENT_DATE, 'ACTIVE')
+         ON CONFLICT DO NOTHING`,
+        [student.rows[0].id, details.rows[0].class_id],
+      );
       await client.query(
         `UPDATE admission_applications SET application_metadata = application_metadata || $2::jsonb, updated_at = NOW(), decision_note = COALESCE($3, decision_note) WHERE id = $1`,
         [id, metadata, note],
