@@ -15,6 +15,7 @@ import OrangTuaAsuh from './pages/OrangTuaAsuh'
 import Transparansi from './pages/Transparansi'
 import PPDB from './pages/PPDB'
 import PPDBDaftar from './pages/PPDBDaftar'
+import PPDBStatus from './pages/PPDBStatus'
 import Berita from './pages/Berita'
 import BeritaDetail from './pages/BeritaDetail'
 import Galeri from './pages/Galeri'
@@ -45,6 +46,7 @@ export default function App() {
         <Route path="/yatim/transparansi" element={<Transparansi />} />
         <Route path="/ppdb" element={<PPDB />} />
         <Route path="/ppdb/daftar" element={<PPDBDaftar />} />
+        <Route path="/ppdb/status" element={<PPDBStatus />} />
         <Route path="/berita" element={<Berita />} />
         <Route path="/berita/:slug" element={<BeritaDetail />} />
         <Route path="/galeri" element={<Galeri />} />

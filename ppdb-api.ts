@@ -155,13 +155,19 @@ const applicationSelect = `
     CASE
       WHEN a.status IN ('ACCEPTED', 'COMPLETED') THEN 'Lulus'
       WHEN a.status = 'REJECTED' THEN 'Tidak Lulus'
-      ELSE 'Menunggu Seleksi'
+      WHEN a.status = 'SUBMITTED' THEN 'Menunggu Verifikasi'
+      WHEN a.status = 'NEEDS_REVISION' THEN 'Perlu Perbaikan'
+      WHEN a.status = 'UNDER_REVIEW' THEN 'Menunggu Penetapan'
+      WHEN a.status = 'WAITLISTED' THEN 'Daftar Tunggu'
+      ELSE 'Menunggu Verifikasi'
     END AS "statusSeleksi",
     to_char(a.created_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD') AS "tanggalDaftar",
     COALESCE(a.application_metadata->>'nisn', '') AS nisn,
     COALESCE(a.application_metadata->>'nitkm', '') AS nitkm,
     COALESCE(a.application_metadata->>'className', '') AS "kelasTujuan",
     COALESCE(a.decision_note, 'Formulir pendaftaran daring diterima') AS keterangan,
+    a.verification_note AS "verificationNote",
+    COALESCE(a.missing_documents, '[]'::jsonb) AS "missingDocuments",
     a.status AS "databaseStatus",
     a.target_program AS program,
     a.previous_school AS "previousSchool",
@@ -330,18 +336,45 @@ app.get("/registrations", async (c) => {
   }
 });
 
+app.get("/status/:applicationNumber", async (c) => {
+  const applicationNumber = cleanText(c.req.param("applicationNumber"), 80);
+  const phone = cleanText(c.req.query("phone"), 30).replace(/[^+\d]/g, "");
+  if (!applicationNumber || phone.replace(/\D/g, "").length < 9) {
+    return c.json({ error: "Nomor pendaftaran dan WhatsApp wajib diisi." }, 400);
+  }
+  const result = await pool.query(
+    `${applicationSelect} WHERE a.application_number = $1 AND g.phone = $2`,
+    [applicationNumber, phone],
+  );
+  if (!result.rows[0]) return c.json({ error: "Data pendaftaran tidak ditemukan." }, 404);
+  const row = result.rows[0];
+  return c.json({
+    applicationNumber: row.noPendaftaran,
+    candidateName: row.nama,
+    status: row.statusSeleksi,
+    databaseStatus: row.databaseStatus,
+    verificationNote: row.verificationNote,
+    missingDocuments: row.missingDocuments,
+    decisionNote: row.keterangan,
+    className: row.kelasTujuan || null,
+    updatedAt: row.tanggalDaftar,
+  });
+});
+
 app.patch("/registrations/:id", async (c) => {
   if (!hasAdminAccess(c.req.raw)) return c.json({ error: "Unauthorized" }, 401);
   const id = c.req.param("id");
   if (!/^[0-9a-f-]{36}$/i.test(id)) return c.json({ error: "ID pendaftaran tidak valid." }, 400);
 
   const body = await c.req.json<{
+    action?: "VERIFY" | "DECIDE" | "PLACE";
     status?: string;
     decisionNote?: string;
     metadata?: Record<string, unknown>;
+    missingDocuments?: string[];
   }>();
   const allowedStatuses = new Set(["UNDER_REVIEW", "ACCEPTED", "REJECTED", "WAITLISTED", "NEEDS_REVISION"]);
-  if (!body.status || !allowedStatuses.has(body.status)) return c.json({ error: "Status tidak valid." }, 400);
+  if (!body.action || !body.status || !allowedStatuses.has(body.status)) return c.json({ error: "Aksi dan status tidak valid." }, 400);
 
   const client = await pool.connect();
   try {
@@ -355,22 +388,45 @@ app.patch("/registrations/:id", async (c) => {
       return c.json({ error: "Pendaftaran tidak ditemukan." }, 404);
     }
 
+    const previousStatus = current.rows[0].status as string;
+    if (body.action === "VERIFY" && !["SUBMITTED", "NEEDS_REVISION"].includes(previousStatus)) {
+      await client.query("ROLLBACK"); return c.json({ error: "Data ini sudah diverifikasi." }, 409);
+    }
+    if (body.action === "DECIDE" && previousStatus !== "UNDER_REVIEW") {
+      await client.query("ROLLBACK"); return c.json({ error: "Calon siswa belum menunggu penetapan." }, 409);
+    }
+    if (body.action === "PLACE" && previousStatus !== "ACCEPTED") {
+      await client.query("ROLLBACK"); return c.json({ error: "Penempatan hanya untuk calon yang lulus." }, 409);
+    }
+    if (body.action === "VERIFY" && body.status === "NEEDS_REVISION" && !body.missingDocuments?.length) {
+      await client.query("ROLLBACK"); return c.json({ error: "Daftar kekurangan berkas wajib diisi." }, 400);
+    }
     const note = cleanText(body.decisionNote, 1000) || null;
     const metadata = JSON.stringify(body.metadata ?? {});
+    if (body.action === "PLACE") {
+      await client.query(
+        `UPDATE admission_applications SET application_metadata = application_metadata || $2::jsonb, updated_at = NOW(), decision_note = COALESCE($3, decision_note) WHERE id = $1`,
+        [id, metadata, note],
+      );
+    } else {
     await client.query(
       `UPDATE admission_applications
        SET status = $2::varchar(30),
            decision_at = CASE WHEN $2::varchar(30) IN ('ACCEPTED', 'REJECTED') THEN NOW() ELSE decision_at END,
+           verified_at = CASE WHEN $5 = 'VERIFY' THEN NOW() ELSE verified_at END,
+           verification_note = CASE WHEN $5 = 'VERIFY' THEN $3 ELSE verification_note END,
+           missing_documents = CASE WHEN $5 = 'VERIFY' THEN $6::jsonb ELSE missing_documents END,
            decision_note = COALESCE($3, decision_note),
            application_metadata = application_metadata || $4::jsonb,
            updated_at = NOW()
        WHERE id = $1`,
-      [id, body.status, note, metadata],
+      [id, body.status, note, metadata, body.action, JSON.stringify(body.missingDocuments ?? [])],
     );
+    }
     await client.query(
       `INSERT INTO admission_status_histories (application_id, previous_status, new_status, note)
        VALUES ($1, $2, $3, $4)`,
-      [id, current.rows[0].status, body.status, note],
+      [id, previousStatus, body.action === "PLACE" ? previousStatus : body.status, note || (body.action === "PLACE" ? "Penempatan kelas dan nomor induk ditetapkan admin." : null)],
     );
     const application = await findApplication(client, id);
     await client.query("COMMIT");

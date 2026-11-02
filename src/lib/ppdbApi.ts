@@ -49,3 +49,10 @@ export async function submitPpdbRegistration(
 
   return result as PpdbRegistrationResult
 }
+
+export async function lookupPpdbStatus(applicationNumber: string, phone: string) {
+  const response = await fetch(`${getApiUrl()}/status/${encodeURIComponent(applicationNumber)}?phone=${encodeURIComponent(phone)}`)
+  const result = await response.json().catch(() => null) as { error?: string; status?: string; candidateName?: string; missingDocuments?: string[]; decisionNote?: string; className?: string | null } | null
+  if (!response.ok || !result?.status) throw new Error(result?.error || 'Status pendaftaran belum dapat dimuat.')
+  return result
+}
