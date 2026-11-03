@@ -1,8 +1,8 @@
 import { defineConfig } from "@neon/config/v1";
 
 export default defineConfig({
-  auth: false,
-  aiGateway: true,
+  auth: true,
+  aiGateway: false,
   functions: {
     ppdbapi: {
       name: "TK Al-Mustam PPDB API",

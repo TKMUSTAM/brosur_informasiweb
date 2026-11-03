@@ -378,6 +378,41 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Toast Notifications
   const [toasts, setToasts] = useState<ToastNotification[]>([])
 
+  useEffect(() => {
+    const baseUrl = import.meta.env.VITE_PPDB_API_URL?.replace(/\/$/, '')
+    if (!baseUrl) return
+    const controller = new AbortController()
+
+    fetch(`${baseUrl}/cms/public`, { signal: controller.signal })
+      .then(async (response) => {
+        const result = await response.json() as {
+          sections?: Array<{ sectionKey: keyof PageContent; content: Record<string, unknown>; updatedAt: string }>
+        }
+        if (!response.ok || !result.sections) throw new Error('Konten publik tidak tersedia')
+        const sections = result.sections
+        setData((current) => {
+          const pageContent = { ...current.pageContent }
+          let lastUpdated = current.lastUpdated
+          for (const section of sections) {
+            if (section.sectionKey in pageContent) {
+              pageContent[section.sectionKey] = {
+                ...pageContent[section.sectionKey],
+                ...section.content,
+              } as never
+              lastUpdated = section.updatedAt || lastUpdated
+            }
+          }
+          return { ...current, pageContent, lastUpdated }
+        })
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === 'AbortError') return
+        console.error('Konten Neon belum dapat dimuat, menggunakan konten lokal.', error)
+      })
+
+    return () => controller.abort()
+  }, [])
+
   const showToast = useCallback((message: string, type: 'success' | 'info' | 'error' = 'success') => {
     const id = Math.random().toString(36).substring(2, 9)
     setToasts((prev) => [...prev, { id, type, message }])

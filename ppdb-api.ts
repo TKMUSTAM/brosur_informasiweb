@@ -18,6 +18,7 @@ const expectedAdminKey = Buffer.from(ADMIN_API_KEY);
 const allowedOrigins = new Set([
   "https://yayasanmustam.id",
   "https://www.yayasanmustam.id",
+  "https://brosur-informasiweb-green.vercel.app",
   "http://localhost:5173",
   "http://127.0.0.1:5173",
 ]);
@@ -183,6 +184,20 @@ async function findApplication(client: PoolClient | typeof pool, id: string) {
 
 app.get("/", (c) => c.json({ service: "TK Al-Mustam PPDB API", status: "ok" }));
 
+app.get("/cms/public", async (c) => {
+  try {
+    const result = await pool.query(`
+      SELECT section_key AS "sectionKey", title, content, updated_at AS "updatedAt"
+      FROM cms_sections
+      WHERE publication_status = 'PUBLISHED'
+      ORDER BY display_order, section_key
+    `);
+    return c.json({ sections: result.rows });
+  } catch {
+    return c.json({ error: "Konten website belum dapat dimuat." }, 503);
+  }
+});
+
 app.get("/health", async (c) => {
   const postgres = await pool.query("SELECT 1 AS ok").then(() => "ok").catch(() => "error");
 
@@ -202,7 +217,7 @@ app.get("/health", async (c) => {
       }).catch(() => "error")
     : "not_configured";
 
-  const ok = postgres === "ok" && objectStorage === "ok" && aiGateway === "ok";
+  const ok = postgres === "ok" && objectStorage === "ok";
   return c.json({ ok, services: { postgres, objectStorage, aiGateway } }, ok ? 200 : 503);
 });
 

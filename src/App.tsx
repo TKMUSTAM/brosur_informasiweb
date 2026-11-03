@@ -23,8 +23,13 @@ import KontenIslami from './pages/KontenIslami'
 import Doa from './pages/Doa'
 import JadwalSholat from './pages/JadwalSholat'
 import Kontak from './pages/Kontak'
-import AdminDashboard from './pages/admin/AdminDashboard'
 import NotFound from './pages/NotFound'
+
+function AdminPortalRedirect() {
+  const target = import.meta.env.VITE_ADMIN_PORTAL_URL || 'http://localhost:3000'
+  window.location.replace(target)
+  return <main className="grid min-h-dvh place-items-center bg-cream px-6 text-center text-primary">Membuka portal admin...</main>
+}
 
 export default function App() {
   return (
@@ -56,7 +61,7 @@ export default function App() {
         <Route path="/kontak" element={<Kontak />} />
         <Route path="*" element={<NotFound />} />
       </Route>
-      <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/admin" element={<AdminPortalRedirect />} />
     </Routes>
   )
 }
