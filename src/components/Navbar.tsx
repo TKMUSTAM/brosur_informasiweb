@@ -422,7 +422,7 @@ export default function Navbar() {
                 Portal Admin CMS &rarr;
               </Link>
               <a
-                href="http://localhost:3000"
+                href={import.meta.env.VITE_ADMIN_PORTAL_URL || 'http://localhost:3000'}
                 target="_blank"
                 rel="noreferrer"
                 className="font-semibold text-ink-mute hover:text-primary"

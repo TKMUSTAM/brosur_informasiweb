@@ -144,7 +144,7 @@ export default function AdminLoginModal() {
               &larr; Halaman Publik
             </a>
             <a
-              href="http://localhost:3000"
+              href={import.meta.env.VITE_ADMIN_PORTAL_URL || 'http://localhost:3000'}
               target="_blank"
               rel="noreferrer"
               className="font-bold text-ink-mute hover:text-primary"

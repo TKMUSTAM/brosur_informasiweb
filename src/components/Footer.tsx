@@ -230,7 +230,7 @@ export default function Footer() {
             </Link>
             <span className="text-white/20">&bull;</span>
             <a
-              href="http://localhost:3000"
+              href={import.meta.env.VITE_ADMIN_PORTAL_URL || 'http://localhost:3000'}
               target="_blank"
               rel="noreferrer"
               className="text-white/70 hover:text-gold transition-colors"
