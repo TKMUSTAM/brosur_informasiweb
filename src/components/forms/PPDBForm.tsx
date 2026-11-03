@@ -3,7 +3,7 @@ import { Check, Copy, MessageCircle, ArrowRight, ShieldCheck, User, Users, FileC
 import { Button } from '../Buttons'
 import { useCMS } from '../../hooks/useCMS'
 import { programs as defaultPrograms } from '../../data/programs'
-import { submitPpdbRegistration } from '../../lib/ppdbApi'
+import { submitPpdbDocument, submitPpdbRegistration, type PpdbDocumentType } from '../../lib/ppdbApi'
 
 type FormState = {
   // Calon siswa
@@ -22,9 +22,17 @@ type FormState = {
   whatsapp: string
   email: string
   alamatOrtu: string
-  // Dokumen
-  kk: string
-  akta: string
+  nomorKk: string
+  nikAyah: string
+  pekerjaanAyah: string
+  pendidikanAyah: string
+  nikIbu: string
+  pekerjaanIbu: string
+  pendidikanIbu: string
+  anakKe: string
+  jumlahSaudara: string
+  golonganDarah: string
+  catatanMedis: string
 }
 
 const empty: FormState = {
@@ -42,9 +50,25 @@ const empty: FormState = {
   whatsapp: '',
   email: '',
   alamatOrtu: '',
-  kk: '',
-  akta: '',
+  nomorKk: '',
+  nikAyah: '',
+  pekerjaanAyah: '',
+  pendidikanAyah: '',
+  nikIbu: '',
+  pekerjaanIbu: '',
+  pendidikanIbu: '',
+  anakKe: '',
+  jumlahSaudara: '',
+  golonganDarah: '',
+  catatanMedis: '',
 }
+
+const DOCUMENT_FIELDS: Array<{ type: PpdbDocumentType; label: string; required: boolean }> = [
+  { type: 'KARTU_KELUARGA', label: 'Kartu Keluarga', required: true },
+  { type: 'AKTA_KELAHIRAN', label: 'Akta kelahiran anak', required: true },
+  { type: 'KTP_ORANG_TUA', label: 'KTP orang tua atau wali', required: false },
+  { type: 'PAS_FOTO', label: 'Pas foto anak', required: false },
+]
 
 export default function PPDBForm() {
   const { data } = useCMS()
@@ -58,6 +82,7 @@ export default function PPDBForm() {
   const [regNo, setRegNo] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [documents, setDocuments] = useState<Partial<Record<PpdbDocumentType, File>>>({})
 
   const set = (key: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [key]: e.target.value }))
@@ -80,6 +105,7 @@ export default function PPDBForm() {
     } else if (form.whatsapp.length < 9) {
       errs.whatsapp = 'Nomor WhatsApp tidak valid'
     }
+    if (!form.alamatOrtu.trim()) errs.alamatOrtu = 'Alamat domisili wajib diisi'
     setErrors(errs)
     return Object.keys(errs).length === 0
   }
@@ -97,6 +123,10 @@ export default function PPDBForm() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (isSubmitting || !validateStep1() || !validateStep2()) return
+    if (!documents.KARTU_KELUARGA || !documents.AKTA_KELAHIRAN) {
+      setSubmitError('Kartu Keluarga dan akta kelahiran wajib diunggah sebelum formulir dikirim.')
+      return
+    }
 
     setIsSubmitting(true)
     setSubmitError(null)
@@ -116,7 +146,22 @@ export default function PPDBForm() {
         whatsapp: form.whatsapp,
         email: form.email,
         guardianAddress: form.alamatOrtu,
+        familyCardNumber: form.nomorKk,
+        fatherNik: form.nikAyah,
+        fatherOccupation: form.pekerjaanAyah,
+        fatherEducation: form.pendidikanAyah,
+        motherNik: form.nikIbu,
+        motherOccupation: form.pekerjaanIbu,
+        motherEducation: form.pendidikanIbu,
+        childOrder: form.anakKe,
+        siblingCount: form.jumlahSaudara,
+        bloodType: form.golonganDarah,
+        medicalNotes: form.catatanMedis,
       })
+      for (const { type } of DOCUMENT_FIELDS) {
+        const file = documents[type]
+        if (file) await submitPpdbDocument(result.applicationNumber, form.whatsapp, type, file)
+      }
       setRegNo(result.applicationNumber)
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Pendaftaran belum dapat dikirim.')
@@ -196,6 +241,7 @@ export default function PPDBForm() {
               setForm(empty)
               setRegNo(null)
               setStep(1)
+              setDocuments({})
             }}
           >
             Daftarkan Calon Siswa Lain
@@ -356,6 +402,53 @@ export default function PPDBForm() {
             <div className="sm:col-span-2">
               <label htmlFor="alamat-ortu" className={labelCls}>Alamat Domisili Tempat Tinggal *</label>
               <input id="alamat-ortu" type="text" value={form.alamatOrtu} onChange={set('alamatOrtu')} placeholder="Alamat jalan, kelurahan, kecamatan" className={inputCls('alamatOrtu')} />
+              {errors.alamatOrtu && <p className="mt-1 text-xs font-semibold text-warmred">{errors.alamatOrtu}</p>}
+            </div>
+            <div>
+              <label htmlFor="nomor-kk" className={labelCls}>Nomor Kartu Keluarga</label>
+              <input id="nomor-kk" inputMode="numeric" maxLength={16} value={form.nomorKk} onChange={set('nomorKk')} className={inputCls('nomorKk')} />
+            </div>
+            <div>
+              <label htmlFor="anak-ke" className={labelCls}>Anak ke</label>
+              <input id="anak-ke" type="number" min="1" value={form.anakKe} onChange={set('anakKe')} className={inputCls('anakKe')} />
+            </div>
+            <div>
+              <label htmlFor="nik-ayah" className={labelCls}>NIK Ayah / Wali</label>
+              <input id="nik-ayah" inputMode="numeric" maxLength={16} value={form.nikAyah} onChange={set('nikAyah')} className={inputCls('nikAyah')} />
+            </div>
+            <div>
+              <label htmlFor="pekerjaan-ayah" className={labelCls}>Pekerjaan Ayah / Wali</label>
+              <input id="pekerjaan-ayah" value={form.pekerjaanAyah} onChange={set('pekerjaanAyah')} className={inputCls('pekerjaanAyah')} />
+            </div>
+            <div>
+              <label htmlFor="pendidikan-ayah" className={labelCls}>Pendidikan terakhir Ayah</label>
+              <input id="pendidikan-ayah" value={form.pendidikanAyah} onChange={set('pendidikanAyah')} className={inputCls('pendidikanAyah')} />
+            </div>
+            <div>
+              <label htmlFor="nik-ibu" className={labelCls}>NIK Ibu</label>
+              <input id="nik-ibu" inputMode="numeric" maxLength={16} value={form.nikIbu} onChange={set('nikIbu')} className={inputCls('nikIbu')} />
+            </div>
+            <div>
+              <label htmlFor="pekerjaan-ibu" className={labelCls}>Pekerjaan Ibu</label>
+              <input id="pekerjaan-ibu" value={form.pekerjaanIbu} onChange={set('pekerjaanIbu')} className={inputCls('pekerjaanIbu')} />
+            </div>
+            <div>
+              <label htmlFor="pendidikan-ibu" className={labelCls}>Pendidikan terakhir Ibu</label>
+              <input id="pendidikan-ibu" value={form.pendidikanIbu} onChange={set('pendidikanIbu')} className={inputCls('pendidikanIbu')} />
+            </div>
+            <div>
+              <label htmlFor="jumlah-saudara" className={labelCls}>Jumlah saudara kandung</label>
+              <input id="jumlah-saudara" type="number" min="0" value={form.jumlahSaudara} onChange={set('jumlahSaudara')} className={inputCls('jumlahSaudara')} />
+            </div>
+            <div>
+              <label htmlFor="golongan-darah" className={labelCls}>Golongan darah</label>
+              <select id="golongan-darah" value={form.golonganDarah} onChange={set('golonganDarah')} className={inputCls('golonganDarah')}>
+                <option value="">Belum diketahui</option><option value="A">A</option><option value="B">B</option><option value="AB">AB</option><option value="O">O</option>
+              </select>
+            </div>
+            <div className="sm:col-span-2">
+              <label htmlFor="catatan-medis" className={labelCls}>Alergi atau catatan kesehatan</label>
+              <input id="catatan-medis" value={form.catatanMedis} onChange={set('catatanMedis')} placeholder="Kosongkan bila tidak ada" className={inputCls('catatanMedis')} />
             </div>
           </div>
 
@@ -397,7 +490,7 @@ export default function PPDBForm() {
                 <span className={`h-4 w-4 rounded-full border-2 ${form.jalur === 'Reguler' ? 'border-primary bg-primary' : 'border-ink-mute'}`} />
               </div>
               <p className="mt-2 text-xs text-ink-soft">
-                Pendaftaran umum dengan kemudahan skema cicilan infaq gedung 3x.
+                Pendaftaran umum sesuai ketentuan dan periode PPDB yang sedang berlaku.
               </p>
             </div>
 
@@ -416,6 +509,29 @@ export default function PPDBForm() {
               </p>
             </div>
           </div>
+
+          <fieldset className="rounded-2xl border border-primary/15 bg-cream p-5">
+            <legend className="px-2 text-xs font-bold uppercase tracking-wider text-primary">Berkas pendaftaran</legend>
+            <p className="mb-4 text-xs leading-5 text-ink-soft">Unggah PDF, JPG, PNG, atau WebP. Ukuran maksimal 5 MB per berkas.</p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {DOCUMENT_FIELDS.map((document) => (
+                <label key={document.type} className="block text-xs font-bold text-ink-soft">
+                  {document.label}{document.required ? ' *' : ' (opsional)'}
+                  <input
+                    type="file"
+                    required={document.required}
+                    accept="application/pdf,image/jpeg,image/png,image/webp"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0]
+                      setDocuments((current) => ({ ...current, [document.type]: file }))
+                      setSubmitError(null)
+                    }}
+                    className="mt-2 block min-h-12 w-full rounded-xl border border-primary/15 bg-white p-2 text-xs file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:font-bold file:text-white"
+                  />
+                </label>
+              ))}
+            </div>
+          </fieldset>
 
           {/* Summary Box */}
           <div className="rounded-2xl border border-primary/10 bg-cream p-5">

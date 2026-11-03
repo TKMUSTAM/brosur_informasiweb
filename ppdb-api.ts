@@ -1,4 +1,5 @@
-import { ListObjectsV2Command, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, GetObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { attachDatabasePool } from "@neon/functions";
 import { randomUUID, timingSafeEqual } from "node:crypto";
 import { Hono } from "hono";
@@ -38,6 +39,17 @@ type RegistrationInput = {
   whatsapp?: unknown;
   email?: unknown;
   guardianAddress?: unknown;
+  familyCardNumber?: unknown;
+  fatherNik?: unknown;
+  fatherOccupation?: unknown;
+  fatherEducation?: unknown;
+  motherNik?: unknown;
+  motherOccupation?: unknown;
+  motherEducation?: unknown;
+  childOrder?: unknown;
+  siblingCount?: unknown;
+  bloodType?: unknown;
+  medicalNotes?: unknown;
 };
 
 type NormalizedRegistration = {
@@ -56,6 +68,17 @@ type NormalizedRegistration = {
   whatsapp: string;
   email: string | null;
   guardianAddress: string | null;
+  familyCardNumber: string | null;
+  fatherNik: string | null;
+  fatherOccupation: string | null;
+  fatherEducation: string | null;
+  motherNik: string | null;
+  motherOccupation: string | null;
+  motherEducation: string | null;
+  childOrder: number | null;
+  siblingCount: number | null;
+  bloodType: string | null;
+  medicalNotes: string | null;
 };
 
 const app = new Hono();
@@ -121,6 +144,17 @@ function normalizeRegistration(input: RegistrationInput): NormalizedRegistration
     whatsapp,
     email,
     guardianAddress: cleanText(input.guardianAddress, 1000) || null,
+    familyCardNumber: cleanText(input.familyCardNumber, 32) || null,
+    fatherNik: cleanText(input.fatherNik, 32) || null,
+    fatherOccupation: cleanText(input.fatherOccupation, 120) || null,
+    fatherEducation: cleanText(input.fatherEducation, 80) || null,
+    motherNik: cleanText(input.motherNik, 32) || null,
+    motherOccupation: cleanText(input.motherOccupation, 120) || null,
+    motherEducation: cleanText(input.motherEducation, 80) || null,
+    childOrder: Number.isInteger(Number(input.childOrder)) && Number(input.childOrder) > 0 ? Number(input.childOrder) : null,
+    siblingCount: Number.isInteger(Number(input.siblingCount)) && Number(input.siblingCount) >= 0 ? Number(input.siblingCount) : null,
+    bloodType: cleanText(input.bloodType, 5) || null,
+    medicalNotes: cleanText(input.medicalNotes, 1000) || null,
   };
 }
 
@@ -158,7 +192,9 @@ const applicationSelect = `
       WHEN a.status = 'REJECTED' THEN 'Tidak Lulus'
       WHEN a.status = 'SUBMITTED' THEN 'Menunggu Verifikasi'
       WHEN a.status = 'NEEDS_REVISION' THEN 'Perlu Perbaikan'
-      WHEN a.status = 'UNDER_REVIEW' THEN 'Menunggu Penetapan'
+      WHEN a.status = 'UNDER_REVIEW' THEN 'Menunggu Jadwal Wawancara'
+      WHEN a.status = 'INTERVIEW_SCHEDULED' THEN 'Wawancara Terjadwal'
+      WHEN a.status = 'INTERVIEW_COMPLETED' THEN 'Menunggu Penetapan'
       WHEN a.status = 'WAITLISTED' THEN 'Daftar Tunggu'
       ELSE 'Menunggu Verifikasi'
     END AS "statusSeleksi",
@@ -172,9 +208,35 @@ const applicationSelect = `
     a.status AS "databaseStatus",
     a.target_program AS program,
     a.previous_school AS "previousSchool",
-    g.email AS email
+    g.email AS email,
+    g.family_card_number AS "noKk",
+    g.father_nik AS "nikAyah",
+    g.father_occupation AS "pekerjaanAyah",
+    g.mother_nik AS "nikIbu",
+    g.mother_occupation AS "pekerjaanIbu",
+    a.child_order AS "anakKe",
+    a.sibling_count AS "jmlSaudara",
+    a.medical_notes AS "catatanMedis",
+    CASE WHEN i.scheduled_at IS NULL THEN NULL
+      ELSE to_char(i.scheduled_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD"T"HH24:MI:SS') END AS "interviewScheduledAt",
+    i.location AS "interviewLocation",
+    i.interview_status AS "interviewStatus",
+    i.observation_notes AS "observationNotes",
+    i.recommendation AS "interviewRecommendation",
+    COALESCE((
+      SELECT jsonb_agg(jsonb_build_object(
+        'id', d.id::text,
+        'type', d.document_type,
+        'fileName', d.file_name,
+        'status', d.verification_status,
+        'note', d.verification_note,
+        'uploadedAt', d.uploaded_at
+      ) ORDER BY d.uploaded_at)
+      FROM admission_documents d WHERE d.application_id = a.id
+    ), '[]'::jsonb) AS documents
   FROM admission_applications a
   JOIN guardians g ON g.id = a.primary_guardian_id
+  LEFT JOIN admission_interviews i ON i.application_id = a.id
 `;
 
 async function findApplication(client: PoolClient | typeof pool, id: string) {
@@ -271,8 +333,10 @@ app.post("/registrations", async (c) => {
 
     const guardian = await client.query(
       `INSERT INTO guardians (
-         full_name, phone, email, address, father_name, mother_name
-       ) VALUES ($1, $2, $3, $4, $5, $6)
+         full_name, phone, email, address, father_name, mother_name,
+         family_card_number, father_nik, father_occupation, father_education,
+         mother_nik, mother_occupation, mother_education
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
        RETURNING id`,
       [
         registration.guardianName,
@@ -281,6 +345,13 @@ app.post("/registrations", async (c) => {
         registration.guardianAddress,
         registration.parentFather,
         registration.parentMother,
+        registration.familyCardNumber,
+        registration.fatherNik,
+        registration.fatherOccupation,
+        registration.fatherEducation,
+        registration.motherNik,
+        registration.motherOccupation,
+        registration.motherEducation,
       ],
     );
 
@@ -299,9 +370,13 @@ app.post("/registrations", async (c) => {
          previous_school,
          target_program,
          admission_track,
+         child_order,
+         sibling_count,
+         blood_type,
+         medical_notes,
          status,
          submitted_at
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'SUBMITTED', NOW())
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, 'SUBMITTED', NOW())
        RETURNING id, created_at`,
       [
         period.rows[0].id,
@@ -316,6 +391,10 @@ app.post("/registrations", async (c) => {
         registration.previousSchool,
         registration.program,
         registration.track,
+        registration.childOrder,
+        registration.siblingCount,
+        registration.bloodType,
+        registration.medicalNotes,
       ],
     );
 
@@ -340,6 +419,66 @@ app.post("/registrations", async (c) => {
   }
 });
 
+const DOCUMENT_TYPES = new Set(["KARTU_KELUARGA", "AKTA_KELAHIRAN", "KTP_ORANG_TUA", "PAS_FOTO"]);
+const DOCUMENT_MIME_TYPES = new Set(["application/pdf", "image/jpeg", "image/png", "image/webp"]);
+
+app.post("/registrations/:applicationNumber/documents", async (c) => {
+  const applicationNumber = cleanText(c.req.param("applicationNumber"), 80);
+  const formData = await c.req.formData().catch(() => null);
+  const phone = cleanText(formData?.get("phone"), 30).replace(/[^+\d]/g, "");
+  const documentType = cleanText(formData?.get("documentType"), 40).toUpperCase();
+  const file = formData?.get("file");
+
+  if (!formData || !DOCUMENT_TYPES.has(documentType) || !(file instanceof File)) {
+    return c.json({ error: "Jenis dan berkas dokumen wajib diisi." }, 400);
+  }
+  if (!DOCUMENT_MIME_TYPES.has(file.type) || file.size < 1 || file.size > 5 * 1024 * 1024) {
+    return c.json({ error: "Berkas harus PDF, JPG, PNG, atau WebP dengan ukuran maksimal 5 MB." }, 400);
+  }
+
+  const application = await pool.query(
+    `SELECT a.id::text
+     FROM admission_applications a
+     JOIN guardians g ON g.id = a.primary_guardian_id
+     WHERE a.application_number = $1 AND g.phone = $2`,
+    [applicationNumber, phone],
+  );
+  if (!application.rows[0]) return c.json({ error: "Data pendaftaran tidak ditemukan." }, 404);
+
+  const extension = file.type === "application/pdf" ? "pdf" : file.type.split("/")[1].replace("jpeg", "jpg");
+  const objectKey = `applications/${application.rows[0].id}/${documentType.toLowerCase()}.${extension}`;
+  try {
+    await s3.send(new PutObjectCommand({
+      Bucket: "ppdb-documents",
+      Key: objectKey,
+      Body: new Uint8Array(await file.arrayBuffer()),
+      ContentType: file.type,
+    }));
+    const result = await pool.query(
+      `INSERT INTO admission_documents (
+         application_id, document_type, file_name, file_path, mime_type, file_size_bytes,
+         verification_status, verification_note, uploaded_at, verified_at, verified_by
+       ) VALUES ($1, $2, $3, $4, $5, $6, 'PENDING', NULL, NOW(), NULL, NULL)
+       ON CONFLICT (application_id, document_type) DO UPDATE SET
+         file_name = EXCLUDED.file_name,
+         file_path = EXCLUDED.file_path,
+         mime_type = EXCLUDED.mime_type,
+         file_size_bytes = EXCLUDED.file_size_bytes,
+         verification_status = 'PENDING',
+         verification_note = NULL,
+         uploaded_at = NOW(),
+         verified_at = NULL,
+         verified_by = NULL
+       RETURNING id::text, document_type AS type, file_name AS "fileName", verification_status AS status`,
+      [application.rows[0].id, documentType, file.name.slice(0, 255), objectKey, file.type, file.size],
+    );
+    return c.json({ document: result.rows[0] }, 201);
+  } catch (error) {
+    console.error("[ppdb:document-upload]", error);
+    return c.json({ error: "Berkas belum dapat disimpan. Silakan coba lagi." }, 500);
+  }
+});
+
 app.get("/registrations", async (c) => {
   if (!hasAdminAccess(c.req.raw)) return c.json({ error: "Unauthorized" }, 401);
   try {
@@ -349,6 +488,25 @@ app.get("/registrations", async (c) => {
     console.error("[ppdb:list]", error);
     return c.json({ error: "Data pendaftaran belum dapat dimuat." }, 500);
   }
+});
+
+app.get("/registrations/:id/documents/:documentId", async (c) => {
+  if (!hasAdminAccess(c.req.raw)) return c.json({ error: "Unauthorized" }, 401);
+  const { id, documentId } = c.req.param();
+  if (!/^[0-9a-f-]{36}$/i.test(id) || !/^[0-9a-f-]{36}$/i.test(documentId)) {
+    return c.json({ error: "ID berkas tidak valid." }, 400);
+  }
+  const result = await pool.query(
+    `SELECT file_path, file_name FROM admission_documents WHERE id = $1 AND application_id = $2`,
+    [documentId, id],
+  );
+  if (!result.rows[0]) return c.json({ error: "Berkas tidak ditemukan." }, 404);
+  const url = await getSignedUrl(s3, new GetObjectCommand({
+    Bucket: "ppdb-documents",
+    Key: result.rows[0].file_path,
+    ResponseContentDisposition: `inline; filename="${String(result.rows[0].file_name).replace(/["\r\n]/g, "")}"`,
+  }), { expiresIn: 300 });
+  return c.json({ url, expiresIn: 300 });
 });
 
 app.get("/status/:applicationNumber", async (c) => {
@@ -372,6 +530,9 @@ app.get("/status/:applicationNumber", async (c) => {
     missingDocuments: row.missingDocuments,
     decisionNote: row.keterangan,
     className: row.kelasTujuan || null,
+    documents: row.documents,
+    interviewScheduledAt: row.interviewScheduledAt,
+    interviewLocation: row.interviewLocation,
     updatedAt: row.tanggalDaftar,
   });
 });
@@ -382,13 +543,16 @@ app.patch("/registrations/:id", async (c) => {
   if (!/^[0-9a-f-]{36}$/i.test(id)) return c.json({ error: "ID pendaftaran tidak valid." }, 400);
 
   const body = await c.req.json<{
-    action?: "VERIFY" | "DECIDE" | "PLACE";
+    action?: "VERIFY" | "SCHEDULE_INTERVIEW" | "COMPLETE_INTERVIEW" | "DECIDE" | "PLACE";
     status?: string;
     decisionNote?: string;
     metadata?: Record<string, unknown>;
     missingDocuments?: string[];
   }>();
-  const allowedStatuses = new Set(["UNDER_REVIEW", "ACCEPTED", "REJECTED", "WAITLISTED", "NEEDS_REVISION"]);
+  const allowedStatuses = new Set([
+    "UNDER_REVIEW", "NEEDS_REVISION", "INTERVIEW_SCHEDULED", "INTERVIEW_COMPLETED",
+    "ACCEPTED", "REJECTED", "WAITLISTED",
+  ]);
   if (!body.action || !body.status || !allowedStatuses.has(body.status)) return c.json({ error: "Aksi dan status tidak valid." }, 400);
 
   const client = await pool.connect();
@@ -407,8 +571,26 @@ app.patch("/registrations/:id", async (c) => {
     if (body.action === "VERIFY" && !["SUBMITTED", "NEEDS_REVISION"].includes(previousStatus)) {
       await client.query("ROLLBACK"); return c.json({ error: "Data ini sudah diverifikasi." }, 409);
     }
-    if (body.action === "DECIDE" && previousStatus !== "UNDER_REVIEW") {
-      await client.query("ROLLBACK"); return c.json({ error: "Calon siswa belum menunggu penetapan." }, 409);
+    if (body.action === "VERIFY" && body.status === "UNDER_REVIEW") {
+      const mandatoryDocuments = await client.query(
+        `SELECT document_type FROM admission_documents
+         WHERE application_id = $1
+           AND document_type IN ('KARTU_KELUARGA', 'AKTA_KELAHIRAN')`,
+        [id],
+      );
+      if (new Set(mandatoryDocuments.rows.map((document) => document.document_type)).size < 2) {
+        await client.query("ROLLBACK");
+        return c.json({ error: "Kartu Keluarga dan akta kelahiran wajib tersedia sebelum verifikasi." }, 409);
+      }
+    }
+    if (body.action === "SCHEDULE_INTERVIEW" && previousStatus !== "UNDER_REVIEW") {
+      await client.query("ROLLBACK"); return c.json({ error: "Berkas calon siswa belum selesai diverifikasi." }, 409);
+    }
+    if (body.action === "COMPLETE_INTERVIEW" && previousStatus !== "INTERVIEW_SCHEDULED") {
+      await client.query("ROLLBACK"); return c.json({ error: "Wawancara belum dijadwalkan." }, 409);
+    }
+    if (body.action === "DECIDE" && previousStatus !== "INTERVIEW_COMPLETED") {
+      await client.query("ROLLBACK"); return c.json({ error: "Hasil wawancara belum lengkap." }, 409);
     }
     if (body.action === "PLACE" && previousStatus !== "ACCEPTED") {
       await client.query("ROLLBACK"); return c.json({ error: "Penempatan hanya untuk calon yang lulus." }, 409);
@@ -418,7 +600,40 @@ app.patch("/registrations/:id", async (c) => {
     }
     const note = cleanText(body.decisionNote, 1000) || null;
     const metadata = JSON.stringify(body.metadata ?? {});
-    if (body.action === "PLACE") {
+    if (body.action === "SCHEDULE_INTERVIEW") {
+      const scheduledAt = cleanText(body.metadata?.scheduledAt, 40);
+      const location = cleanText(body.metadata?.location, 180);
+      if (!scheduledAt || !location || Number.isNaN(Date.parse(scheduledAt))) {
+        await client.query("ROLLBACK");
+        return c.json({ error: "Tanggal, waktu, dan lokasi wawancara wajib diisi." }, 400);
+      }
+      await client.query(
+        `INSERT INTO admission_interviews (application_id, scheduled_at, location, interview_status)
+         VALUES ($1, $2::timestamptz, $3, 'SCHEDULED')
+         ON CONFLICT (application_id) DO UPDATE SET
+           scheduled_at = EXCLUDED.scheduled_at,
+           location = EXCLUDED.location,
+           interview_status = 'SCHEDULED',
+           updated_at = NOW()`,
+        [id, scheduledAt, location],
+      );
+      await client.query("UPDATE admission_applications SET status = 'INTERVIEW_SCHEDULED', updated_at = NOW() WHERE id = $1", [id]);
+    } else if (body.action === "COMPLETE_INTERVIEW") {
+      const observationNotes = cleanText(body.metadata?.observationNotes, 2000);
+      const recommendation = cleanText(body.metadata?.recommendation, 20).toUpperCase();
+      if (!observationNotes || !["ACCEPT", "WAITLIST", "REJECT"].includes(recommendation)) {
+        await client.query("ROLLBACK");
+        return c.json({ error: "Catatan observasi dan rekomendasi wajib diisi." }, 400);
+      }
+      await client.query(
+        `UPDATE admission_interviews
+         SET interview_status = 'COMPLETED', observation_notes = $2, recommendation = $3,
+             completed_at = NOW(), updated_at = NOW()
+         WHERE application_id = $1`,
+        [id, observationNotes, recommendation],
+      );
+      await client.query("UPDATE admission_applications SET status = 'INTERVIEW_COMPLETED', updated_at = NOW() WHERE id = $1", [id]);
+    } else if (body.action === "PLACE") {
       const className = cleanText(body.metadata?.className, 80);
       const classSlug = cleanText(body.metadata?.classSlug, 80);
       const nisn = cleanText(body.metadata?.nisn, 40);
@@ -462,7 +677,10 @@ app.patch("/registrations/:id", async (c) => {
         [student.rows[0].id, details.rows[0].class_id],
       );
       await client.query(
-        `UPDATE admission_applications SET application_metadata = application_metadata || $2::jsonb, updated_at = NOW(), decision_note = COALESCE($3, decision_note) WHERE id = $1`,
+        `UPDATE admission_applications
+         SET status = 'COMPLETED', application_metadata = application_metadata || $2::jsonb,
+             updated_at = NOW(), decision_note = COALESCE($3, decision_note)
+         WHERE id = $1`,
         [id, metadata, note],
       );
     } else {
@@ -483,7 +701,7 @@ app.patch("/registrations/:id", async (c) => {
     await client.query(
       `INSERT INTO admission_status_histories (application_id, previous_status, new_status, note)
        VALUES ($1, $2, $3, $4)`,
-      [id, previousStatus, body.action === "PLACE" ? previousStatus : body.status, note || (body.action === "PLACE" ? "Penempatan kelas dan nomor induk ditetapkan admin." : null)],
+      [id, previousStatus, body.action === "PLACE" ? "COMPLETED" : body.status, note || (body.action === "PLACE" ? "Penempatan kelas dan nomor induk ditetapkan admin." : null)],
     );
     const application = await findApplication(client, id);
     await client.query("COMMIT");
@@ -513,6 +731,10 @@ app.delete("/registrations/:id", async (c) => {
       await client.query("ROLLBACK");
       return c.json({ error: "Pendaftaran tidak ditemukan." }, 404);
     }
+    const storedDocuments = await client.query(
+      "SELECT file_path FROM admission_documents WHERE application_id = $1",
+      [id],
+    );
     const placedStudent = await client.query(
       "SELECT id FROM students WHERE source_application_id = $1",
       [id],
@@ -532,6 +754,10 @@ app.delete("/registrations/:id", async (c) => {
     await client.query("DELETE FROM admission_applications WHERE id = $1", [id]);
     await client.query("DELETE FROM guardians WHERE id = $1", [application.rows[0].primary_guardian_id]);
     await client.query("COMMIT");
+    await Promise.allSettled(storedDocuments.rows.map((document) => s3.send(new DeleteObjectCommand({
+      Bucket: "ppdb-documents",
+      Key: document.file_path,
+    }))));
     return c.body(null, 204);
   } catch (error) {
     await client.query("ROLLBACK");

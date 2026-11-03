@@ -13,13 +13,47 @@ export type PpdbRegistrationPayload = {
   whatsapp: string
   email: string
   guardianAddress: string
+  familyCardNumber: string
+  fatherNik: string
+  fatherOccupation: string
+  fatherEducation: string
+  motherNik: string
+  motherOccupation: string
+  motherEducation: string
+  childOrder: string
+  siblingCount: string
+  bloodType: string
+  medicalNotes: string
 }
+
+export type PpdbDocumentType = 'KARTU_KELUARGA' | 'AKTA_KELAHIRAN' | 'KTP_ORANG_TUA' | 'PAS_FOTO'
 
 type PpdbRegistrationResult = {
   id?: string
   applicationNumber: string
   submittedAt?: string
   duplicate?: boolean
+}
+
+export async function submitPpdbDocument(
+  applicationNumber: string,
+  phone: string,
+  documentType: PpdbDocumentType,
+  file: File,
+) {
+  const body = new FormData()
+  body.set('phone', phone)
+  body.set('documentType', documentType)
+  body.set('file', file)
+  const response = await fetch(`${getApiUrl()}/registrations/${encodeURIComponent(applicationNumber)}/documents`, {
+    method: 'POST',
+    body,
+  })
+  const result = await response.json().catch(() => null) as { document?: unknown; error?: string } | null
+  if (!response.ok || !result?.document) {
+    throw new Error(result?.error || 'Berkas belum dapat diunggah. Silakan coba lagi.')
+  }
+  return result.document
 }
 
 function getApiUrl() {
