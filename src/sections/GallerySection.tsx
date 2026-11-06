@@ -15,8 +15,8 @@ export default function GallerySection() {
       <div className="mx-auto max-w-[1440px]">
         <SectionHeading
           eyebrow="Dokumentasi Kegiatan"
-          title="Momen Ceria &amp; Prestasi Santri Al-Mustam"
-          subtitle="Suasana belajar sentra, hafalan Al-Qur’an, eksplorasi sains, dan kebersamaan santri yang penuh kehangatan."
+          title="Momen Ceria &amp; Prestasi Murid Al-Mustam"
+          subtitle="Suasana belajar sentra, hafalan Al-Qur’an, eksplorasi sains, dan kebersamaan murid yang penuh kehangatan."
         />
 
         {/* Grid Galeri Rapi & Simetris (Tanpa Space Kosong) */}

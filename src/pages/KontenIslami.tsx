@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, BookOpen, Moon, Sparkles, Quote } from 'lucide-react'
+import { ArrowRight, BookOpen, Moon, Quote } from 'lucide-react'
+import { FaHandsPraying } from 'react-icons/fa6'
 import PageHeader from '../components/PageHeader'
 import SectionHeading from '../components/SectionHeading'
 import Reveal from '../components/Reveal'
@@ -35,7 +36,7 @@ export default function KontenIslami() {
           <Reveal className="flex flex-col justify-between rounded-3xl border border-primary/10 bg-softgreen p-8 shadow-soft sm:p-10">
             <div>
               <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-gold shadow-soft">
-                <Sparkles className="h-6 w-6" />
+                <FaHandsPraying className="h-6 w-6" />
               </span>
               <h2 className="mt-5 font-heading text-2xl font-extrabold text-primary">Doa Harian &amp; Dzikir Anak</h2>
               <p className="mt-2 text-sm leading-relaxed text-ink-soft">
@@ -83,7 +84,7 @@ export default function KontenIslami() {
           <SectionHeading
             eyebrow="Hadits Pilihan"
             title="Hadits Adab &amp; Akhlak Ramah Anak"
-            subtitle="Hadits-hadits shahih pendek yang mudah dihafal santri di kelas dan dipraktikkan di rumah."
+            subtitle="Hadits-hadits shahih pendek yang mudah dihafal murid di kelas dan dipraktikkan di rumah."
           />
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2">

@@ -31,7 +31,7 @@ export const programs: Program[] = [
     color: 'blue',
     icon: 'blocks',
     description:
-      'Langkah awal yang menyenangkan untuk si kecil. Menggunakan pendekatan *learning through play* dan stimulasi sensori-motorik, melatih kemandirian, sosialisasi, toilet training, serta pembiasaan doa dan adab harian dengan kasih sayang para ustadzah.',
+      'Langkah awal yang menyenangkan untuk si kecil. Menggunakan pendekatan belajar melalui bermain dan stimulasi sensori-motorik, melatih kemandirian, sosialisasi, toilet training, serta pembiasaan doa dan adab harian dengan kasih sayang para ustadzah.',
     highlights: [
       'Stimulasi sensori-motorik & motorik halus',
       'Toilet training & kemandirian makan sendiri',
@@ -59,7 +59,7 @@ export const programs: Program[] = [
     color: 'gold',
     icon: 'pencil',
     description:
-      'Mengembangkan kecerdasan majemuk (*Multiple Intelligences*) anak melalui Kurikulum Merdeka yang terintegrasi dengan nilai-nilai Qur’ani. Anak aktif belajar dalam 5 sentra tematik, tahfidz juz 30 metode Tilawati, hafalan hadits pendek, dan calistung sensori tanpa paksaan.',
+      'Mengembangkan kecerdasan majemuk anak melalui Kurikulum Merdeka yang terintegrasi dengan nilai-nilai Qur’ani. Anak aktif belajar dalam 5 sentra tematik, tahfidz juz 30 metode Tilawati, hafalan hadits pendek, dan calistung sensori tanpa paksaan.',
     highlights: [
       'Tahfidz Juz 30 (Target: An-Naas s.d Al-Fiil)',
       'Sentra Imtaq, Sentra Balok, & Sentra Bahan Alam',
@@ -109,7 +109,7 @@ export const programs: Program[] = [
     slug: 'tpa',
     code: 'TPA',
     name: 'TPA & Tahfidz Cilik Al-Mustam',
-    subtitle: 'Bimbingan Tilawah, Tartil & Karakter Santri',
+    subtitle: 'Bimbingan Tilawah, Tartil & Karakter Murid',
     age: '4–12 Tahun',
     ageRange: 'Usia 4–12 tahun',
     color: 'green',
@@ -124,11 +124,11 @@ export const programs: Program[] = [
       'Laporan perkembangan muraja’ah berkala untuk orang tua',
     ],
     schedule: 'Senin–Kamis, 15.30 – 17.15 WIB',
-    capacity: '15 santri per kelas',
+    capacity: '15 murid per kelas',
     ratio: '1 : 8',
     image: '/images/content/prog-tpa.jpg',
     objectives: [
-      'Santri mampu membaca Al-Qur’an dengan tartil, fasih, dan tartil',
+      'Murid mampu membaca Al-Qur’an dengan tartil, fasih, dan tartil',
       'Mencetak generasi pecinta Al-Qur’an yang berakhlak karimah',
       'Hafal juz 30 serta doa dan dzikir harian mustajab',
     ],
@@ -183,7 +183,7 @@ export const dailyRoutines = [
   {
     time: '07.15 – 07.45',
     title: 'Penyambutan Senyum & Gerak Ceria',
-    desc: 'Penyambutan 5S (Senyum, Sapa, Salam, Sopan, Santun) oleh guru, senam motorik kasar ceria, dan ikrar santri.',
+    desc: 'Penyambutan 5S (Senyum, Sapa, Salam, Sopan, Santun) oleh guru, senam motorik kasar ceria, dan ikrar murid.',
   },
   {
     time: '07.45 – 08.20',

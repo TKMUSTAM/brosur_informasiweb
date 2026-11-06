@@ -88,6 +88,25 @@ export const initialCMSData: CMSData = {
     ppdb: {
       academicYear: '2026/2027',
       registrationOpen: true,
+      closedMessage: 'Mohon maaf, pendaftaran peserta didik baru saat ini belum dibuka atau kuota pada gelombang aktif telah terpenuhi. Silakan hubungi sekretariat via WhatsApp untuk masuk daftar tunggu (waiting list).',
+      waves: [
+        {
+          id: 'gelombang-1',
+          name: 'Gelombang 1 (Early Bird & Beasiswa Yatim)',
+          period: '1 Januari – 30 April 2026',
+          quota: 'Sisa 8 Kuota',
+          status: 'OPEN',
+          description: 'Potongan biaya sarana pendidikan & prioritas pemilihan shift kelas.',
+        },
+        {
+          id: 'gelombang-2',
+          name: 'Gelombang 2 (Reguler)',
+          period: '1 Mei – 10 Juli 2026',
+          quota: '30 Kuota Tersedia',
+          status: 'UPCOMING',
+          description: 'Penerimaan siswa reguler untuk tahun ajaran baru 2026/2027.',
+        },
+      ],
       title: 'Bergabung Bersama Keluarga Besar TK Islam Al-Mustam',
       description: 'Penerimaan peserta didik baru untuk KB, TK A, TK B, dan TPA.',
       notice: 'Pendaftaran diproses sesuai ketersediaan kuota pada gelombang aktif.',
@@ -96,6 +115,35 @@ export const initialCMSData: CMSData = {
         'Fotokopi Akta Kelahiran Anak',
         'Pas foto berwarna anak ukuran 3×4',
         'Fotokopi KTP orang tua atau wali',
+      ],
+    },
+    profile: {
+      title: 'Pendidikan Islam Unggulan Berakar Karakter Qur’ani',
+      description: 'TK Islam Al-Mustam berdiri dengan tekad melahirkan generasi muslim cilik yang beradab, mencintai Al-Qur\'an, mandiri, dan berwawasan luas.',
+      aboutParagraph1: 'TK Islam Al-Mustam didirikan dengan niat tulus menghadirkan lingkungan belajar anak usia dini yang sehat, hangat, dan berstandar nasional. Kami menaungi program Kelompok Bermain (KB), Taman Kanak-kanak (TK A & TK B), TPA Tahfidz Cilik, serta program beasiswa yatim piatu.',
+      aboutParagraph2: 'Kami meyakini bahwa pondasi keberhasilan masa depan anak berakar pada adab dan kematangan emosi di usia emas (golden age). Oleh karena itu, kurikulum kami memadukan Kurikulum Merdeka dengan metode sentra (BCCT) dan 7 Pilar Karakter Islami, memastikan setiap potensi fitrah anak distimulasi secara optimal tanpa paksaan.',
+      image: '/images/content/hero-school.jpg',
+      imageAlt: 'Gedung TK Islam Al-Mustam',
+    },
+    visionMission: {
+      visionText: 'Menjadi lembaga pendidikan Islam unggulan yang melahirkan generasi Qur’ani, beradab, berakhlaqul karimah, dan cerdas holistik, serta membawa manfaat luas bagi umat dan bangsa.',
+      missionList: [
+        'Menyelenggarakan pendidikan anak usia dini (PAUD/TK) Islam berkualitas berpusat pada anak dengan pendekatan kasih sayang dan keteladanan.',
+        'Menanamkan aqidah yang lurus, pembiasaan sholat dhuha, tahfidz Juz 30, serta hafalan doa harian sejak dini.',
+        'Mengembangkan potensi fitrah anak secara holistik: kecerdasan intelektual, kemandirian motorik, dan kepekaan sosial.',
+        'Menyelenggarakan jalur pengajuan bantuan pendidikan bagi anak yatim dan keluarga yang membutuhkan sesuai kemampuan program.',
+        'Membangun kemitraan harmonis dan transparan dengan orang tua sebagai pilar utama pendidikan anak.',
+        'Mengelola yayasan secara amanah, profesional, taat hukum, dan berstandar mutu nasional.',
+      ],
+    },
+    sejarah: {
+      milestones: [
+        { year: '2012', title: 'Awal Mula: Majelis Taklim & TPQ Kecil', desc: 'Bermula dari majelis taklim dan TPQ kecil dengan 15 murid, semangat mengajarkan baca-tulis Al-Qur’an dan adab kepada anak-anak sekitar mulai bersemi.' },
+        { year: '2016', title: 'Pendirian Resmi Yayasan Al-Mustam', desc: 'Yayasan resmi berbadan hukum melalui akta notaris dan SK Kemenkumham RI, memperkokoh tata kelola kelembagaan yang amanah dan transparan.' },
+        { year: '2018', title: 'Pembukaan Kelompok Bermain (Playgroup / KB)', desc: 'KB dibuka untuk melayani anak usia 3–4 tahun dengan metode stimulasi sensori-motorik dan pembiasaan doa harian.' },
+        { year: '2020', title: 'Peresmian TK Islam Al-Mustam (TK A & TK B)', desc: 'Menerapkan Kurikulum Merdeka yang terintegrasi muatan diniyah dan metode sentra (BCCT), dilengkapi ruang kelas ber-AC dan playground outdoor.' },
+        { year: '2022', title: 'Pengembangan Program Dukungan Pendidikan', desc: 'Yayasan mulai mengembangkan jalur bantuan pendidikan bagi anak yatim dan keluarga yang membutuhkan.' },
+        { year: '2026', title: 'Penguatan Mutu dan Layanan Pendidikan', desc: 'Sekolah melanjutkan pengembangan program, tata kelola, dan layanan informasi bagi keluarga.' },
       ],
     },
   },
@@ -218,7 +266,7 @@ export const initialCMSData: CMSData = {
       id: 'faq-2',
       category: 'PPDB',
       question: 'Apakah ada bantuan pendidikan untuk anak yatim dan dhuafa?',
-      answer: 'Yayasan Al-Mustam menyediakan bantuan pendidikan bagi santri yatim dan dhuafa yang lolos verifikasi. Bentuk bantuan mengikuti ketentuan program dan ketersediaan dana pada periode berjalan.',
+      answer: 'Yayasan Al-Mustam menyediakan bantuan pendidikan bagi murid yatim dan dhuafa yang lolos verifikasi. Bentuk bantuan mengikuti ketentuan program dan ketersediaan dana pada periode berjalan.',
     },
     {
       id: 'faq-3',
@@ -332,7 +380,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const migratedSite = {
           ...initialCMSData.site,
           ...parsed.site,
-          description: parsed.site?.description === 'Lembaga Pendidikan Islam Terakreditasi A yang menaungi Playgroup (KB), TK A, TK B, TPA Tahfidz, serta program pembinaan beasiswa penuh bagi santri yatim dan dhuafa.'
+          description: parsed.site?.description === 'Lembaga Pendidikan Islam Terakreditasi A yang menaungi Playgroup (KB), TK A, TK B, TPA Tahfidz, serta program pembinaan beasiswa penuh bagi murid yatim dan dhuafa.'
             ? initialCMSData.site.description
             : parsed.site?.description || initialCMSData.site.description,
         }

@@ -3,12 +3,13 @@ import Reveal from '../components/Reveal'
 import CTASection from '../components/CTASection'
 import { useSEO } from '../hooks/useSEO'
 import { site } from '../data/site'
+import { useCMS } from '../hooks/useCMS'
 
-const milestones = [
+const defaultMilestones = [
   {
     year: '2012',
     title: 'Awal Mula: Majelis Taklim & TPQ Kecil',
-    desc: 'Bermula dari majelis taklim dan TPQ kecil dengan 15 santri, semangat mengajarkan baca-tulis Al-Qur’an dan adab kepada anak-anak sekitar mulai bersemi.',
+    desc: 'Bermula dari majelis taklim dan TPQ kecil dengan 15 murid, semangat mengajarkan baca-tulis Al-Qur’an dan adab kepada anak-anak sekitar mulai bersemi.',
   },
   {
     year: '2016',
@@ -38,6 +39,9 @@ const milestones = [
 ]
 
 export default function Sejarah() {
+  const { data } = useCMS()
+  const milestones = data.pageContent.sejarah?.milestones || defaultMilestones
+
   useSEO({
     title: `Sejarah & Perjalanan | ${site.name}`,
     description: `Perjalanan ${site.name} dari majelis taklim kecil hingga menjadi yayasan pendidikan Islam modern terakreditasi A.`,
@@ -47,7 +51,6 @@ export default function Sejarah() {
   return (
     <>
       <PageHeader
-        eyebrow="Sejarah &amp; Perjalanan"
         title="Jejak Langkah Menebar Ilmu &amp; Kebaikan"
         description="Dari majelis taklim sederhana, tumbuh menjadi lembaga pendidikan Islam yang dipercaya dan menginspirasi banyak keluarga."
         crumbs={[{ label: 'Profil Yayasan', href: '/profil' }, { label: 'Sejarah Lembaga' }]}
@@ -59,14 +62,18 @@ export default function Sejarah() {
             <div className="absolute left-5 top-0 h-full w-0.5 bg-primary/10 sm:left-1/2" aria-hidden="true" />
             <ol className="space-y-10">
               {milestones.map((m, i) => (
-                <Reveal as="li" key={m.year} delay={i * 60} className={`relative flex gap-6 sm:gap-10 ${i % 2 === 1 ? 'sm:flex-row-reverse' : ''}`}>
-                  <span className="relative z-10 mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary font-heading text-xs font-extrabold text-gold shadow-soft ring-4 ring-cream">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <div className={`flex-1 rounded-2xl border border-primary/15 bg-white p-7 transition-colors duration-200 hover:border-primary/35 ${i % 2 === 1 ? 'sm:text-left' : ''}`}>
-                    <span className="inline-block rounded-full bg-softgreen px-3.5 py-1 font-heading text-sm font-extrabold text-primary">{m.year}</span>
-                    <h2 className="mt-3 font-heading text-lg font-extrabold text-primary sm:text-xl">{m.title}</h2>
-                    <p className="mt-2 text-sm leading-relaxed text-ink-soft">{m.desc}</p>
+                <Reveal as="li" key={m.year} delay={i * 80}>
+                  <div className={`relative flex flex-col gap-4 sm:flex-row sm:items-center ${i % 2 === 0 ? 'sm:flex-row-reverse sm:text-right' : ''}`}>
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-4 border-white bg-gold font-heading text-xs font-black text-primary shadow-soft sm:absolute sm:left-1/2 sm:-translate-x-1/2">
+                      {m.year.slice(2)}
+                    </div>
+                    <div className="ml-14 sm:ml-0 sm:w-[calc(50%-2rem)]">
+                      <div className="rounded-2xl border border-primary/10 bg-white p-6 shadow-soft transition-all duration-300 hover:shadow-lift">
+                        <span className="font-heading text-xs font-extrabold text-gold-dark">{m.year}</span>
+                        <h3 className="mt-1 font-heading text-base font-extrabold text-primary">{m.title}</h3>
+                        <p className="mt-2 text-xs leading-relaxed text-ink-soft sm:text-sm">{m.desc}</p>
+                      </div>
+                    </div>
                   </div>
                 </Reveal>
               ))}
@@ -76,12 +83,12 @@ export default function Sejarah() {
       </section>
 
       <CTASection
-        title={<>Menjadi Bagian dari Perjalanan Kami</>}
-        description="Daftarkan putra-putri Anda atau ambil bagian dalam mendukung program beasiswa yatim."
-        primaryLabel="Daftar PPDB 2026/2027"
+        title={<>Menjadi Bagian dari Jejak Kebaikan Ini</>}
+        description="Daftarkan ananda atau berkontribusi dalam program beasiswa yatim untuk generasi yang lebih baik."
+        primaryLabel="Daftar PPDB Online"
         primaryTo="/ppdb/daftar"
-        secondaryLabel="Dukung Program Yatim"
-        secondaryTo="/yatim/donasi"
+        secondaryLabel="Program Orang Tua Asuh"
+        secondaryTo="/yatim/orangtua-asuh"
       />
     </>
   )

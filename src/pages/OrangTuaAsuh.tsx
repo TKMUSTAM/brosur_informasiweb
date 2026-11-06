@@ -16,10 +16,10 @@ const steps = [
 
 const benefits = [
   'Laporan perkembangan belajar anak setiap akhir semester',
-  'Kabar dan foto dokumentasi kegiatan santri di sekolah',
+  'Kabar dan foto dokumentasi kegiatan murid di sekolah',
   'Undangan khusus acara silaturahmi tahunan keluarga yayasan',
   'Sertifikat apresiasi wali asuh dari pimpinan yayasan',
-  'Doa tulus dari santri-santri cilik Al-Mustam setiap hari',
+  'Doa tulus dari murid-murid cilik Al-Mustam setiap hari',
   'Pendampingan berkelanjutan hingga anak siap melanjutkan ke jenjang SD',
 ]
 
@@ -33,9 +33,9 @@ export default function OrangTuaAsuh() {
   return (
     <>
       <PageHeader
-        eyebrow="Kepedulian Santri Yatim"
+        eyebrow="Kepedulian Murid Yatim"
         title="Program Orang Tua Asuh: Menjadi Pelita Harapan"
-        description="Melalui program wali asuh, Anda ikut membiayai kelangsungan pendidikan, pemenuhan gizi, dan masa depan seorang santri yatim."
+        description="Melalui program wali asuh, Anda ikut membiayai kelangsungan pendidikan, pemenuhan gizi, dan masa depan seorang murid yatim."
         crumbs={[{ label: 'Program Yatim', href: '/yatim' }, { label: 'Orang Tua Asuh' }]}
       >
         <div className="mt-8 flex flex-wrap gap-3">
@@ -86,7 +86,7 @@ export default function OrangTuaAsuh() {
             <Reveal className="overflow-hidden rounded-3xl border border-primary/10 bg-white p-3 shadow-lift">
               <img
                 src="/images/content/prog-tpa.jpg"
-                alt="Santri cilik binaan TK Islam Al-Mustam"
+                alt="Murid cilik binaan TK Islam Al-Mustam"
                 loading="lazy"
                 className="h-full w-full rounded-2xl object-cover"
               />
@@ -117,9 +117,9 @@ export default function OrangTuaAsuh() {
 
       <CTASection
         title={<>Mari Bersama Membuka Pintu Surga</>}
-        description="Satu uluran tangan Anda adalah pelita besar bagi masa depan santri yatim Al-Mustam."
+        description="Satu uluran tangan Anda adalah pelita besar bagi masa depan murid yatim Al-Mustam."
         primaryLabel="Daftar Wali Asuh via WhatsApp"
-        primaryTo={`https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent('Assalamualaikum Admin, saya ingin mendaftar menjadi orang tua asuh santri yatim.')}`}
+        primaryTo={`https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent('Assalamualaikum Admin, saya ingin mendaftar menjadi orang tua asuh murid yatim.')}`}
         secondaryLabel="Hubungi Kontak"
         secondaryTo="/kontak"
       />

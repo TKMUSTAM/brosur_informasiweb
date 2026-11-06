@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { Check, Clock, Mail, MapPin, MessageCircle, Phone, Send } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import Reveal from '../components/Reveal'
 import { Button } from '../components/Buttons'
 import { useSEO } from '../hooks/useSEO'
 import { site } from '../data/site'
+import { RiCheckLine, RiSendPlaneFill } from 'react-icons/ri'
+import { FaLocationDot, FaWhatsapp, FaEnvelope, FaClock } from 'react-icons/fa6'
 
 export default function Kontak() {
   useSEO({
@@ -27,10 +28,10 @@ export default function Kontak() {
   }
 
   const contactCards = [
-    { icon: MapPin, title: 'Alamat Kampus', value: site.contact.address, href: site.mapsLink, isExternal: true },
-    { icon: MessageCircle, title: 'WhatsApp Resmi', value: site.contact.whatsappDisplay, href: `https://wa.me/${site.contact.whatsapp}`, isExternal: true },
-    { icon: Mail, title: 'Email Informasi', value: site.contact.email, href: `mailto:${site.contact.email}`, isExternal: false },
-    { icon: Clock, title: 'Jam Layanan Kantor', value: site.hours, href: undefined, isExternal: false },
+    { icon: FaLocationDot, title: 'Alamat Kampus', value: site.contact.address, href: site.mapsLink, isExternal: true },
+    { icon: FaWhatsapp, title: 'WhatsApp Resmi', value: site.contact.whatsappDisplay, href: `https://wa.me/${site.contact.whatsapp}`, isExternal: true },
+    { icon: FaEnvelope, title: 'Email Informasi', value: site.contact.email, href: `mailto:${site.contact.email}`, isExternal: false },
+    { icon: FaClock, title: 'Jam Layanan Kantor', value: site.hours, href: undefined, isExternal: false },
   ]
 
   const inputCls = (key: string) =>
@@ -43,7 +44,7 @@ export default function Kontak() {
       <PageHeader
         eyebrow="Layanan Informasi &amp; Kontak"
         title="Kami Siap Melayani &amp; Menyambut Anda"
-        description="Punya pertanyaan seputar pendaftaran santri baru (PPDB), kurikulum 5 sentra, atau ingin menjadwalkan kunjungan sekolah (*school tour*)? Silakan hubungi kami."
+        description="Punya pertanyaan seputar pendaftaran murid baru (PPDB), kurikulum 5 sentra, atau ingin menjadwalkan kunjungan sekolah langsung? Silakan hubungi kami."
         crumbs={[{ label: 'Kontak' }]}
       />
 
@@ -90,7 +91,7 @@ export default function Kontak() {
               {sent ? (
                 <div className="flex h-full flex-col items-center justify-center gap-4 rounded-3xl border border-primary/10 bg-white p-10 text-center shadow-soft">
                   <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-softgreen text-primary">
-                    <Check className="h-8 w-8 text-primary" strokeWidth={3} />
+                    <RiCheckLine className="h-10 w-10 text-primary" />
                   </span>
                   <h3 className="font-heading text-xl font-extrabold text-primary">Pesan Terkirim!</h3>
                   <p className="max-w-sm text-sm text-ink-soft">
@@ -120,20 +121,21 @@ export default function Kontak() {
                       <textarea id="k-pesan" rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="Tuliskan pertanyaan seputar pendaftaran, program sekolah, atau jadwal kunjungan..." className={`${inputCls('message')} resize-none`} />
                       {errors.message && <p className="mt-1.5 text-xs font-semibold text-warmred">{errors.message}</p>}
                     </div>
-                    <Button type="submit" variant="primary" size="lg" className="w-full sm:w-auto shadow-soft">
-                      <Send className="h-4 w-4" /> Kirim Pesan Sekarang
+                    <Button type="submit" variant="primary" size="lg" className="w-full sm:w-auto shadow-soft flex items-center gap-2">
+                      <RiSendPlaneFill className="h-4 w-4" /> <span>Kirim Pesan Sekarang</span>
                     </Button>
                   </div>
                 </form>
               )}
             </Reveal>
 
-            <Reveal delay={100}>
-              <div className="relative overflow-hidden rounded-3xl border border-primary/10 bg-white shadow-soft h-full min-h-[380px]">
+            {/* Peta Google Maps */}
+            <Reveal delay={120}>
+              <div className="overflow-hidden rounded-3xl border border-primary/10 bg-white p-2.5 shadow-soft">
                 <iframe
-                  title={`Peta lokasi ${site.name}`}
+                  title={`Peta Lokasi ${site.name}`}
                   src={site.mapsEmbed}
-                  className="h-full min-h-[380px] w-full grayscale-[15%]"
+                  className="h-[380px] w-full rounded-2xl grayscale-[20%]"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   allowFullScreen
@@ -141,30 +143,8 @@ export default function Kontak() {
               </div>
             </Reveal>
           </div>
-        </div>
-      </section>
 
-      {/* CTA WhatsApp Cepat */}
-      <section className="px-4 pb-20 sm:px-6">
-        <Reveal className="mx-auto flex max-w-[1440px] flex-col items-center justify-between gap-6 rounded-3xl bg-primary p-8 text-white shadow-lift sm:flex-row sm:p-10">
-          <div className="flex items-center gap-4">
-            <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 text-gold shadow-soft">
-              <Phone className="h-7 w-7" />
-            </span>
-            <div>
-              <h3 className="font-heading text-xl font-extrabold sm:text-2xl">Konsultasi Cepat via WhatsApp?</h3>
-              <p className="text-xs sm:text-sm text-white/80">Layanan konsultasi orang tua: {site.hours}</p>
-            </div>
-          </div>
-          <a
-            href={`https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent('Assalamualaikum Admin, saya ingin konsultasi pendaftaran TK Islam Al-Mustam.')}`}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded-full bg-gold px-8 py-3.5 font-extrabold text-primary-deep shadow-gold transition-all hover:-translate-y-0.5 hover:bg-gold-light"
-          >
-            <MessageCircle className="h-5 w-5" /> Chat Admin Sekarang
-          </a>
-        </Reveal>
+        </div>
       </section>
     </>
   )

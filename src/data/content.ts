@@ -347,7 +347,7 @@ export const fasilitas = [
   {
     icon: 'blocks',
     title: 'Playground Outdoor & Sensori Park',
-    desc: 'Area bermain luar ruang berlantai karet peredam benturan (*soft flooring*), perosotan, ayunan, jaring panjat, kolam pasir, dan kebun hidroponik.',
+    desc: 'Area bermain luar ruang berlantai karet peredam benturan dengan lantai peredam benturan, perosotan, ayunan, jaring panjat, kolam pasir, dan kebun hidroponik.',
     tag: 'Motorik & Fisik',
   },
   {

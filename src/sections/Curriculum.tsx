@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Clock } from 'lucide-react'
+import { FaClock } from 'react-icons/fa6'
+import { RiCheckLine } from 'react-icons/ri'
 import SectionHeading from '../components/SectionHeading'
 import Reveal from '../components/Reveal'
 import { curriculumGroups, curriculumItems, sentraList, dailyRoutines } from '../data/programs'
@@ -14,7 +15,7 @@ export default function Curriculum() {
         <SectionHeading
           eyebrow="Kurikulum &amp; Metode Belajar"
           title="Kurikulum Merdeka Integratif Berbasis Sentra (BCCT)"
-          subtitle="Menggabungkan kerangka nasional dengan nilai-nilai diniyah, stimulasi sensori, dan pembiasaan adab harian agar anak tumbuh cerdas dan berkarakter."
+          subtitle="Menggabungkan kerangka nasional dengan nilai diniyah, stimulasi sensori, dan pembiasaan adab harian agar anak tumbuh cerdas dan berkarakter."
         />
 
         {/* Tab Navigator */}
@@ -79,10 +80,6 @@ export default function Curriculum() {
                       {s.desc}
                     </p>
                   </div>
-                  <div className="mt-6 flex items-center gap-2 text-xs font-bold text-primary">
-                    <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
-                    <span>Metode Eksplorasi Aktif</span>
-                  </div>
                 </div>
               </Reveal>
             ))}
@@ -98,7 +95,7 @@ export default function Curriculum() {
                   <div className="flex h-full flex-col rounded-3xl border border-primary/10 bg-cream p-6 shadow-soft transition-all duration-300 hover:bg-white hover:shadow-lift">
                     <div className="flex items-center justify-between">
                       <span className="flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1 text-xs font-extrabold text-white">
-                        <Clock className="h-3.5 w-3.5 text-gold" />
+                        <FaClock className="h-3.5 w-3.5 text-gold" />
                         {r.time}
                       </span>
                       <span className="font-heading text-sm font-black text-primary/30">0{i + 1}</span>
@@ -116,32 +113,41 @@ export default function Curriculum() {
           </div>
         )}
 
-        {/* ===== Tab 3: 10 Kompetensi Inti ===== */}
+        {/* ===== Tab 3: 10 Kompetensi Inti (Bersih & Terstruktur tanpa Hashtag Slop) ===== */}
         {activeTab === 'kompetensi' && (
-          <div className="mt-12">
-            <div className="mb-6 flex flex-wrap justify-center gap-3">
-              {curriculumGroups.map((g) => (
-                <span key={g.title} className="inline-flex items-center rounded-full border border-primary/10 bg-cream px-4 py-2 text-xs font-bold text-primary shadow-soft sm:text-sm">
-                  {g.title}
-                </span>
+          <div className="mt-12 space-y-8">
+            {/* 3 Kerangka Utama */}
+            <div className="grid gap-4 sm:grid-cols-3">
+              {curriculumGroups.map((g, i) => (
+                <Reveal key={g.title} delay={i * 60}>
+                  <div className="h-full rounded-2xl border border-primary/15 bg-cream p-5">
+                    <h4 className="font-heading text-sm sm:text-base font-bold text-primary">{g.title}</h4>
+                    <p className="mt-1.5 text-xs text-ink-soft leading-relaxed">{g.note}</p>
+                  </div>
+                </Reveal>
               ))}
             </div>
 
-            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-              {curriculumItems.map((item, i) => (
-                <Reveal as="li" key={item.label} delay={i * 40} className="group flex flex-col justify-between rounded-2xl border border-primary/15 bg-cream p-5 transition-colors duration-200 hover:border-primary/35 hover:bg-white">
-                  <div className="flex items-center justify-between">
-                    <span className="font-heading text-xs font-black text-primary/40">
-                      #{String(i + 1).padStart(2, '0')}
-                    </span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
-                  </div>
-                  <p className="mt-4 font-heading text-sm font-bold text-ink">
-                    {item.label}
-                  </p>
-                </Reveal>
-              ))}
-            </ul>
+            {/* Daftar 10 Kompetensi Terpadu */}
+            <div className="rounded-2xl border border-primary/15 bg-white p-6 sm:p-8 shadow-soft">
+              <h4 className="font-heading text-sm font-bold uppercase tracking-wider text-ink-mute mb-5">
+                Capaian Perkembangan Murid Usia Dini
+              </h4>
+              <ul className="grid gap-3.5 sm:grid-cols-2">
+                {curriculumItems.map((item, i) => (
+                  <Reveal as="li" key={item.label} delay={i * 30}>
+                    <div className="flex items-start gap-3 rounded-xl border border-primary/10 bg-cream/50 p-3.5 transition-colors hover:bg-softgreen/50">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-primary text-white mt-0.5">
+                        <RiCheckLine className="h-3.5 w-3.5" />
+                      </span>
+                      <span className="text-xs sm:text-sm font-bold text-primary leading-snug">
+                        {item.label}
+                      </span>
+                    </div>
+                  </Reveal>
+                ))}
+              </ul>
+            </div>
           </div>
         )}
 

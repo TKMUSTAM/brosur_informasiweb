@@ -129,6 +129,15 @@ export type IslamicArticle = {
   status?: 'DRAFT' | 'PUBLISHED'
 }
 
+export type PPDBWave = {
+  id: 'gelombang-1' | 'gelombang-2';
+  name: string;
+  period: string;
+  quota?: string;
+  status: 'OPEN' | 'CLOSED' | 'UPCOMING';
+  description?: string;
+};
+
 export type PageContent = {
   hero: {
     eyebrow: string
@@ -157,7 +166,28 @@ export type PageContent = {
     title: string
     description: string
     notice: string
+    closedMessage?: string
+    waves?: PPDBWave[]
     requirements: string[]
+  }
+  profile?: {
+    title: string
+    description: string
+    aboutParagraph1: string
+    aboutParagraph2: string
+    image: string
+    imageAlt: string
+  }
+  visionMission?: {
+    visionText: string
+    missionList: string[]
+  }
+  sejarah?: {
+    milestones: Array<{
+      year: string
+      title: string
+      desc: string
+    }>
   }
 }
 

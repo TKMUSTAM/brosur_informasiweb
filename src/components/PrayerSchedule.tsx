@@ -1,6 +1,7 @@
-import { AlertCircle, Clock, LocateFixed, Sunrise, Sunset } from 'lucide-react'
 import { usePrayer } from '../hooks/usePrayer'
 import { PRAYER_LABELS, type PrayerName, type PrayerTimes } from '../lib/prayerTimes'
+import { FaClock, FaLocationDot } from 'react-icons/fa6'
+import { LuSunrise, LuSunset } from 'react-icons/lu'
 
 const order: PrayerName[] = ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya']
 
@@ -17,69 +18,114 @@ function nextPrayer(times: PrayerTimes): PrayerName {
 }
 
 export function PrayerTimesGrid({ compact = false }: { compact?: boolean }) {
-  const { times, loading, error, usingFallback } = usePrayer()
+  const { times, loading } = usePrayer()
 
   if (loading) {
     return (
-      <div className="grid grid-cols-5 gap-2 sm:gap-3" role="status" aria-label="Memuat jadwal sholat">
+      <div className="grid grid-cols-5 gap-1.5 rounded-xl bg-white/60 p-1.5 w-full border border-primary/10" role="status" aria-label="Memuat jadwal sholat">
         {order.map((p) => (
-          <div key={p} className="flex flex-col items-center gap-1.5 rounded-xl bg-white/60 p-3 animate-pulse">
-            <span className="h-2.5 w-14 rounded-full bg-primary/10" />
-            <span className="h-5 w-12 rounded-full bg-primary/10" />
+          <div key={p} className="flex min-w-0 flex-col items-center gap-1 rounded-lg bg-cream/70 py-2 animate-pulse">
+            <span className="h-2 w-8 rounded-full bg-primary/10" />
+            <span className="h-3.5 w-10 rounded-full bg-primary/10" />
           </div>
         ))}
       </div>
     )
   }
 
-  return (
-    <div>
-      {times && (
-        <div className={`grid grid-cols-5 gap-2 sm:gap-3 ${compact ? '' : 'sm:grid-cols-5'}`}>
+  if (!times) return null
+
+  const currentNext = nextPrayer(times)
+
+  if (compact) {
+    return (
+      <div className="w-full flex flex-col items-center">
+        {/* Grid 5 Waktu Sholat */}
+        <div className="grid grid-cols-5 gap-1 sm:gap-1.5 rounded-xl bg-white/90 p-1.5 border border-primary/10 w-full shadow-xs">
           {order.map((p) => {
-            const active = p === nextPrayer(times)
+            const active = p === currentNext
             return (
               <div
                 key={p}
-                className={`flex flex-col items-center gap-1 rounded-xl px-2 py-3 text-center transition-all sm:py-4 ${
-                  active ? 'bg-gold text-primary shadow-gold' : 'bg-white/70 text-ink hover:bg-white'
+                className={`flex min-w-0 flex-col items-center justify-center rounded-lg py-1.5 px-1 text-center transition-all ${
+                  active
+                    ? 'bg-primary text-white shadow-sm ring-1 ring-primary/20 scale-[1.02]'
+                    : 'text-ink-soft hover:bg-cream/70'
                 }`}
               >
-                <span className={`text-[11px] font-bold uppercase tracking-wider sm:text-xs ${active ? 'text-primary' : 'text-ink-mute'}`}>
+                <span
+                  className={`block w-full text-[10px] sm:text-[11px] font-semibold leading-tight tracking-tight ${
+                    active ? 'text-gold-light font-bold' : 'text-ink-mute'
+                  }`}
+                  title={PRAYER_LABELS[p]}
+                >
                   {PRAYER_LABELS[p]}
                 </span>
-                <span className="font-heading text-base font-extrabold tabular-nums sm:text-lg">{times[p]}</span>
+                <span
+                  className={`mt-1 block font-heading text-xs sm:text-[13px] font-extrabold tabular-nums leading-none ${
+                    active ? 'text-white' : 'text-ink'
+                  }`}
+                >
+                  {times[p]}
+                </span>
               </div>
             )
           })}
         </div>
-      )}
-      {(error || usingFallback) && (
-        <p className="mt-3 flex items-center gap-1.5 text-xs text-ink-mute">
-          <AlertCircle className="h-3.5 w-3.5" />
-          {error ?? 'Menampilkan jadwal lokasi Anda.'}
-        </p>
-      )}
-      {times && (
-        <p className="mt-3 flex items-center gap-1.5 text-xs font-medium text-ink-mute">
-          <LocateFixed className="h-3.5 w-3.5 text-gold-dark" />
-          {times.city} • {times.dateLabel}
-        </p>
-      )}
+
+        {/* Status Lokasi & Waktu Sholat (Ketengah) */}
+        <div className="mt-2.5 flex items-center justify-center gap-2 text-[11px] text-ink-mute text-center">
+          <span className="inline-flex items-center gap-1 font-medium text-ink-soft">
+            <FaLocationDot className="h-3 w-3 text-gold-dark shrink-0" />
+            <span>{times.city}</span>
+          </span>
+          <span className="text-ink-mute/50">•</span>
+          <span className="text-[10px] font-semibold text-primary/80 bg-softgreen px-2 py-0.5 rounded-md border border-primary/10">
+            Deteksi Otomatis
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="w-full">
+      <div className="grid grid-cols-5 gap-2 sm:gap-3">
+        {order.map((p) => {
+          const active = p === currentNext
+          return (
+            <div
+              key={p}
+              className={`flex flex-col items-center gap-1 rounded-xl px-2 py-3 text-center transition-all sm:py-4 ${
+                active ? 'bg-primary text-white shadow-md' : 'bg-white/70 text-ink hover:bg-white border border-primary/5'
+              }`}
+            >
+              <span className={`text-[11px] font-semibold tracking-tight sm:text-xs ${active ? 'text-gold-light' : 'text-ink-mute'}`}>
+                {PRAYER_LABELS[p]}
+              </span>
+              <span className="font-heading text-base font-extrabold tabular-nums sm:text-lg">{times[p]}</span>
+            </div>
+          )
+        })}
+      </div>
+      <div className="mt-3 flex items-center justify-center gap-1.5 text-xs font-medium text-ink-mute">
+        <FaLocationDot className="h-3.5 w-3.5 text-gold-dark" />
+        {times.city} • {times.dateLabel}
+      </div>
     </div>
   )
 }
 
 /** Kartu jadwal lengkap dengan waktu imsak & terbit matahari. */
 export function PrayerScheduleCard() {
-  const { times, loading, error, usingFallback } = usePrayer()
+  const { times, loading } = usePrayer()
 
   return (
-    <div className="overflow-hidden rounded-card bg-white shadow-soft">
+    <div className="overflow-hidden rounded-card bg-white shadow-soft border border-primary/10">
       <div className="flex items-center justify-between gap-3 bg-primary px-6 py-4 text-white">
         <div className="flex items-center gap-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10">
-            <Clock className="h-5 w-5 text-gold" />
+            <FaClock className="h-5 w-5 text-gold" />
           </span>
           <div>
             <h2 className="font-heading text-lg font-extrabold">Jadwal Sholat</h2>
@@ -101,7 +147,7 @@ export function PrayerScheduleCard() {
               </div>
               <div className="flex items-center justify-between rounded-xl bg-softblue px-4 py-3">
                 <span className="flex items-center gap-1.5 text-sm font-semibold text-ink-soft">
-                  <Sunrise className="h-4 w-4 text-secondary" /> Terbit
+                  <LuSunrise className="h-4 w-4 text-secondary" /> Terbit
                 </span>
                 <span className="font-heading text-base font-extrabold text-secondary-dark">{times.sunrise}</span>
               </div>
@@ -113,7 +159,7 @@ export function PrayerScheduleCard() {
               </div>
             ))}
             <p className="flex items-center gap-1.5 pt-1 text-xs text-ink-mute">
-              <Sunset className="h-3.5 w-3.5 text-gold-dark" /> Jadwal dihitung otomatis berdasarkan posisi matahari di lokasi Anda.
+              <LuSunset className="h-3.5 w-3.5 text-gold-dark" /> Jadwal dihitung otomatis berdasarkan koordinat lokasi perangkat Anda.
             </p>
           </div>
         ) : (
@@ -122,12 +168,6 @@ export function PrayerScheduleCard() {
               <div key={i} className="h-12 animate-pulse rounded-xl bg-cream" />
             ))}
           </div>
-        )}
-        {(error || usingFallback) && (
-          <p className="mt-4 flex items-start gap-2 rounded-xl bg-softyellow px-4 py-3 text-xs leading-relaxed text-gold-ink">
-            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-            {error ?? 'Perkiraan jadwal berdasarkan waktu matahari; jadwal resmi dapat berbeda 1–3 menit.'}
-          </p>
         )}
       </div>
     </div>

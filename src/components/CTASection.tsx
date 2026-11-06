@@ -1,9 +1,11 @@
+import type { ReactNode } from 'react'
 import Reveal from './Reveal'
 import { ButtonLink } from './Buttons'
 import { LogoEmblem } from './Logo'
 
 type Props = {
-  title: React.ReactNode
+  badge?: string
+  title: ReactNode
   description?: string
   primaryLabel?: string
   primaryTo?: string
@@ -14,9 +16,9 @@ type Props = {
 export default function CTASection({
   title,
   description,
-  primaryLabel = 'Daftar Sekarang',
+  primaryLabel = 'Daftar PPDB Online',
   primaryTo = '/ppdb/daftar',
-  secondaryLabel = 'Menjadi Donatur',
+  secondaryLabel = 'Menjadi Donatur / Wali Asuh',
   secondaryTo = '/yatim/donasi',
 }: Props) {
   return (
@@ -27,9 +29,6 @@ export default function CTASection({
       </div>
 
       <Reveal className="relative mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
-        <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-gold-light">
-          Bergabung Bersama Kami
-        </span>
         <h2 className="text-3xl font-extrabold leading-[1.15] text-white sm:text-4xl lg:text-5xl">{title}</h2>
         {description && <p className="max-w-xl text-base leading-relaxed text-white/75 sm:text-lg">{description}</p>}
         <div className="mt-2 flex flex-col gap-3 sm:flex-row">

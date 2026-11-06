@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Check, Copy, Sparkles } from 'lucide-react'
+import { RiCheckLine, RiFileCopyLine } from 'react-icons/ri'
+import { FaHandsPraying } from 'react-icons/fa6'
 import PageHeader from '../components/PageHeader'
 import Reveal from '../components/Reveal'
 import { useSEO } from '../hooks/useSEO'
@@ -10,7 +11,7 @@ export default function Doa() {
   const doas = data.doas.filter((item) => item.status !== 'DRAFT')
   useSEO({
     title: 'Kumpulan Doa Harian Anak | TK Islam Al-Mustam',
-    description: 'Kumpulan doa harian anak muslim lengkap dengan tulisan Arab berharakat, transliterasi latin, arti bahasa Indonesia dan keutamaannya.',
+    description: 'Kumpulan doa harian anak muslim lengkap dengan tulisan Arab berharakat, transliterasi latin, dan arti bahasa Indonesia.',
     path: '/doa',
   })
 
@@ -32,7 +33,7 @@ export default function Doa() {
     <>
       <PageHeader
         eyebrow="Khazanah Doa"
-        title="Koleksi Doa Harian Santri Cilik"
+        title="Koleksi Doa Harian Murid Cilik"
         description="Doa-doa shahih sehari-hari yang mudah dihafalkan buah hati, dilengkapi harakat jelas, teks latin, dan terjemahannya."
         crumbs={[{ label: 'Konten Islami', href: '/konten-islami' }, { label: 'Doa Harian' }]}
       />
@@ -56,7 +57,7 @@ export default function Doa() {
                   aria-pressed={active === d.slug}
                 >
                   <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${active === d.slug ? 'bg-white/10 text-gold' : 'bg-softgreen text-primary'}`}>
-                    <Sparkles className="h-4.5 w-4.5" />
+                    <FaHandsPraying className="h-4.5 w-4.5" />
                   </span>
                   <div>
                     <span className="block font-heading text-sm font-extrabold">{d.title}</span>
@@ -80,7 +81,7 @@ export default function Doa() {
                   className="flex items-center gap-1.5 rounded-xl border border-primary/10 bg-cream px-3.5 py-1.5 text-xs font-bold text-primary transition-colors hover:bg-primary hover:text-white"
                   aria-label="Salin doa"
                 >
-                  {copied ? <Check className="h-3.5 w-3.5 text-primary-mint" /> : <Copy className="h-3.5 w-3.5" />}
+                  {copied ? <RiCheckLine className="h-4 w-4 text-primary-mint" /> : <RiFileCopyLine className="h-4 w-4" />}
                   <span>{copied ? 'Tersalin!' : 'Salin Teks Doa'}</span>
                 </button>
               </div>
@@ -107,13 +108,6 @@ export default function Doa() {
                 <p className="text-xs font-bold uppercase tracking-wider text-ink-mute">Arti / Terjemahan</p>
                 <p className="mt-2 text-sm leading-relaxed text-ink-soft">{doa.meaning}</p>
               </div>
-
-              {/* Keutamaan Doa */}
-              {doa.virtue && (
-                <div className="mt-6 rounded-2xl bg-softyellow p-5 text-xs leading-relaxed text-gold-ink sm:text-sm font-medium">
-                  <span className="font-bold">✨ Keutamaan &amp; Waktu Amalan:</span> {doa.virtue}
-                </div>
-              )}
             </article>
           </Reveal>
 

@@ -15,7 +15,7 @@ export default function Galeri() {
 
   useSEO({
     title: `Galeri Foto Dokumentasi | ${site.name}`,
-    description: `Galeri dokumentasi kegiatan pembelajaran, murojaah tahfidz, praktik ibadah, dan outing santri di ${site.name}.`,
+    description: `Galeri dokumentasi kegiatan pembelajaran, murojaah tahfidz, praktik ibadah, dan outing murid di ${site.name}.`,
     path: '/galeri',
   })
 
@@ -91,8 +91,8 @@ export default function Galeri() {
     <>
       <PageHeader
         eyebrow="Galeri Dokumentasi"
-        title="Momen Ceria &amp; Tumbuh Kembang Santri"
-        description="Dokumentasi autentik aktivitas pembelajaran 5 sentra, murojaah Al-Qur’an, peringatan hari besar Islam, dan kreativitas santri."
+        title="Momen Ceria &amp; Tumbuh Kembang Murid"
+        description="Dokumentasi autentik aktivitas pembelajaran 5 sentra, murojaah Al-Qur’an, peringatan hari besar Islam, dan kreativitas murid."
         crumbs={[{ label: 'Galeri Foto' }]}
       />
 

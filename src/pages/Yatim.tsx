@@ -43,7 +43,7 @@ export default function Yatim() {
     <>
       <PageHeader
         eyebrow="Kepedulian Sosial"
-        title="Program Beasiswa &amp; Pembinaan Santri Yatim"
+        title="Program Beasiswa &amp; Pembinaan Murid Yatim"
         description="Setiap anak berhak mendapatkan kesempatan belajar di lingkungan terbaik, tumbuh dengan kasih sayang, dan menatap masa depan cerah."
         crumbs={[{ label: 'Program Yatim' }]}
       >
@@ -69,7 +69,7 @@ export default function Yatim() {
           <SectionHeading
             eyebrow="Bentuk Pembinaan"
             title="Dukungan Holistik: Ilmu, Karakter, &amp; Masa Depan"
-            subtitle="Kami mendampingi santri yatim secara menyeluruh untuk memastikan tumbuh kembang optimal dan mandiri."
+            subtitle="Kami mendampingi murid yatim secara menyeluruh untuk memastikan tumbuh kembang optimal dan mandiri."
           />
           
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -100,11 +100,11 @@ export default function Yatim() {
         <div className="mx-auto max-w-[1440px]">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             
-            {/* Foto Kelas & Santri */}
+            {/* Foto Kelas & Murid */}
             <Reveal className="overflow-hidden rounded-3xl border border-primary/10 bg-cream p-3 shadow-lift">
               <img
                 src="/images/content/prog-tk-a.jpg"
-                alt="Santri yatim belajar di TK Islam Al-Mustam"
+                alt="Murid yatim belajar di TK Islam Al-Mustam"
                 loading="lazy"
                 className="h-full w-full rounded-2xl object-cover"
               />
@@ -141,9 +141,9 @@ export default function Yatim() {
 
       <CTASection
         title={<>Konsultasikan Program Kemitraan Peduli Yatim</>}
-        description="Hubungi sekretariat yayasan untuk informasi pendaftaran beasiswa santri yatim atau program wali asuh."
+        description="Hubungi sekretariat yayasan untuk informasi pendaftaran beasiswa murid yatim atau program wali asuh."
         primaryLabel="Konsultasi WhatsApp"
-        primaryTo={`https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent('Assalamualaikum Admin, saya ingin konsultasi program santri yatim di TK Islam Al-Mustam.')}`}
+        primaryTo={`https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent('Assalamualaikum Admin, saya ingin konsultasi program murid yatim di TK Islam Al-Mustam.')}`}
         secondaryLabel="Program Orang Tua Asuh"
         secondaryTo="/yatim/orangtua-asuh"
       />

@@ -1,8 +1,21 @@
 import { Link } from 'react-router-dom'
-import { Mail, MapPin, Phone, ArrowUpRight, Award, ShieldCheck, Heart } from 'lucide-react'
 import Logo, { LogoEmblem } from './Logo'
-import { InstagramIcon, FacebookIcon, YoutubeIcon } from './SocialIcons'
 import { useCMS } from '../hooks/useCMS'
+import {
+  RiAwardLine,
+  RiArrowRightUpLine,
+} from 'react-icons/ri'
+import {
+  FaLocationDot,
+  FaPhone,
+  FaEnvelope,
+  FaWhatsapp,
+  FaHeart,
+  FaInstagram,
+  FaFacebookF,
+  FaYoutube,
+  FaClock,
+} from 'react-icons/fa6'
 
 const footerColumns = [
   {
@@ -31,7 +44,8 @@ const footerColumns = [
     title: 'Layanan PPDB',
     links: [
       { label: 'Informasi PPDB 2026/2027', href: '/ppdb' },
-      { label: 'Formulir Pendaftaran Online', href: '/ppdb/daftar' },
+      { label: 'Portal Mandiri PPDB (Pendaftaran)', href: '/ppdb/daftar' },
+      { label: 'Cek Status Pendaftaran', href: 'http://localhost:5175/cek-status' },
       { label: 'Rincian Biaya Transparan', href: '/ppdb#biaya' },
       { label: 'Jadwal Gelombang & Syarat', href: '/ppdb#syarat' },
       { label: 'Berita & Kegiatan', href: '/berita' },
@@ -76,7 +90,7 @@ export default function Footer() {
             {/* Accreditation Badge */}
             <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3.5 backdrop-blur-md">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gold text-primary-deep">
-                <Award className="h-5 w-5" />
+                <RiAwardLine className="h-5 w-5" />
               </span>
               <div>
                 <p className="text-xs font-extrabold text-gold-light">{site.accreditation}</p>
@@ -84,12 +98,12 @@ export default function Footer() {
               </div>
             </div>
 
-            {/* Social Icons */}
+            {/* Social Icons with react-icons */}
             <div className="flex items-center gap-3">
               {[
-                { icon: InstagramIcon, href: site.social.instagram, label: 'Instagram' },
-                { icon: FacebookIcon, href: site.social.facebook, label: 'Facebook' },
-                { icon: YoutubeIcon, href: site.social.youtube, label: 'YouTube' },
+                { icon: FaInstagram, href: site.social.instagram, label: 'Instagram' },
+                { icon: FaFacebookF, href: site.social.facebook, label: 'Facebook' },
+                { icon: FaYoutube, href: site.social.youtube, label: 'YouTube' },
               ].map((s) => (
                 <a
                   key={s.label}
@@ -107,7 +121,7 @@ export default function Footer() {
             {/* Address box */}
             <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
               <p className="mb-1.5 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gold-light">
-                <MapPin className="h-3.5 w-3.5" /> Alamat Kampus
+                <FaLocationDot className="h-3.5 w-3.5" /> Alamat Kampus
               </p>
               <p className="text-xs leading-relaxed text-white/80">{site.contact.address}</p>
             </div>
@@ -123,13 +137,25 @@ export default function Footer() {
                 <ul className="space-y-2.5">
                   {col.links.map((l) => (
                     <li key={l.label}>
-                      <Link
-                        to={l.href}
-                        className="group inline-flex items-center gap-1 text-xs text-white/70 transition-colors hover:text-gold sm:text-sm"
-                      >
-                        <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
-                        <span>{l.href === '/ppdb' ? `Informasi PPDB ${data.pageContent.ppdb.academicYear}` : l.label}</span>
-                      </Link>
+                      {l.href.startsWith('http') ? (
+                        <a
+                          href={l.href}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="group inline-flex items-center gap-1 text-xs text-white/70 transition-colors hover:text-gold sm:text-sm"
+                        >
+                          <RiArrowRightUpLine className="h-3 w-3" aria-hidden="true" />
+                          <span>{l.label}</span>
+                        </a>
+                      ) : (
+                        <Link
+                          to={l.href}
+                          className="group inline-flex items-center gap-1 text-xs text-white/70 transition-colors hover:text-gold sm:text-sm"
+                        >
+                          <RiArrowRightUpLine className="h-3 w-3" aria-hidden="true" />
+                          <span>{l.href === '/ppdb' ? `Informasi PPDB ${data.pageContent.ppdb.academicYear}` : l.label}</span>
+                        </Link>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -150,7 +176,7 @@ export default function Footer() {
               className="flex items-center gap-3.5 text-sm text-white/85 transition-colors hover:text-gold"
             >
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gold/20 text-gold">
-                <Phone className="h-5 w-5" />
+                <FaWhatsapp className="h-5 w-5" />
               </span>
               <span className="flex flex-col">
                 <span className="text-[11px] text-white/60">WhatsApp Resmi</span>
@@ -163,7 +189,7 @@ export default function Footer() {
               className="flex items-center gap-3.5 text-sm text-white/85 transition-colors hover:text-gold"
             >
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gold/20 text-gold">
-                <Mail className="h-5 w-5" />
+                <FaEnvelope className="h-5 w-5" />
               </span>
               <span className="flex flex-col">
                 <span className="text-[11px] text-white/60">Email Informasi</span>
@@ -173,7 +199,7 @@ export default function Footer() {
 
             <div className="flex items-center gap-3.5 text-sm text-white/85">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gold/20 text-gold">
-                <Phone className="h-5 w-5" />
+                <FaPhone className="h-5 w-5" />
               </span>
               <span className="flex flex-col">
                 <span className="text-[11px] text-white/60">Telepon Kantor</span>
@@ -183,7 +209,7 @@ export default function Footer() {
 
             <div className="flex items-center gap-3.5 text-sm text-white/85">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gold/20 text-gold">
-                <ShieldCheck className="h-5 w-5" />
+                <FaClock className="h-5 w-5" />
               </span>
               <span className="flex flex-col">
                 <span className="text-[11px] text-white/60">Jam Layanan</span>
@@ -195,7 +221,7 @@ export default function Footer() {
           <div className="relative overflow-hidden rounded-3xl border border-white/10">
             <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-2 bg-primary-deep/85 px-5 py-3 backdrop-blur-sm">
               <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gold-light">
-                <MapPin className="h-3.5 w-3.5" /> Peta Kampus
+                <FaLocationDot className="h-3.5 w-3.5" /> Peta Kampus
               </p>
               <a
                 href={site.mapsLink}
@@ -241,7 +267,7 @@ export default function Footer() {
 
           <p className="flex items-center gap-1.5 text-xs text-gold-light">
             <span>{site.tagline}</span>
-            <Heart className="h-3.5 w-3.5 fill-gold text-gold" />
+            <FaHeart className="h-3.5 w-3.5 text-gold" />
           </p>
         </div>
 

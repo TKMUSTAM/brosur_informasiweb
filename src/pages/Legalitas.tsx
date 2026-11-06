@@ -16,7 +16,7 @@ export default function Legalitas() {
   return (
     <>
       <PageHeader
-        eyebrow="Legalitas &amp; Akreditasi"
+        eyebrow="Izin Operasional &amp; Akreditasi"
         title="Lembaga Resmi, Terakreditasi &amp; Amanah"
         description={`${site.name} beroperasi secara legal dan terdaftar resmi di Kementerian Pendidikan Dasar & Menengah RI, Kementerian Agama RI, serta Kementerian Hukum dan HAM RI.`}
         crumbs={[{ label: 'Profil Yayasan', href: '/profil' }, { label: 'Legalitas & Akreditasi' }]}

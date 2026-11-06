@@ -39,14 +39,14 @@ export default function Home() {
       <CTASection
         title={
           <>
-            Mari Bentuk Generasi <span className="text-gold">Qur’ani &amp; Berakhlaqul Karimah.</span>
+            Mari Bersilaturahmi &amp; Kenali Lebih Dekat <span className="text-gold">TK Islam Al-Mustam.</span>
           </>
         }
-        description={`Tanyakan ketersediaan kuota PPDB Tahun Ajaran ${data.pageContent.ppdb.academicYear} melalui kanal resmi sekolah.`}
-        primaryLabel="Daftar PPDB Online"
-        primaryTo="/ppdb/daftar"
-        secondaryLabel="Konsultasi WhatsApp"
-        secondaryTo={`https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent('Assalamualaikum, saya ingin konsultasi pendaftaran di TK Islam Al-Mustam.')}`}
+        description={`Kunjungi lingkungan belajar kami, amati interaksi guru ramah anak, dan konsultasikan tumbuh kembang buah hati Anda.`}
+        primaryLabel="Hubungi Kontak Sekolah"
+        primaryTo="/kontak"
+        secondaryLabel="Portal PPDB Online"
+        secondaryTo="/ppdb/daftar"
       />
     </>
   )

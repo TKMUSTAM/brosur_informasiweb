@@ -1,13 +1,24 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, BookOpen, FileText, Home, Search, Sparkles, X } from 'lucide-react'
 import { searchAll, type SearchResult } from '../data/searchIndex'
+import {
+  RiSearchLine,
+  RiCloseLine,
+  RiArrowRightLine,
+  RiBookOpenLine,
+  RiNewspaperLine,
+  RiHome5Line,
+} from 'react-icons/ri'
+import { FaMosque } from 'react-icons/fa6'
+import type { ComponentType } from 'react'
 
-const groupMeta: Record<SearchResult['group'], { icon: typeof BookOpen; label: string; color: string }> = {
-  Program: { icon: BookOpen, label: 'Program', color: 'bg-softgreen text-primary' },
-  Berita: { icon: FileText, label: 'Berita', color: 'bg-softblue text-secondary-dark' },
-  'Konten Islami': { icon: Sparkles, label: 'Konten Islami', color: 'bg-softyellow text-gold-ink' },
-  Halaman: { icon: Home, label: 'Halaman', color: 'bg-cream-dark text-ink-soft' },
+type IconComp = ComponentType<{ className?: string }>
+
+const groupMeta: Record<SearchResult['group'], { icon: IconComp; label: string; color: string }> = {
+  Program: { icon: RiBookOpenLine, label: 'Program', color: 'bg-softgreen text-primary' },
+  Berita: { icon: RiNewspaperLine, label: 'Berita', color: 'bg-softblue text-secondary-dark' },
+  'Konten Islami': { icon: FaMosque, label: 'Konten Islami', color: 'bg-softyellow text-gold-ink' },
+  Halaman: { icon: RiHome5Line, label: 'Halaman', color: 'bg-cream-dark text-ink-soft' },
 }
 
 type Props = {
@@ -129,11 +140,11 @@ export default function SearchOverlay({ open, onClose }: Props) {
       <div
         ref={listRef}
         onKeyDown={onPanelKeyDown}
-        className="dropdown-in relative w-full max-w-xl overflow-hidden rounded-none border border-primary/10 bg-white shadow-lift"
+        className="dropdown-in relative w-full max-w-xl overflow-hidden rounded-2xl border border-primary/10 bg-white shadow-lift"
       >
         {/* input */}
         <div className="flex items-center gap-3 border-b border-primary/5 px-5 py-4">
-          <Search className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+          <RiSearchLine className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
           <input
             ref={inputRef}
             type="search"
@@ -154,7 +165,7 @@ export default function SearchOverlay({ open, onClose }: Props) {
             aria-label="Tutup"
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cream text-ink-soft transition-colors hover:bg-softred hover:text-warmred"
           >
-            <X className="h-4 w-4" />
+            <RiCloseLine className="h-5 w-5" />
           </button>
         </div>
 
@@ -195,7 +206,7 @@ export default function SearchOverlay({ open, onClose }: Props) {
                       </span>
                       <span className="mt-0.5 block truncate text-xs text-ink-mute">{r.description}</span>
                     </span>
-                    <ArrowRight
+                    <RiArrowRightLine
                       className={`h-4 w-4 shrink-0 transition-all ${
                         isActive ? 'translate-x-0 text-primary opacity-100' : '-translate-x-1 text-ink-mute opacity-0'
                       }`}

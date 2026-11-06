@@ -1,5 +1,6 @@
 import { useParams, Link, Navigate } from 'react-router-dom'
-import { ArrowLeft, CheckCircle2, Clock, Users, CalendarDays } from 'lucide-react'
+import { FaUsers, FaClock, FaCalendarDays } from 'react-icons/fa6'
+import { RiArrowLeftLine, RiCheckboxCircleLine } from 'react-icons/ri'
 import PageHeader from '../components/PageHeader'
 import Reveal from '../components/Reveal'
 import ContentImage from '../components/illustrations/ContentImage'
@@ -17,7 +18,7 @@ export default function ProgramDetail() {
   const program = programs.find((p) => p.slug === slug)
 
   useSEO({
-    title: program ? (program.code === program.name ? program.code : `${program.code}: ${program.name}`) : 'Program',
+    title: program ? `${program.name} (${program.code}) | TK Islam Al-Mustam` : 'Program',
     description: program?.description ?? 'Program pendidikan Yayasan Mustam.',
     path: `/program/${slug}`,
   })
@@ -27,21 +28,21 @@ export default function ProgramDetail() {
   return (
     <>
       <PageHeader
-        eyebrow={program.code}
-        title={program.name}
+        eyebrow="Program Pendidikan"
+        title={`${program.name} (${program.code})`}
         description={program.description}
         crumbs={[{ label: 'Program Pendidikan', href: '/program' }, { label: program.code }]}
         variant="green"
       >
-        <div className="mt-6 flex flex-wrap gap-3">
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white">
-            <Users className="h-4 w-4 text-gold" /> {program.ageRange}
+        <div className="mt-6 flex flex-wrap gap-2.5 sm:gap-3">
+          <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-white border border-white/10">
+            <FaUsers className="h-3.5 w-3.5 text-gold-light" /> {program.ageRange}
           </span>
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white">
-            <Clock className="h-4 w-4 text-gold" /> {program.schedule}
+          <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-white border border-white/10">
+            <FaClock className="h-3.5 w-3.5 text-gold-light" /> {program.schedule}
           </span>
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white">
-            <CalendarDays className="h-4 w-4 text-gold" /> {program.capacity}
+          <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-white border border-white/10">
+            <FaCalendarDays className="h-3.5 w-3.5 text-gold-light" /> {program.capacity}
           </span>
         </div>
       </PageHeader>
@@ -66,7 +67,7 @@ export default function ProgramDetail() {
             <div>
               <Reveal>
                 <h2 className="font-heading text-2xl font-extrabold text-primary sm:text-3xl">
-                  Yang Dipelajari di {program.code}
+                  Fokus Pembelajaran di {program.code}
                 </h2>
                 <p className="mt-3 text-[15px] leading-relaxed text-ink-soft">{program.description}</p>
               </Reveal>
@@ -74,14 +75,14 @@ export default function ProgramDetail() {
               <ul className="mt-8 grid gap-3 sm:grid-cols-2">
                 {program.highlights.map((h, i) => (
                   <Reveal as="li" key={h} delay={i * 50} className="flex items-start gap-3 rounded-xl border border-primary/5 bg-white px-4 py-3.5 shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-gold/60 hover:shadow-lift">
-                    <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                    <RiCheckboxCircleLine className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                     <span className="text-sm font-semibold text-ink">{h}</span>
                   </Reveal>
                 ))}
               </ul>
 
               {/* info singkat */}
-              <Reveal className="mt-8 grid gap-4 rounded-card bg-softgreen p-6 sm:grid-cols-3">
+              <Reveal className="mt-8 grid gap-4 rounded-2xl bg-softgreen p-6 sm:grid-cols-3 border border-primary/10">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-wider text-ink-mute">Usia</p>
                   <p className="mt-1 font-heading text-base font-extrabold text-primary">{program.age}</p>
@@ -104,7 +105,7 @@ export default function ProgramDetail() {
                   to="/program"
                   className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-ink-soft transition-colors hover:text-primary"
                 >
-                  <ArrowLeft className="h-4 w-4" /> Semua Program
+                  <RiArrowLeftLine className="h-4 w-4" /> Semua Program
                 </Link>
               </div>
             </div>

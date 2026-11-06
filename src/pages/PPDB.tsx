@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Calculator, Download, CheckCircle2, Heart, Sparkles } from 'lucide-react'
+import { RiCalculatorLine, RiDownloadLine, RiCheckboxCircleLine } from 'react-icons/ri'
+import { FaHeart } from 'react-icons/fa6'
 import PageHeader from '../components/PageHeader'
 import SectionHeading from '../components/SectionHeading'
 import Reveal from '../components/Reveal'
@@ -87,14 +88,14 @@ export default function PPDB() {
         crumbs={[{ label: `PPDB ${ppdb.academicYear}` }]}
       >
         <div className="mt-8 flex flex-wrap gap-3">
-          {ppdb.registrationOpen && <ButtonLink to="/ppdb/daftar" variant="gold" size="lg" withArrow className="shadow-gold">Daftar Online Sekarang</ButtonLink>}
+          {ppdb.registrationOpen && <ButtonLink to="http://localhost:5175/daftar" variant="gold" size="lg" withArrow className="shadow-gold">Daftar Online di Portal PPDB</ButtonLink>}
           <a
             href={`https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent('Assalamualaikum, saya ingin menanyakan brosur dan panduan PPDB TK Islam Al-Mustam.')}`}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-md transition-all hover:bg-white/25"
           >
-            <Download className="h-4 w-4 text-gold" />
+            <RiDownloadLine className="h-4 w-4 text-gold" />
             Unduh Brosur &amp; Rincian PDF
           </a>
         </div>
@@ -106,7 +107,7 @@ export default function PPDB() {
           <Reveal className="rounded-3xl border border-primary/10 bg-white p-7 shadow-lift sm:p-10">
             <div className="flex items-center gap-3">
               <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-softyellow text-gold-ink">
-                <Calculator className="h-6 w-6" />
+                <RiCalculatorLine className="h-6 w-6" />
               </span>
               <div>
                 <h2 className="font-heading text-lg font-extrabold text-primary sm:text-xl">
@@ -150,7 +151,7 @@ export default function PPDB() {
                     <p className="font-heading text-lg font-extrabold text-primary">{calcResult.ageStr}</p>
                     <p className="mt-1 text-sm font-bold text-primary-light">{calcResult.recommendation}</p>
                   </div>
-                  <ButtonLink to="/ppdb/daftar" variant="primary" size="sm" withArrow className="mt-2 sm:mt-0">
+                  <ButtonLink to="http://localhost:5175/daftar" variant="primary" size="sm" withArrow className="mt-2 sm:mt-0">
                     Daftar Kelas Ini
                   </ButtonLink>
                 </div>
@@ -194,7 +195,7 @@ export default function PPDB() {
       </section>
 
       {/* ===== RINCIAN BIAYA PENDIDIKAN TRANSPARAN ===== */}
-      <section className="bg-cream px-4 py-16 sm:px-6 sm:py-20" aria-label="Rincian biaya pendidikan">
+      <section id="biaya" className="scroll-mt-24 bg-cream px-4 py-16 sm:px-6 sm:py-20" aria-label="Rincian biaya pendidikan">
         <div className="mx-auto max-w-[1440px]">
           <SectionHeading
             eyebrow="Investasi Pendidikan"
@@ -226,7 +227,7 @@ export default function PPDB() {
 
               <div className="border-t border-primary/10 bg-cream p-4 text-center">
                 <p className="text-xs text-ink-mute">
-                  * Pembayaran uang pangkal dapat diangsur selama 3 bulan pertama.
+                  Catatan: Pembayaran uang pangkal dapat diangsur selama 3 bulan pertama.
                 </p>
               </div>
             </Reveal>
@@ -236,7 +237,7 @@ export default function PPDB() {
               <div>
                 <div className="flex items-center gap-3">
                   <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-warmred text-white shadow-soft">
-                    <Heart className="h-6 w-6" />
+                    <FaHeart className="h-6 w-6" />
                   </span>
                   <div>
                     <span className="rounded-full bg-warmred px-3 py-0.5 text-[11px] font-extrabold text-white">
@@ -254,22 +255,22 @@ export default function PPDB() {
 
                 <ul className="mt-4 space-y-2 text-xs font-semibold text-ink">
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-warmred" />
+                    <RiCheckboxCircleLine className="h-4 w-4 text-warmred" />
                     <span>Pengajuan diperiksa oleh sekretariat</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-warmred" />
+                    <RiCheckboxCircleLine className="h-4 w-4 text-warmred" />
                     <span>Cakupan bantuan dijelaskan setelah verifikasi</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-warmred" />
+                    <RiCheckboxCircleLine className="h-4 w-4 text-warmred" />
                     <span>Keputusan disampaikan melalui kanal resmi sekolah</span>
                   </li>
                 </ul>
               </div>
 
               <div className="mt-6 border-t border-warmred/10 pt-4">
-                <ButtonLink to="/ppdb/daftar" variant="outline" className="w-full justify-center border-warmred text-warmred hover:bg-warmred hover:text-white">
+                <ButtonLink to="http://localhost:5175/daftar" variant="outline" className="w-full justify-center border-warmred text-warmred hover:bg-warmred hover:text-white">
                   Daftar Jalur Beasiswa Yatim
                 </ButtonLink>
               </div>
@@ -283,7 +284,7 @@ export default function PPDB() {
         <div className="mx-auto max-w-[1440px]">
           <SectionHeading
             eyebrow="Alur Pendaftaran"
-            title="5 Tahap Mudah Menjadi Santri Al-Mustam"
+            title="5 Tahap Mudah Menjadi Murid Al-Mustam"
             subtitle="Proses pendaftaran yang praktis, transparan, dan ramah bagi orang tua dan anak."
           />
 
@@ -303,7 +304,7 @@ export default function PPDB() {
                     </p>
                   </div>
                   <div className="mt-4 flex items-center gap-1 text-[11px] font-bold text-primary-mint">
-                    <Sparkles className="h-3 w-3" />
+                    
                     <span>Langkah {step.no}</span>
                   </div>
                 </div>
@@ -325,7 +326,7 @@ export default function PPDB() {
             <ul className="mt-6 space-y-3.5">
               {requirements.map((r) => (
                 <li key={r} className="flex items-start gap-3 text-sm text-ink">
-                  <CheckCircle2 className="mt-0.5 h-4.5 w-4.5 shrink-0 text-primary" />
+                  <RiCheckboxCircleLine className="mt-0.5 h-4.5 w-4.5 shrink-0 text-primary" />
                   <span>{r}</span>
                 </li>
               ))}
@@ -363,7 +364,7 @@ export default function PPDB() {
         title={<>Amankan Kursi untuk Buah Hati Anda Sekarang</>}
         description="Kuota murid per kelas dibatasi maksimal 14 anak demi memastikan perhatian dan pendampingan optimal."
         primaryLabel="Isi Formulir Online"
-        primaryTo="/ppdb/daftar"
+        primaryTo="http://localhost:5175/daftar"
         secondaryLabel="Konsultasi WhatsApp"
         secondaryTo={`https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent('Assalamualaikum, saya ingin menanyakan sisa kuota pendaftaran TK Islam Al-Mustam.')}`}
       />

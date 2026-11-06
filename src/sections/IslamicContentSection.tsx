@@ -1,105 +1,142 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight } from 'lucide-react'
-import Icon from '../components/Icon'
 import SectionHeading from '../components/SectionHeading'
 import Reveal from '../components/Reveal'
-import { PrayerTimesGrid } from '../components/PrayerSchedule'
 import { useCMS } from '../hooks/useCMS'
+import { FaBookQuran, FaHeart } from 'react-icons/fa6'
+import { RiCheckLine, RiArrowRightLine } from 'react-icons/ri'
 
 export default function IslamicContentSection() {
   const { data } = useCMS()
-  const doa = data.doas.find((item) => item.status !== 'DRAFT')
-  const article = data.islamicArticles.find((item) => item.status !== 'DRAFT')
-  if (!doa || !article) return null
+  const doa = data.doas.find((item) => item.status !== 'DRAFT') || data.doas[0]
+  const article = data.islamicArticles.find((item) => item.status !== 'DRAFT') || data.islamicArticles[0]
 
   return (
-    <section className="px-4 py-20 sm:px-6 sm:py-24" aria-label="Konten Islami">
+    <section className="bg-slate-50/60 px-4 py-20 sm:px-6 sm:py-24 border-t border-primary/10" aria-label="Khazanah Edukasi Islami">
       <div className="mx-auto max-w-[1440px]">
         <SectionHeading
-          eyebrow="Konten Islami"
-          title="Belajar Kebaikan Setiap Hari"
-          subtitle="Doa, jadwal sholat, dan artikel parenting Islami untuk menemani tumbuh kembang buah hati."
+          eyebrow="Khazanah &amp; Pembiasaan Islami"
+          title="Menanamkan Adab &amp; Mutiara Ilmu Sejak Dini"
+          subtitle="Doa harian, panduan adab islami, dan artikel parenting untuk mendampingi tumbuh kembang buah hati di rumah."
         />
 
-        <div className="mt-12 grid gap-6 lg:grid-cols-3">
-          {/* Doa hari ini */}
-          <Reveal>
-            <Link to="/doa" className="group flex h-full flex-col overflow-hidden rounded-2xl border border-primary/10 bg-softgreen p-7 transition-colors duration-200 hover:border-primary/30">
-              <span className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-soft transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
-                <Icon name="pray" className="h-6 w-6 text-gold" />
-              </span>
-              <p className="text-xs font-bold uppercase tracking-wider text-primary">Doa Hari Ini</p>
-              <h3 className="mt-1.5 font-heading text-xl font-extrabold text-primary">{doa.title}</h3>
-              <p dir="rtl" className="mt-4 text-right font-heading text-lg font-bold leading-relaxed text-primary">
-                {doa.arabic}
-              </p>
-              <p className="mt-2 text-sm italic leading-relaxed text-ink-soft">{doa.latin}</p>
-              <span className="mt-auto inline-flex items-center gap-2 pt-5 text-sm font-bold text-primary transition-all group-hover:gap-3">
-                Baca Doa Harian <ArrowRight className="h-4 w-4" />
+        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {/* Card 1: Doa Hari Ini */}
+          <Reveal className="h-full">
+            <Link
+              to="/doa"
+              className="group flex h-full flex-col justify-between rounded-2xl border border-primary/15 bg-white p-7 transition-all duration-300 hover:border-primary/40 hover:shadow-soft"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-softgreen text-primary font-bold">
+                    <FaBookQuran className="h-5 w-5" />
+                  </span>
+                  <span className="rounded-full bg-softgreen px-3 py-1 text-xs font-bold text-primary">
+                    Doa Harian
+                  </span>
+                </div>
+                <h3 className="font-heading text-lg font-bold text-primary sm:text-xl">
+                  {doa.title}
+                </h3>
+                <p dir="rtl" className="mt-4 text-right font-heading text-xl font-bold leading-loose text-primary">
+                  {doa.arabic}
+                </p>
+                <p className="mt-3 text-xs italic leading-relaxed text-ink-mute">
+                  "{doa.latin}"
+                </p>
+                <p className="mt-2 text-xs text-ink-soft leading-relaxed line-clamp-2">
+                  Artinya: {doa.meaning}
+                </p>
+              </div>
+
+              <span className="mt-6 inline-flex items-center gap-1.5 text-xs font-bold text-primary transition-all group-hover:gap-2.5 pt-4 border-t border-primary/10">
+                <span>Buka Kumpulan Doa Lengkap</span>
+                <RiArrowRightLine className="h-4 w-4" />
               </span>
             </Link>
           </Reveal>
 
-          {/* Jadwal sholat */}
-          <Reveal delay={100}>
-            <Link to="/jadwal-sholat" className="group flex h-full flex-col rounded-2xl border border-secondary/10 bg-softblue p-7 transition-colors duration-200 hover:border-secondary/30">
-              <div className="flex items-center justify-between">
-                <span className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-white shadow-soft transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
-                  <Icon name="moon" className="h-6 w-6" />
+          {/* Card 2: 7 Pilar Adab Murid */}
+          <Reveal delay={100} className="h-full">
+            <Link
+              to="/visi-misi"
+              className="group flex h-full flex-col justify-between rounded-2xl border border-primary/15 bg-white p-7 transition-all duration-300 hover:border-primary/40 hover:shadow-soft"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-softyellow text-gold-dark font-bold">
+                    <FaHeart className="h-5 w-5" />
+                  </span>
+                  <span className="rounded-full bg-softyellow px-3 py-1 text-xs font-bold text-gold-ink">
+                    Karakter Islami
+                  </span>
+                </div>
+                <h3 className="font-heading text-lg font-bold text-primary sm:text-xl">
+                  Pembiasaan 7 Pilar Karakter Murid
+                </h3>
+                <p className="mt-3 text-xs sm:text-sm text-ink-soft leading-relaxed">
+                  Pendidikan di TK Islam Al-Mustam membiasakan anak cinta sholat, gemar berinfaq, jujur, santun berbicara, mandiri, dan berbakti kepada orang tua.
+                </p>
+
+                <ul className="mt-4 space-y-2 text-xs font-medium text-ink-soft">
+                  <li className="flex items-center gap-2">
+                    <RiCheckLine className="h-3.5 w-3.5 text-primary shrink-0" />
+                    <span>Praktik Wudhu &amp; Sholat Berjamaah</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <RiCheckLine className="h-3.5 w-3.5 text-primary shrink-0" />
+                    <span>Hafalan Juz 'Amma Metode Menyenangkan</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <RiCheckLine className="h-3.5 w-3.5 text-primary shrink-0" />
+                    <span>Adab Makan, Belajar, dan Bergaul</span>
+                  </li>
+                </ul>
+              </div>
+
+              <span className="mt-6 inline-flex items-center gap-1.5 text-xs font-bold text-primary transition-all group-hover:gap-2.5 pt-4 border-t border-primary/10">
+                <span>Pelajari Pendekatan Karakter</span>
+                <RiArrowRightLine className="h-4 w-4" />
+              </span>
+            </Link>
+          </Reveal>
+
+          {/* Card 3: Artikel Parenting Edukatif */}
+          <Reveal delay={200} className="h-full">
+            <Link
+              to="/konten-islami"
+              className="group flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-primary/15 bg-white transition-all duration-300 hover:border-primary/40 hover:shadow-soft"
+            >
+              <div>
+                <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-100">
+                  <img
+                    src={article.image || '/images/content/news-parenting.jpg'}
+                    alt={article.title}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <span className="absolute top-3 left-3 rounded-full bg-primary/90 backdrop-blur-sm px-3 py-1 text-[11px] font-bold text-white shadow-xs">
+                    {article.category || 'Parenting Islami'}
+                  </span>
+                </div>
+
+                <div className="p-6">
+                  <h3 className="font-heading text-base sm:text-lg font-bold text-primary leading-snug line-clamp-2">
+                    {article.title}
+                  </h3>
+                  <p className="mt-2 text-xs text-ink-soft leading-relaxed line-clamp-2">
+                    {article.excerpt}
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-6 pt-0">
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-primary transition-all group-hover:gap-2.5 pt-3 border-t border-primary/10 w-full">
+                  <span>Baca Selengkapnya</span>
+                  <RiArrowRightLine className="h-4 w-4" />
                 </span>
-                <span className="rounded-full bg-white px-3 py-1 text-[11px] font-bold text-secondary-dark">Lokasi Anda</span>
-              </div>
-              <p className="text-xs font-bold uppercase tracking-wider text-secondary-dark">Jadwal Sholat</p>
-              <h3 className="mt-1.5 font-heading text-xl font-extrabold text-secondary-dark">Waktu Sholat Hari Ini</h3>
-              <div className="mt-5">
-                <PrayerTimesGrid compact />
-              </div>
-              <span className="mt-auto inline-flex items-center gap-2 pt-5 text-sm font-bold text-secondary-dark transition-all group-hover:gap-3">
-                Jadwal Lengkap <ArrowRight className="h-4 w-4" />
-              </span>
-            </Link>
-          </Reveal>
-
-          {/* Artikel parenting */}
-          <Reveal delay={200}>
-            <Link to="/konten-islami" className="group flex h-full flex-col overflow-hidden rounded-2xl border border-primary/15 bg-white transition-colors duration-200 hover:border-primary/35">
-              <div className="relative overflow-hidden">
-                {article.image ? <img src={article.image} alt={article.imageAlt || article.title} className="aspect-[16/7] w-full object-cover transition-transform duration-500 group-hover:scale-105" /> : <svg viewBox="0 0 320 140" className="aspect-[16/7] w-full transition-transform duration-500 group-hover:scale-105" role="img" aria-label="Ilustrasi parenting">
-                  <rect width="320" height="140" fill="#FFF5C9" />
-                  <circle cx="270" cy="30" r="24" fill="#F4C542" opacity="0.8" />
-                  <circle cx="60" cy="112" r="16" fill="#F2C79B" />
-                  <rect x="48" y="118" width="24" height="20" rx="10" fill="#124B3A" />
-                  <path d="M48 122 Q60 108 72 122" fill="#124B3A" />
-                  <rect x="230" y="116" width="26" height="22" rx="10" fill="#3D82C6" />
-                  <circle cx="243" cy="108" r="10" fill="#F2C79B" />
-                  <path d="M120 88 q-10 6 -6 18 M120 88 q10 6 6 18" stroke="#124B3A" strokeWidth="3" fill="none" strokeLinecap="round" />
-                  <path d="M96 92 L96 108 M120 90 L120 108" stroke="#124B3A" strokeWidth="2.4" strokeLinecap="round" />
-                  <path d="M150 94 Q158 88 166 94" stroke="#C0544E" strokeWidth="2.4" fill="none" strokeLinecap="round" />
-                  <circle cx="143" cy="90" r="2" fill="#2A1A0E" />
-                  <circle cx="157" cy="90" r="2" fill="#2A1A0E" />
-                </svg>}
-              </div>
-              <div className="flex flex-1 flex-col gap-3 p-7">
-                <span className="w-fit rounded-full bg-softyellow px-3 py-1 text-[11px] font-bold text-gold-ink">{article.category}</span>
-                <h3 className="font-heading text-lg font-extrabold leading-snug text-primary">{article.title}</h3>
-                <p className="line-clamp-2 text-sm leading-relaxed text-ink-soft">{article.excerpt}</p>
-                <span className="mt-auto inline-flex items-center gap-2 pt-4 text-sm font-bold text-primary transition-all group-hover:gap-3">
-                  Baca Artikel <ArrowRight className="h-4 w-4" />
-                </span>
               </div>
             </Link>
           </Reveal>
-        </div>
-
-        <div className="mt-10 text-center">
-          <Link
-            to="/konten-islami"
-            className="group inline-flex min-h-11 items-center gap-2 rounded-xl bg-primary px-7 text-sm font-bold text-white transition-colors hover:bg-primary-light sm:text-base"
-          >
-            <Icon name="read" className="h-5 w-5 text-gold" />
-            Jelajahi Konten Islami
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
         </div>
       </div>
     </section>

@@ -1,4 +1,4 @@
-import { BadgeCheck, GraduationCap, Heart, ShieldCheck, Sparkles, UserCheck } from 'lucide-react'
+import { BadgeCheck, GraduationCap, Heart, ShieldCheck, Users } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import SectionHeading from '../components/SectionHeading'
 import Reveal from '../components/Reveal'
@@ -75,11 +75,6 @@ export default function Organisasi() {
                     </h3>
                     <p className="mt-1 text-xs font-semibold text-ink-mute">{o.note}</p>
                   </div>
-
-                  <div className="mt-6 flex items-center gap-1.5 border-t border-primary/5 pt-4 text-xs font-bold text-primary-mint">
-                    <UserCheck className="h-3.5 w-3.5" />
-                    <span>Tenaga Ahli Bersertifikasi</span>
-                  </div>
                 </div>
               </Reveal>
             ))}
@@ -114,9 +109,7 @@ export default function Organisasi() {
                 title: 'Pengembangan Kompetensi',
                 desc: 'Sekolah mendorong guru mengikuti pembinaan sesuai kebutuhan pembelajaran dan perkembangan anak.',
               },
-              {
-                icon: Sparkles,
-                title: 'Pendampingan Kelas',
+              { icon: Users, title: 'Pendampingan Kelas',
                 desc: 'Pengaturan kelas mengikuti kapasitas program yang tercantum pada halaman masing-masing jenjang.',
               },
             ].map((k, i) => (

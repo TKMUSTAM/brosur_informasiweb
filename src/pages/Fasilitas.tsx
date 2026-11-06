@@ -1,4 +1,4 @@
-import { ShieldCheck, Video, Wind, Sparkles, CheckCircle2 } from 'lucide-react'
+import { ShieldCheck, Video, Wind } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import SectionHeading from '../components/SectionHeading'
 import Reveal from '../components/Reveal'
@@ -12,7 +12,7 @@ const safetyStandards = [
   { icon: Video, title: 'Pemantauan Area Sekolah', desc: 'Area utama sekolah dipantau selama kegiatan operasional sesuai kebijakan lembaga.' },
   { icon: Wind, title: 'Sirkulasi Udara & AC Bersih', desc: 'Ruang kelas sejuk dengan filter udara rutin dibersihkan dan pencahayaan matahari.' },
   { icon: ShieldCheck, title: 'Soft Flooring & P3K Ramah Balita', desc: 'Lantai karet peredam benturan di area playground serta perlengkapan P3K anak.' },
-  { icon: Sparkles, title: 'Standar Kebersihan & Sanitasi', desc: 'Pembersihan dan disinfeksi mainan dan alat peraga edukatif setiap hari.' },
+  { icon: ShieldCheck, title: 'Standar Kebersihan & Sanitasi', desc: 'Pembersihan dan disinfeksi mainan dan alat peraga edukatif setiap hari.' },
 ]
 
 export default function Fasilitas() {
@@ -40,7 +40,7 @@ export default function Fasilitas() {
           <SectionHeading
             eyebrow="Sarana Prasarana"
             title="Fasilitas Lengkap Berstandar Pendidikan Nasional"
-            subtitle="Mendukung kegiatan belajar di dalam ruangan (*indoor*) maupun eksplorasi alam luar ruang (*outdoor*)."
+            subtitle="Mendukung kegiatan belajar di dalam ruangan maupun eksplorasi alam luar ruang."
           />
 
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -59,11 +59,6 @@ export default function Fasilitas() {
                     </div>
                     <h3 className="mt-5 font-heading text-xl font-extrabold text-primary">{f.title}</h3>
                     <p className="mt-2.5 text-sm leading-relaxed text-ink-soft">{f.desc}</p>
-                  </div>
-
-                  <div className="mt-6 flex items-center gap-2 border-t border-primary/5 pt-4 text-xs font-bold text-primary-mint">
-                    <CheckCircle2 className="h-4 w-4" />
-                    <span>Terawat &amp; Higienis</span>
                   </div>
                 </div>
               </Reveal>

@@ -37,23 +37,13 @@ export default function Logo({ light = false, compact = false }: { light?: boole
         />
         <LogoEmblem size={compact ? 36 : 42} light={light} />
       </span>
-      {!compact && (
-        <span className="flex flex-col leading-none">
-          <span
-            className={`font-heading text-base sm:text-lg font-black tracking-tight transition-colors ${
-              light ? 'text-white' : 'text-primary'
-            }`}
-          >
-            {site.shortName}
-          </span>
-          <span className="mt-1 flex items-center gap-1.5">
-            <span aria-hidden="true" className="h-[3px] w-4 rounded-full bg-gradient-to-r from-gold to-gold-light" />
-            <span className={`text-[11px] font-bold tracking-tight ${light ? 'text-white/70' : 'text-ink-mute'}`}>
-              {site.tagline}
-            </span>
-          </span>
-        </span>
-      )}
+      <span
+        className={`font-heading text-base sm:text-lg font-black tracking-tight transition-colors ${
+          light ? 'text-white' : 'text-primary'
+        }`}
+      >
+        {site.shortName}
+      </span>
     </Link>
   )
 }

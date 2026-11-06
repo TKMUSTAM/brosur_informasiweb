@@ -22,7 +22,7 @@ const staticPages: Omit<SearchResult, 'id'>[] = [
   { title: 'PPDB: Pendaftaran Peserta Didik Baru', description: 'Alur, jadwal, syarat, dan formulir pendaftaran 2026/2027.', href: '/ppdb', group: 'Halaman' },
   { title: 'Formulir Pendaftaran PPDB', description: 'Daftar online untuk TPA, KB, TK A, dan TK B.', href: '/ppdb/daftar', group: 'Halaman' },
   { title: 'Program Yatim Piatu', description: 'Bantuan pendidikan dan pembinaan bagi anak yatim yang lolos verifikasi program.', href: '/yatim', group: 'Halaman' },
-  { title: 'Orang Tua Asuh', description: 'Program wali asuh untuk mendampingi masa depan santri yatim.', href: '/yatim/orangtua-asuh', group: 'Halaman' },
+  { title: 'Orang Tua Asuh', description: 'Program wali asuh untuk mendampingi masa depan murid yatim.', href: '/yatim/orangtua-asuh', group: 'Halaman' },
   { title: 'Kurikulum', description: 'Kurikulum Merdeka & muatan diniyah.', href: '/kurikulum', group: 'Halaman' },
   { title: 'Galeri', description: 'Foto-foto kegiatan pembelajaran dan momen sekolah.', href: '/galeri', group: 'Halaman' },
   { title: 'Jadwal Sholat', description: 'Jadwal sholat harian berdasarkan lokasi.', href: '/jadwal-sholat', group: 'Halaman' },

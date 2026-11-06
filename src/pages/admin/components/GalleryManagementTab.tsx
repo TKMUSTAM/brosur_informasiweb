@@ -73,7 +73,7 @@ export default function GalleryManagementTab() {
       <div className="flex flex-col justify-between gap-4 rounded-3xl border border-primary/10 bg-white p-6 shadow-soft sm:flex-row sm:items-center">
         <div>
           <h3 className="font-heading text-lg font-extrabold text-primary">Manajemen Galeri Aktivitas</h3>
-          <p className="text-xs text-ink-mute">Kelola dokumentasi foto kegiatan santri ({data.gallery.length} foto)</p>
+          <p className="text-xs text-ink-mute">Kelola dokumentasi foto kegiatan murid ({data.gallery.length} foto)</p>
         </div>
         <button
           type="button"

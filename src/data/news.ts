@@ -25,7 +25,7 @@ export const news: NewsItem[] = [
     excerpt:
       'Kegiatan Isra Mi\u2019raj tahun ini dikemas dengan dongeng, lomba adzan, dan praktik sholat bersama agar anak-anak mencintai ibadah.',
     content: [
-      'Peringatan Isra Mi\u2019raj 1448 H di Yayasan Mustam berlangsung meriah dan penuh makna. Rangkaian acara diawali dengan pembacaan ayat suci Al-Qur\u2019an oleh santri TPA.',
+      'Peringatan Isra Mi\u2019raj 1448 H di Yayasan Mustam berlangsung meriah dan penuh makna. Rangkaian acara diawali dengan pembacaan ayat suci Al-Qur\u2019an oleh murid TPA.',
       'Anak-anak mengikuti lomba adzan, hafalan doa, dan mewarnai kaligrafi sederhana. Puncak acara adalah praktik sholat berjamaah yang dipandu para ustadzah.',
       'Kami berharap kegiatan ini menumbuhkan kecintaan anak-anak terhadap sholat sejak usia dini.',
     ],
@@ -90,7 +90,7 @@ export const news: NewsItem[] = [
     excerpt:
       'Kegiatan murojaah berjamaah setiap Jumat pagi membantu anak-anak menjaga hafalan surat pendek dan doa harian.',
     content: [
-      'Setiap Jumat pagi, seluruh santri mengikuti murojaah bersama di halaman utama yayasan.',
+      'Setiap Jumat pagi, seluruh murid mengikuti murojaah bersama di halaman utama yayasan.',
       'Kegiatan dipimpin bergantian oleh siswa untuk melatih keberanian dan rasa percaya diri.',
       'Orang tua dapat memantau perkembangan hafalan anak melalui buku murojaah yang dibawa pulang.',
     ],

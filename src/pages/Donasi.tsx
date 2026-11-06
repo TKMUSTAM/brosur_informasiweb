@@ -21,7 +21,7 @@ export default function Donasi() {
   return (
     <>
       <PageHeader
-        eyebrow="Donasi"
+        eyebrow="Layanan Infaq & Sedekah"
         title="Donasi Anda, Amanah Kami"
         description="Salurkan kebaikan Anda melalui program yang jelas dan terukur. Setiap rupiah tercatat dan dilaporkan."
         crumbs={[{ label: 'Program Yatim', href: '/yatim' }, { label: 'Donasi' }]}

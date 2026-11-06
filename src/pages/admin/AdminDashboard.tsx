@@ -10,13 +10,13 @@ import {
   LayoutDashboard,
   Menu,
   Settings,
-  Sparkles,
   Users,
   X,
   Building,
   Database,
   Lock,
   PanelsTopLeft,
+  Eye,
 } from 'lucide-react'
 import { LogoEmblem } from '../../components/Logo'
 import { useSEO } from '../../hooks/useSEO'
@@ -30,7 +30,6 @@ import NewsManagementTab from './components/NewsManagementTab'
 import ProgramsManagementTab from './components/ProgramsManagementTab'
 import TeachersManagementTab from './components/TeachersManagementTab'
 import GalleryManagementTab from './components/GalleryManagementTab'
-import PPDBManagementTab from './components/PPDBManagementTab'
 import DonasiManagementTab from './components/DonasiManagementTab'
 import FacilitiesManagementTab from './components/FacilitiesManagementTab'
 import DataBackupTab from './components/DataBackupTab'
@@ -39,7 +38,6 @@ import KhazanahManagementTab from './components/KhazanahManagementTab'
 
 type PanelId =
   | 'dashboard'
-  | 'ppdb'
   | 'program'
   | 'guru'
   | 'berita'
@@ -129,29 +127,12 @@ function DonutChart({ data }: { data: { label: string; value: number; color: str
   )
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    Diterima: 'bg-softgreen text-primary',
-    Wawancara: 'bg-softyellow text-gold-ink',
-    Verifikasi: 'bg-softblue text-secondary-dark',
-    Baru: 'bg-softred text-warmred-dark',
-    Terkumpul: 'bg-softblue text-secondary-dark',
-    Tersalur: 'bg-softgreen text-primary',
-  }
-  return (
-    <span className={`inline-block rounded-full px-3 py-1 text-xs font-bold ${styles[status] ?? 'bg-cream text-ink-soft'}`}>
-      {status}
-    </span>
-  )
-}
-
 /* ===== Panel Utama Dashboard ===== */
 function DashboardOverview({ onNavigate }: { onNavigate: (panel: PanelId) => void }) {
   const { data } = useCMS()
 
   const totalDonation = data.donations.reduce((sum, d) => sum + d.amount, 0)
-  const newApplicants = data.ppdbApplicants.filter((a) => a.status === 'Baru').length
-
+  
   const chartPendaftaran = [
     { month: 'Mar', value: 6 },
     { month: 'Apr', value: 9 },
@@ -180,22 +161,32 @@ function DashboardOverview({ onNavigate }: { onNavigate: (panel: PanelId) => voi
 
   return (
     <div className="space-y-6">
+      {/* KARTU SAMBUTAN RAMAH ORANG AWAM */}
+      <div className="rounded-3xl border border-primary/10 bg-gradient-to-r from-primary to-primary-light p-6 sm:p-8 text-white shadow-soft">
+        <h2 className="font-heading text-xl sm:text-2xl font-extrabold">
+          Selamat Datang di Panel Pengelolaan Website Sekolah 👋
+        </h2>
+        <p className="mt-2 text-xs sm:text-sm text-white/80 max-w-3xl leading-relaxed">
+          Di sini Bapak/Ibu dapat mengubah tulisan, mengganti foto sekolah, melihat laporan pendaftaran murid baru, serta memperbarui berita kapan saja dengan mudah.
+        </p>
+      </div>
+
       {/* 4 STATS CARDS */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div
-          onClick={() => onNavigate('ppdb')}
+          onClick={() => onNavigate('program')}
           className="group cursor-pointer rounded-3xl border border-primary/10 bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
         >
           <div className="flex items-center justify-between">
             <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-softgreen text-primary group-hover:scale-110 transition-transform">
-              <FileText className="h-5 w-5" />
+              <BookOpen className="h-5 w-5" />
             </span>
-            <span className="flex items-center gap-1 rounded-full bg-softgreen px-2.5 py-1 text-xs font-bold text-primary">
-              <ArrowUpRight className="h-3 w-3" /> {newApplicants} Baru
+            <span className="rounded-full bg-softgreen px-2.5 py-1 text-xs font-bold text-primary">
+              Aktif
             </span>
           </div>
-          <p className="mt-4 font-heading text-2xl font-black text-primary">{data.ppdbApplicants.length}</p>
-          <p className="text-xs font-bold uppercase tracking-wider text-ink-mute">Calon Siswa PPDB</p>
+          <p className="mt-4 font-heading text-2xl font-black text-primary">{data.programs.length}</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-ink-mute">Program Jenjang Kelas</p>
         </div>
 
         <div
@@ -204,14 +195,14 @@ function DashboardOverview({ onNavigate }: { onNavigate: (panel: PanelId) => voi
         >
           <div className="flex items-center justify-between">
             <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-softblue text-secondary-dark group-hover:scale-110 transition-transform">
-              <Sparkles className="h-5 w-5" />
+              <FileText className="h-5 w-5" />
             </span>
             <span className="rounded-full bg-softblue px-2.5 py-1 text-xs font-bold text-secondary-dark">
               {data.news.filter((n) => n.featured).length} Utama
             </span>
           </div>
           <p className="mt-4 font-heading text-2xl font-black text-primary">{data.news.length}</p>
-          <p className="text-xs font-bold uppercase tracking-wider text-ink-mute">Artikel Berita</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-ink-mute">Warta Berita &amp; Kegiatan</p>
         </div>
 
         <div
@@ -227,7 +218,7 @@ function DashboardOverview({ onNavigate }: { onNavigate: (panel: PanelId) => voi
             </span>
           </div>
           <p className="mt-4 font-heading text-2xl font-black text-primary">{data.orphans.length}</p>
-          <p className="text-xs font-bold uppercase tracking-wider text-ink-mute">Santri Yatim Binaan</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-ink-mute">Murid Yatim Binaan</p>
         </div>
 
         <div
@@ -243,50 +234,47 @@ function DashboardOverview({ onNavigate }: { onNavigate: (panel: PanelId) => voi
             </span>
           </div>
           <p className="mt-4 font-heading text-xl font-black text-primary truncate">{formatRupiah(totalDonation)}</p>
-          <p className="text-xs font-bold uppercase tracking-wider text-ink-mute">Total Donasi Masuk</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-ink-mute">Total Infak / Donasi</p>
         </div>
       </div>
 
       {/* CHARTS */}
       <div className="grid gap-6 xl:grid-cols-2">
         <div className="rounded-3xl border border-primary/10 bg-white p-6 shadow-soft">
-          <h3 className="font-heading text-base font-extrabold text-primary">Pendaftaran Siswa PPDB (6 Bulan)</h3>
+          <h3 className="font-heading text-base font-extrabold text-primary">Grafik Pendaftaran Calon Murid (6 Bulan)</h3>
           <BarChart data={chartPendaftaran} />
         </div>
         <div className="rounded-3xl border border-primary/10 bg-white p-6 shadow-soft">
-          <h3 className="font-heading text-base font-extrabold text-primary">Donasi Masuk per Bulan (Juta Rupiah)</h3>
+          <h3 className="font-heading text-base font-extrabold text-primary">Grafik Infak &amp; Donasi (Juta Rupiah)</h3>
           <BarChart data={chartDonasi} color="#F4C542" />
         </div>
       </div>
 
-      {/* QUICK PREVIEW & RECENT APPLICANTS */}
+      {/* QUICK PREVIEW */}
       <div className="grid gap-6 xl:grid-cols-2">
         <div className="rounded-3xl border border-primary/10 bg-white p-6 shadow-soft">
-          <h3 className="mb-5 font-heading text-base font-extrabold text-primary">Distribusi Program Aktif</h3>
+          <h3 className="mb-5 font-heading text-base font-extrabold text-primary">Proporsi Program Penyaluran Dana</h3>
           <DonutChart data={programAktif} />
         </div>
 
         <div className="rounded-3xl border border-primary/10 bg-white p-6 shadow-soft">
-          <div className="flex items-center justify-between">
-            <h3 className="font-heading text-base font-extrabold text-primary">Pendaftar PPDB Terbaru</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-heading text-base font-extrabold text-primary">Katalog Jenjang Kelas</h3>
             <button
-              type="button"
-              onClick={() => onNavigate('ppdb')}
-              className="text-xs font-bold text-primary hover:underline"
+              onClick={() => onNavigate('program')}
+              className="text-xs font-bold text-primary hover:text-gold transition-colors"
             >
-              Lihat Semua →
+              Kelola Program →
             </button>
           </div>
-          <ul className="mt-4 divide-y divide-primary/5">
-            {data.ppdbApplicants.slice(0, 4).map((p) => (
-              <li key={p.id} className="flex items-center justify-between gap-3 py-3">
+          <ul className="divide-y divide-primary/5">
+            {data.programs.map((p) => (
+              <li key={p.slug} className="flex items-center justify-between py-3">
                 <div>
-                  <p className="text-sm font-bold text-ink">{p.name}</p>
-                  <p className="text-xs text-ink-mute">
-                    {p.id} • {p.program}
-                  </p>
+                  <p className="text-sm font-bold text-primary">{p.name}</p>
+                  <p className="text-xs text-ink-mute">{p.ageRange} • Kapasitas {p.capacity}</p>
                 </div>
-                <StatusBadge status={p.status} />
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-softgreen text-primary">{p.code}</span>
               </li>
             ))}
           </ul>
@@ -305,30 +293,23 @@ export default function AdminDashboard() {
   const [notifOpen, setNotifOpen] = useState(false)
   const sidebarBtnRef = useRef<HTMLButtonElement | null>(null)
 
-  const menu: { id: PanelId; label: string; icon: any; badge?: string }[] = useMemo(
+  // MENU RAMAH ORANG AWAM (DENGAN PENJELASAN SINGKAT & ICON JELAS)
+  const menu: { id: PanelId; label: string; sub?: string; icon: any; badge?: string }[] = useMemo(
     () => [
-      { id: 'dashboard', label: 'Ringkasan', icon: LayoutDashboard },
-      {
-        id: 'ppdb',
-        label: 'PPDB & Calon Siswa',
-        icon: FileText,
-        badge: String(data.ppdbApplicants.length),
-      },
-      { id: 'program', label: 'Program & Biaya', icon: BookOpen },
-      { id: 'guru', label: 'Guru & Tenaga Pendidik', icon: Users, badge: String(data.teachers.length) },
-      { id: 'berita', label: 'Berita & Kegiatan', icon: Sparkles, badge: String(data.news.length) },
-      { id: 'galeri', label: 'Galeri Foto', icon: GalleryHorizontalEnd, badge: String(data.gallery.length) },
-      { id: 'khazanah', label: 'Khazanah Islami', icon: BookOpen, badge: String(data.doas.length + data.islamicArticles.length) },
-      { id: 'halaman', label: 'Konten Halaman', icon: PanelsTopLeft },
-      { id: 'donasi', label: 'Santri Yatim & Donasi', icon: Heart },
-      { id: 'fasilitas', label: 'Fasilitas Kampus', icon: Building },
-      { id: 'pengaturan', label: 'Identitas & Kontak', icon: Settings },
-      { id: 'backup', label: 'Backup & Restore Data', icon: Database },
+      { id: 'dashboard', label: '1. Dashboard Utama', sub: 'Ringkasan & statistik', icon: LayoutDashboard },
+      { id: 'halaman', label: '2. Edit Tulisan & Foto', sub: 'Beranda, profil, visi, sejarah', icon: PanelsTopLeft },
+      { id: 'program', label: '3. Program & Biaya SPP', sub: 'KB, TK A, TK B, & TPA', icon: BookOpen },
+      { id: 'guru', label: '4. Data Guru / Ustadzah', sub: 'Foto & gelar pendidik', icon: Users, badge: String(data.teachers.length) },
+      { id: 'fasilitas', label: '5. Ruang & Fasilitas', sub: 'Playground, kelas, UKS', icon: Building, badge: String(data.facilities.length) },
+      { id: 'berita', label: '6. Berita & Kegiatan', sub: 'Kabar kegiatan murid', icon: FileText, badge: String(data.news.length) },
+      { id: 'galeri', label: '7. Galeri Foto', sub: 'Album dokumentasi acara', icon: GalleryHorizontalEnd, badge: String(data.gallery.length) },
+      { id: 'khazanah', label: '8. Doa Harian Anak', sub: 'Koleksi doa & hadits', icon: BookOpen, badge: String(data.doas.length) },
+      { id: 'donasi', label: '9. Murid Yatim & Infak', sub: 'Beasiswa & donatur', icon: Heart },
+      { id: 'pengaturan', label: '10. Kontak & Rekening', sub: 'No WA, alamat, BSI yayasan', icon: Settings },
+      { id: 'backup', label: '11. Cadangkan Data', sub: 'Download file arsip web', icon: Database },
     ],
     [data]
   )
-
-
 
   useEffect(() => {
     if (!sidebarOpen) return
@@ -342,7 +323,7 @@ export default function AdminDashboard() {
     return () => window.removeEventListener('keydown', onKey)
   }, [sidebarOpen])
 
-  const activeLabel = useMemo(() => menu.find((m) => m.id === panel)?.label ?? 'Ringkasan', [menu, panel])
+  const activeLabel = useMemo(() => menu.find((m) => m.id === panel)?.label ?? 'Dashboard', [menu, panel])
 
   // If not logged in, render authentication modal
   if (!isLoggedIn) {
@@ -353,8 +334,8 @@ export default function AdminDashboard() {
     switch (panel) {
       case 'dashboard':
         return <DashboardOverview onNavigate={(p) => setPanel(p)} />
-      case 'ppdb':
-        return <PPDBManagementTab />
+      case 'halaman':
+        return <PageContentManagementTab />
       case 'program':
         return <ProgramsManagementTab />
       case 'guru':
@@ -365,8 +346,6 @@ export default function AdminDashboard() {
         return <GalleryManagementTab />
       case 'khazanah':
         return <KhazanahManagementTab />
-      case 'halaman':
-        return <PageContentManagementTab />
       case 'donasi':
         return <DonasiManagementTab />
       case 'fasilitas':
@@ -382,14 +361,14 @@ export default function AdminDashboard() {
 
   const sidebar = (
     <div className="flex h-full flex-col">
-      <div className="flex items-center gap-3 px-5 py-6">
+      <div className="flex items-center gap-3 px-5 py-6 border-b border-white/10">
         <LogoEmblem size={40} />
         <div>
-          <p className="font-heading text-base font-extrabold text-white">CMS Al-Mustam</p>
-          <p className="text-xs text-white/50">Admin Panel Kendali</p>
+          <p className="font-heading text-base font-extrabold text-white">Admin Al-Mustam</p>
+          <p className="text-xs text-gold-light">Panel Kendali Sekolah</p>
         </div>
       </div>
-      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-2" aria-label="Menu admin">
+      <nav className="flex-1 space-y-1.5 overflow-y-auto px-3 py-4" aria-label="Menu admin">
         {menu.map((m) => (
           <button
             key={m.id}
@@ -398,15 +377,22 @@ export default function AdminDashboard() {
               setPanel(m.id)
               setSidebarOpen(false)
             }}
-            className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-xs font-bold transition-all ${
+            className={`flex w-full items-start gap-3 rounded-2xl px-3.5 py-2.5 text-left transition-all ${
               panel === m.id
                 ? 'bg-gold text-primary shadow-soft'
-                : 'text-white/70 hover:bg-white/10 hover:text-white'
+                : 'text-white/75 hover:bg-white/10 hover:text-white'
             }`}
             aria-current={panel === m.id ? 'page' : undefined}
           >
-            <m.icon className="h-4 w-4" />
-            <span className="flex-1 text-left">{m.label}</span>
+            <m.icon className={`h-4 w-4 mt-0.5 shrink-0 ${panel === m.id ? 'text-primary' : 'text-gold-light'}`} />
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold leading-tight truncate">{m.label}</p>
+              {m.sub && (
+                <p className={`text-[10px] truncate mt-0.5 ${panel === m.id ? 'text-primary/75' : 'text-white/50'}`}>
+                  {m.sub}
+                </p>
+              )}
+            </div>
             {m.badge && (
               <span
                 className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold ${
@@ -418,7 +404,21 @@ export default function AdminDashboard() {
             )}
           </button>
         ))}
+
+        <div className="pt-3 border-t border-white/10 mt-3 px-1">
+          <a
+            href="http://localhost:5175/admin/dashboard"
+            target="_blank"
+            rel="noreferrer"
+            className="flex w-full items-center gap-2.5 rounded-2xl bg-gold/15 border border-gold/40 px-3.5 py-2.5 text-xs font-bold text-gold-light hover:bg-gold/25 transition-all shadow-soft"
+          >
+            <FileText className="h-4 w-4 text-gold shrink-0" />
+            <span className="flex-1 text-left">Portal Seleksi PPDB</span>
+            <ArrowUpRight className="h-3.5 w-3.5 text-gold shrink-0" />
+          </a>
+        </div>
       </nav>
+
       <div className="border-t border-white/10 p-4">
         <button
           type="button"
@@ -461,7 +461,7 @@ export default function AdminDashboard() {
       {/* konten */}
       <div className="flex min-w-0 flex-1 flex-col">
         {/* topbar */}
-        <header className="sticky top-0 z-40 flex items-center justify-between gap-4 border-b border-primary/10 bg-white/85 px-4 py-3.5 backdrop-blur-xl sm:px-7">
+        <header className="sticky top-0 z-40 flex items-center justify-between gap-4 border-b border-primary/10 bg-white/90 px-4 py-3.5 backdrop-blur-xl sm:px-7">
           <div className="flex items-center gap-3">
             <button
               ref={sidebarBtnRef}
@@ -475,11 +475,26 @@ export default function AdminDashboard() {
               <Menu className="h-5 w-5" />
             </button>
             <div>
-              <p className="text-[11px] font-bold text-ink-mute">Admin CMS / {activeLabel}</p>
+              <p className="text-[11px] font-bold text-ink-mute">Panel Admin / {activeLabel}</p>
               <h1 className="font-heading text-lg font-extrabold text-primary">{activeLabel}</h1>
             </div>
           </div>
-          <div className="flex items-center gap-2.5">
+
+          <div className="flex items-center gap-3">
+            {/* TOMBOL PENYELAMAT 1-KLIK LIHAT HASIL DI WEBSITE */}
+            <a
+              href="/"
+              target="_blank"
+              rel="noreferrer"
+              className="hidden sm:inline-flex items-center gap-2 rounded-full border border-primary/20 bg-softgreen px-4 py-2 text-xs font-bold text-primary hover:bg-primary hover:text-white transition-all shadow-xs"
+              title="Melihat tampilan website publik langsung"
+            >
+              <Eye className="h-3.5 w-3.5 text-gold-dark" />
+              <span>Lihat Tampilan Website</span>
+              <ArrowUpRight className="h-3.5 w-3.5 opacity-70" />
+            </a>
+
+            {/* NOTIFIKASI */}
             <div className="relative">
               <button
                 type="button"
@@ -491,7 +506,7 @@ export default function AdminDashboard() {
                 <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-warmred" />
               </button>
               {notifOpen && (
-                <div className="absolute right-0 top-12 w-80 rounded-3xl border border-primary/10 bg-white p-4 shadow-lift">
+                <div className="absolute right-0 top-12 w-80 rounded-3xl border border-primary/10 bg-white p-4 shadow-lift z-50">
                   <p className="px-1 pb-2 text-xs font-bold uppercase tracking-wider text-ink-mute">Notifikasi Sistem</p>
                   <p className="rounded-2xl bg-softgreen px-3.5 py-3 text-xs font-semibold text-primary">
                     {data.ppdbApplicants.filter((a) => a.status === 'Baru').length} pendaftar baru PPDB siap diverifikasi.
@@ -499,12 +514,14 @@ export default function AdminDashboard() {
                 </div>
               )}
             </div>
+
+            {/* USER INFO */}
             <div className="flex items-center gap-2.5">
               <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary font-heading text-sm font-extrabold text-gold shadow-soft">
-                AY
+                TU
               </span>
-              <div className="hidden sm:block">
-                <p className="text-xs font-bold text-ink">Admin Yayasan</p>
+              <div className="hidden md:block">
+                <p className="text-xs font-bold text-ink">Staf Tata Usaha</p>
                 <p className="text-[11px] text-ink-mute">{data.site.contact.email}</p>
               </div>
             </div>
@@ -514,7 +531,7 @@ export default function AdminDashboard() {
         <main className="flex-1 p-4 sm:p-7">
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
             <p className="text-xs text-ink-mute">
-              Panel Pengelolaan Konten Terpusat (CMS), Yayasan Pendidikan Islam Al-Mustam
+              Panel Pengelolaan Konten Website (CMS) — TK Islam Al-Mustam
             </p>
             <span className="rounded-full bg-softyellow px-4 py-1.5 text-xs font-bold text-gold-ink shadow-soft">
               {new Intl.DateTimeFormat('id-ID', {

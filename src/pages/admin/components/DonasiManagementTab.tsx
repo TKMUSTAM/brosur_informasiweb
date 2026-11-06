@@ -103,7 +103,7 @@ export default function DonasiManagementTab() {
             </span>
           </div>
           <p className="mt-3 font-heading text-2xl font-black text-primary">{totalOrphans} Anak</p>
-          <p className="text-xs font-bold uppercase tracking-wider text-ink-mute">Santri Yatim Binaan</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-ink-mute">Murid Yatim Binaan</p>
         </div>
 
         <div className="rounded-3xl border border-primary/10 bg-white p-6 shadow-soft">
@@ -128,7 +128,7 @@ export default function DonasiManagementTab() {
                 activeSubTab === 'yatim' ? 'bg-primary text-white shadow-soft' : 'bg-cream text-ink'
               }`}
             >
-              Data Santri Yatim
+              Data Murid Yatim
             </button>
             <button
               type="button"
@@ -143,12 +143,12 @@ export default function DonasiManagementTab() {
         </div>
       </div>
 
-      {/* SUB-TAB: SANTRI YATIM */}
+      {/* SUB-TAB: MURID YATIM */}
       {activeSubTab === 'yatim' && (
         <div className="space-y-4">
           <div className="flex flex-col justify-between gap-4 rounded-3xl border border-primary/10 bg-white p-6 shadow-soft sm:flex-row sm:items-center">
             <div>
-              <h3 className="font-heading text-lg font-extrabold text-primary">Daftar Santri Yatim & Beasiswa</h3>
+              <h3 className="font-heading text-lg font-extrabold text-primary">Daftar Murid Yatim & Beasiswa</h3>
               <p className="text-xs text-ink-mute">Kelola data anak asuh yang didanai beasiswa pendidikan</p>
             </div>
             <button
@@ -157,7 +157,7 @@ export default function DonasiManagementTab() {
               className="flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white shadow-soft hover:bg-primary-light"
             >
               <Plus className="h-4 w-4" />
-              <span>Tambah Santri Yatim</span>
+              <span>Tambah Murid Yatim</span>
             </button>
           </div>
 
@@ -291,7 +291,7 @@ export default function DonasiManagementTab() {
           <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-6 shadow-lift sm:p-8">
             <div className="flex items-center justify-between border-b border-primary/5 pb-4">
               <h3 className="font-heading text-lg font-extrabold text-primary">
-                {editingOrphanId ? 'Edit Data Santri Yatim' : 'Tambah Santri Yatim Binaan'}
+                {editingOrphanId ? 'Edit Data Murid Yatim' : 'Tambah Murid Yatim Binaan'}
               </h3>
               <button
                 type="button"

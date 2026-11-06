@@ -1,12 +1,24 @@
+import { Check } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import SectionHeading from '../components/SectionHeading'
 import Reveal from '../components/Reveal'
 import CTASection from '../components/CTASection'
 import { ButtonLink } from '../components/Buttons'
 import { useSEO } from '../hooks/useSEO'
-import { site } from '../data/site'
+import { useCMS } from '../hooks/useCMS'
 
 export default function Profil() {
+  const { data } = useCMS()
+  const site = data.site
+  const profile = data.pageContent.profile || {
+    title: 'Pendidikan Islam Unggulan Berakar Karakter Qur’ani',
+    description: `${site.name} berdiri dengan tekad melahirkan generasi muslim cilik yang beradab, mencintai Al-Qur'an, mandiri, dan berwawasan luas.`,
+    aboutParagraph1: `${site.name} didirikan sejak tahun ${site.foundedYear} dengan niat tulus menghadirkan lingkungan belajar anak usia dini yang sehat, hangat, dan berstandar nasional. Kami menaungi program Kelompok Bermain (KB), Taman Kanak-kanak (TK A & TK B), TPA Tahfidz Cilik, serta program beasiswa yatim piatu.`,
+    aboutParagraph2: 'Kami meyakini bahwa pondasi keberhasilan masa depan anak berakar pada adab dan kematangan emosi di usia emas (golden age). Oleh karena itu, kurikulum kami memadukan Kurikulum Merdeka dengan metode sentra (BCCT) dan 7 Pilar Karakter Islami, memastikan setiap potensi fitrah anak distimulasi secara optimal tanpa paksaan.',
+    image: '/images/content/hero-school.jpg',
+    imageAlt: 'Gedung TK Islam Al-Mustam',
+  }
+
   useSEO({
     title: `Tentang Kami | ${site.name}`,
     description: `Mengenal ${site.name}: Lembaga pendidikan Islam Terakreditasi A yang menaungi KB, TK A, TK B, TPA Tahfidz dan pembinaan yatim dhuafa.`,
@@ -16,9 +28,8 @@ export default function Profil() {
   return (
     <>
       <PageHeader
-        eyebrow="Profil Lembaga"
-        title="Pendidikan Islam Unggulan Berakar Karakter Qur’ani"
-        description={`${site.name} berdiri dengan tekad melahirkan generasi muslim cilik yang beradab, mencintai Al-Qur'an, mandiri, dan berwawasan luas.`}
+        title={profile.title}
+        description={profile.description}
         crumbs={[{ label: 'Profil Yayasan' }]}
       />
 
@@ -28,112 +39,97 @@ export default function Profil() {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             
             {/* Foto Dokumentasi Nyata Kampus */}
-            <Reveal>
-              <div className="relative">
-                <div className="aspect-[4/3] overflow-hidden rounded-3xl border-4 border-white bg-cream shadow-lift ring-1 ring-primary/10">
-                  <img
-                    src="/images/content/hero-school.jpg"
-                    alt="Aktivitas ceria belajar siswa di TK Islam Al-Mustam"
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              </div>
+            <Reveal className="overflow-hidden rounded-3xl border border-primary/10 bg-white p-3 shadow-lift">
+              <img
+                src={profile.image}
+                alt={profile.imageAlt || 'Gedung TK Islam Al-Mustam'}
+                width="720"
+                height="540"
+                className="aspect-[4/3] w-full rounded-2xl object-cover"
+              />
             </Reveal>
 
-            {/* Teks Penjelasan Profil */}
-            <Reveal delay={120} className="flex flex-col gap-5">
+            {/* Narasi Sejarah & Nilai */}
+            <Reveal delay={100} className="space-y-6">
               <SectionHeading
                 align="left"
-                eyebrow="Tentang Kami"
-                title="Rumah Kedua yang Penuh Kasih Sayang &amp; Nilai Luhur"
-                className="max-w-none"
+                eyebrow="Sejarah &amp; Dedikasi"
+                title="Membangun Fitrah Anak Sejak Usia Dini"
               />
               <div className="space-y-4 text-sm leading-relaxed text-ink-soft sm:text-base">
-                <p>
-                  <strong>{site.name}</strong> didirikan sejak tahun {site.foundedYear} dengan niat tulus menghadirkan lingkungan belajar anak usia dini yang sehat, hangat, dan berstandar nasional. Kami menaungi program <strong>Kelompok Bermain (KB), Taman Kanak-kanak (TK A &amp; TK B), TPA Tahfidz Cilik</strong>, serta program beasiswa yatim piatu.
-                </p>
-                <p>
-                  Kami meyakini bahwa pondasi keberhasilan masa depan anak berakar pada adab dan kematangan emosi di usia emas (*golden age*). Oleh karena itu, kurikulum kami memadukan <strong>Kurikulum Merdeka</strong> dengan <strong>metode sentra (BCCT)</strong> dan <strong>7 Pilar Karakter Islami</strong>, memastikan setiap potensi fitrah anak distimulasi secara optimal tanpa paksaan.
-                </p>
+                <p>{profile.aboutParagraph1}</p>
+                <p>{profile.aboutParagraph2}</p>
               </div>
 
               {/* Keunggulan Inti */}
               <div className="grid gap-2.5 sm:grid-cols-2">
                 <div className="flex items-center gap-2 text-xs font-bold text-primary sm:text-sm">
-                  <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
+                  <Check className="h-4 w-4 text-primary shrink-0" />
                   <span>Kapasitas kelas tercantum per program</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-bold text-primary sm:text-sm">
-                  <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
+                  <Check className="h-4 w-4 text-primary shrink-0" />
                   <span>Pembelajaran Al-Qur’an bertahap</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-bold text-primary sm:text-sm">
-                  <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
+                  <Check className="h-4 w-4 text-primary shrink-0" />
                   <span>Informasi fasilitas dapat diperiksa langsung</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-bold text-primary sm:text-sm">
-                  <span className="h-1.5 w-1.5 rounded-full bg-primary-mint" />
+                  <Check className="h-4 w-4 text-primary shrink-0" />
                   <span>Jalur pengajuan bantuan pendidikan</span>
                 </div>
               </div>
 
-              <div className="mt-2 flex flex-wrap gap-3">
-                <ButtonLink to="/visi-misi" variant="primary" withArrow>Visi, Misi &amp; Nilai</ButtonLink>
-                <ButtonLink to="/organisasi" variant="soft">Struktur Pendidik</ButtonLink>
-                <ButtonLink to="/legalitas" variant="ghost">Legalitas &amp; Akreditasi</ButtonLink>
+              <div className="pt-2">
+                <ButtonLink to="/ppdb/daftar" variant="primary" size="lg" withArrow>
+                  Pendaftaran Murid Baru
+                </ButtonLink>
               </div>
             </Reveal>
-
           </div>
         </div>
       </section>
 
-      {/* ===== BUDAYA & LINGKUNGAN SEKOLAH ===== */}
-      <section className="bg-cream px-4 py-16 sm:px-6 sm:py-20" aria-label="Budaya sekolah">
+      {/* ===== IDENTITAS SINGKAT ===== */}
+      <section className="border-t border-primary/10 bg-cream px-4 py-16 sm:px-6 sm:py-20">
         <div className="mx-auto max-w-[1440px]">
           <SectionHeading
-            eyebrow="Budaya Sekolah"
-            title="Tiga Nilai Luhur yang Kami Hidupkan"
-            subtitle="Menjadi panduan sikap seluruh ustadzah, staf, santri, dan wali murid."
+            align="center"
+            eyebrow="Landasan Operasional"
+            title="Karakteristik &amp; Komitmen Pelayanan"
+            subtitle="Prinsip tata kelola dan pendidikan yang diterapkan secara konsisten dalam operasional harian sekolah."
+            className="mb-14"
           />
 
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {[
-              {
-                num: '01',
-                title: 'Keteladanan & Kasih Sayang',
-                desc: 'Anak meniru apa yang dilihat. Kami mendidik dengan keteladanan akhlak, tutur kata santun, dan pelukan hangat.',
-              },
-              {
-                num: '02',
-                title: 'Eksplorasi yang Menyenangkan',
-                desc: 'Bermain adalah fitrah belajar anak. Kami menghadirkan media pembelajaran interaktif yang memantik daya kritis.',
-              },
-              {
-                num: '03',
-                title: 'Amanah & Transparansi',
-                desc: 'Menjaga kepercayaan orang tua dan donatur melalui tata kelola terbuka dan komunikasi dua arah yang harmonis.',
-              },
-            ].map((b, i) => (
-              <Reveal key={b.title} delay={i * 90} className="h-full">
-                <div className="flex h-full flex-col justify-between border-l-4 border-primary/20 bg-white p-8">
-                  <div>
-                    <span className="font-heading text-2xl font-black text-primary/30">
-                      {b.num}
-                    </span>
-                    <h3 className="mt-4 font-heading text-xl font-extrabold text-primary">{b.title}</h3>
-                    <p className="mt-2.5 text-sm leading-relaxed text-ink-soft">{b.desc}</p>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-3xl border border-primary/10 bg-white p-6 shadow-soft">
+              <p className="font-heading text-3xl font-extrabold text-gold-dark">{site.foundedYear}</p>
+              <h3 className="mt-2 font-heading text-base font-extrabold text-primary">Tahun Berdiri</h3>
+              <p className="mt-1.5 text-xs text-ink-soft">Konsisten melayani pendidikan anak usia dini dengan dasar nilai Islam.</p>
+            </div>
+            <div className="rounded-3xl border border-primary/10 bg-white p-6 shadow-soft">
+              <p className="font-heading text-3xl font-extrabold text-primary">{site.accreditation}</p>
+              <h3 className="mt-2 font-heading text-base font-extrabold text-primary">Akreditasi</h3>
+              <p className="mt-1.5 text-xs text-ink-soft">Pengakuan standar kelayakan penyelenggaraan PAUD dari BAN PDM.</p>
+            </div>
+            <div className="rounded-3xl border border-primary/10 bg-white p-6 shadow-soft">
+              <p className="font-heading text-3xl font-extrabold text-gold-dark">1:15</p>
+              <h3 className="mt-2 font-heading text-base font-extrabold text-primary">Rasio Guru &amp; Anak</h3>
+              <p className="mt-1.5 text-xs text-ink-soft">Pendampingan optimal dengan kapasitas kelas terbatas per jenjang.</p>
+            </div>
+            <div className="rounded-3xl border border-primary/10 bg-white p-6 shadow-soft">
+              <p className="font-heading text-3xl font-extrabold text-primary">100%</p>
+              <h3 className="mt-2 font-heading text-base font-extrabold text-primary">Beasiswa Yatim</h3>
+              <p className="mt-1.5 text-xs text-ink-soft">Didanai langsung dari amanah infak dan sedekah yayasan.</p>
+            </div>
           </div>
         </div>
       </section>
 
       <CTASection
-        title={<>Ingin Berkunjung dan Melihat Kampus Kami?</>}
-        description="Kami mengundang ayah dan bunda untuk melihat langsung kelas, fasilitas bermain, dan berdiskusi dengan tim guru kami."
+        title={<>Kenali Lingkungan Belajar Kami Secara Langsung</>}
+        description="Jadwalkan kunjungan sekolah untuk melihat fasilitas, suasana sentra, dan berkonsultasi langsung dengan ustadzah."
         primaryLabel="Jadwalkan Kunjungan"
         primaryTo="/kontak"
         secondaryLabel="Daftar PPDB Online"

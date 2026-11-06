@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight } from 'lucide-react'
 import SectionHeading from '../components/SectionHeading'
 import NewsCard from '../components/cards/NewsCard'
 import { ButtonLink } from '../components/Buttons'
 import ContentImage from '../components/illustrations/ContentImage'
 import { useCMS } from '../hooks/useCMS'
 import { sceneForNewsSlug } from '../lib/scenes'
+import { RiArrowRightLine } from 'react-icons/ri'
 
 export default function NewsSection() {
   const { data } = useCMS()
@@ -20,9 +20,9 @@ export default function NewsSection() {
         <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
           <SectionHeading
             align="left"
-            eyebrow="Berita & Kegiatan"
-            title="Berita & Kegiatan Terbaru"
-            subtitle="Ikuti perkembangan, momen, dan kabar terbaru dari Yayasan Mustam."
+            eyebrow="Warta & Agenda"
+            title="Kabar Terbaru Sekolah & Kegiatan Murid"
+            subtitle="Ikuti perkembangan, momen kebersamaan, dan pengumuman resmi dari keluarga besar TK Islam Al-Mustam."
             className="sm:max-w-xl"
           />
           <ButtonLink to="/berita" variant="soft" withArrow className="shrink-0">
@@ -54,8 +54,8 @@ export default function NewsSection() {
               <h3 className="font-heading text-2xl font-extrabold leading-snug text-primary">{featured.title}</h3>
               <p className="line-clamp-3 text-sm leading-relaxed text-ink-soft">{featured.excerpt}</p>
               <span className="mt-auto inline-flex items-center gap-2 pt-3 text-sm font-bold text-primary transition-all group-hover:gap-3">
-                Baca Selengkapnya
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                <span>Baca Selengkapnya</span>
+                <RiArrowRightLine className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </span>
             </div>
           </Link>

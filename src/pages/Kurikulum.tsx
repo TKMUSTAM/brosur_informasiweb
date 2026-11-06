@@ -1,4 +1,4 @@
-import { Check, Clock, Sparkles } from 'lucide-react'
+import { Check, Clock } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import SectionHeading from '../components/SectionHeading'
 import Reveal from '../components/Reveal'
@@ -51,7 +51,7 @@ export default function Kurikulum() {
                 className="max-w-none"
               />
               <p className="text-sm leading-relaxed text-ink-soft sm:text-base">
-                Kami percaya bahwa anak usia dini belajar paling efektif melalui <strong>pengalaman nyata (*hands-on experience*) dan bermain bermakna</strong>. Oleh karena itu, pendekatan pembelajaran kami dirancang agar anak tidak merasa tertekan, melainkan antusias mengeksplorasi ilmu pengetahuan, menghafal Al-Qur’an dengan ceria, dan mempraktikkan adab mulia dalam pergaulan sehari-hari.
+                Kami percaya bahwa anak usia dini belajar paling efektif melalui <strong>pengalaman nyata dan bermain bermakna</strong>. Oleh karena itu, pendekatan pembelajaran kami dirancang agar anak tidak merasa tertekan, melainkan antusias mengeksplorasi ilmu pengetahuan, menghafal Al-Qur’an dengan ceria, dan mempraktikkan adab mulia dalam pergaulan sehari-hari.
               </p>
 
               <div className="flex flex-wrap gap-2.5">
@@ -94,10 +94,6 @@ export default function Kurikulum() {
                     <h3 className="mt-4 font-heading text-lg font-extrabold text-primary">{s.name}</h3>
                     <p className="mt-2.5 text-xs leading-relaxed text-ink-soft sm:text-sm">{s.desc}</p>
                   </div>
-                  <div className="mt-6 flex items-center gap-1.5 text-xs font-bold text-primary-mint">
-                    <Sparkles className="h-3.5 w-3.5" />
-                    <span>Sentra Pilihan</span>
-                  </div>
                 </div>
               </Reveal>
             ))}
@@ -135,7 +131,7 @@ export default function Kurikulum() {
         <div className="mx-auto max-w-[1440px]">
           <SectionHeading
             eyebrow="Aktivitas Harian"
-            title="Jadwal Rutinitas Harian Santri (07.15 – 11.30 WIB)"
+            title="Jadwal Rutinitas Harian Murid (07.15 – 11.30 WIB)"
             subtitle="Ritme harian yang teratur membentuk disiplin alami, kenyamanan emosi, dan kemandirian anak."
           />
 
