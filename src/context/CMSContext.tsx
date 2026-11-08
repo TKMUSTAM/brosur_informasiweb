@@ -19,43 +19,64 @@ import type {
 } from '../types/cms'
 import { CMSContext, initialCMSData, STORAGE_KEY, type ToastNotification } from './cmsStore'
 
+type PublicCmsSectionEntry = {
+  sectionKey: string
+  title?: string
+  content: Record<string, unknown>
+  updatedAt?: string
+}
+
 type PublicCmsPayload = {
-  sections?: Record<string, Record<string, unknown>>
+  sections?: Record<string, Record<string, unknown>> | PublicCmsSectionEntry[]
   news?: Array<{
-    id: string
+    id?: string
     title: string
     slug: string
     excerpt?: string
     content: string
+    image?: string
     coverImagePath?: string
+    date?: string
     publishedAt?: string
   }>
   programs?: Array<{
     id: string
-    programName: string
+    name?: string
+    programName?: string
     description?: string
+    image?: string
     imagePath?: string
     displayOrder?: number
   }>
   facilities?: Array<{
     id: string
-    facilityName: string
+    name?: string
+    facilityName?: string
     description?: string
+    image?: string
     imagePath?: string
     displayOrder?: number
   }>
-  gallery?: Array<{
-    id: string
-    albumName: string
-    description?: string
-    coverImagePath?: string
-    items?: Array<{
-      id: string
-      imagePath: string
-      caption?: string
-      displayOrder?: number
-    }>
-  }>
+  gallery?: Array<
+    | {
+        id: string
+        category?: string
+        src?: string
+        caption?: string
+      }
+    | {
+        id: string
+        albumName: string
+        description?: string
+        coverImagePath?: string
+        items?: Array<{
+          id: string
+          imagePath: string
+          caption?: string
+          displayOrder?: number
+        }>
+      }
+  >
 }
 
 export function CMSProvider({ children }: { children: React.ReactNode }) {
@@ -73,7 +94,17 @@ export function CMSProvider({ children }: { children: React.ReactNode }) {
       .then((result: PublicCmsPayload | null) => {
         if (!result) return
         setData((prev) => {
-          const sections = result.sections ?? {}
+          const sections: Record<string, Record<string, unknown>> = {}
+          if (Array.isArray(result.sections)) {
+            for (const entry of result.sections) {
+              if (entry && typeof entry.sectionKey === 'string' && entry.content) {
+                sections[entry.sectionKey] = entry.content
+              }
+            }
+          } else if (result.sections && typeof result.sections === 'object') {
+            Object.assign(sections, result.sections)
+          }
+
           const siteSection = sections.site ?? {}
           const nextSite: SiteData = {
             ...prev.site,
@@ -105,7 +136,8 @@ export function CMSProvider({ children }: { children: React.ReactNode }) {
           const nextNews: NewsItem[] =
             result.news && result.news.length > 0
               ? result.news.map((n, idx) => {
-                  const dateISO = n.publishedAt ? n.publishedAt.slice(0, 10) : '2026-08-01'
+                  const rawDate = n.publishedAt || n.date
+                  const dateISO = rawDate ? rawDate.slice(0, 10) : '2026-08-01'
                   const formattedDate = new Intl.DateTimeFormat('id-ID', {
                     day: 'numeric',
                     month: 'long',
@@ -125,11 +157,25 @@ export function CMSProvider({ children }: { children: React.ReactNode }) {
                       .filter(Boolean),
                     color: existing?.color || colors[idx % colors.length],
                     featured: idx === 0,
-                    image: n.coverImagePath || existing?.image || '/images/content/news-murojaah.jpg',
+                    image: n.coverImagePath || n.image || existing?.image || '/images/content/news-murojaah.jpg',
                     status: 'PUBLISHED',
                   }
                 })
               : prev.news
+
+          const nextPrograms: ProgramItem[] =
+            result.programs && result.programs.length > 0
+              ? result.programs.map((p, idx) => {
+                  const existing = prev.programs[idx] || prev.programs[0]
+                  const resolvedName = p.programName || p.name || existing.name
+                  return {
+                    ...existing,
+                    name: resolvedName,
+                    description: p.description || existing.description,
+                    image: p.imagePath || p.image || existing.image,
+                  }
+                })
+              : prev.programs
 
           const nextFacilities: FacilityItem[] =
             result.facilities && result.facilities.length > 0
@@ -138,10 +184,10 @@ export function CMSProvider({ children }: { children: React.ReactNode }) {
                   return {
                     id: f.id,
                     icon: existing?.icon || 'mosque',
-                    title: f.facilityName,
+                    title: f.facilityName || f.name || existing?.title || 'Fasilitas Sekolah',
                     desc: f.description || existing?.desc || '',
                     tag: existing?.tag || 'Fasilitas Kampus',
-                    image: f.imagePath || existing?.image,
+                    image: f.imagePath || f.image || existing?.image,
                   }
                 })
               : prev.facilities
@@ -150,16 +196,29 @@ export function CMSProvider({ children }: { children: React.ReactNode }) {
           if (result.gallery && result.gallery.length > 0) {
             const palettes: Array<'green' | 'blue' | 'gold' | 'red' | 'mixed'> = ['green', 'blue', 'gold', 'red', 'mixed']
             let seq = 1
-            for (const album of result.gallery) {
-              for (const item of album.items ?? []) {
+            for (const entry of result.gallery) {
+              if ('items' in entry && Array.isArray(entry.items)) {
+                for (const item of entry.items) {
+                  flattenedGallery.push({
+                    id: seq,
+                    title: item.caption || entry.albumName,
+                    category: entry.albumName,
+                    scene: 'quran',
+                    palette: palettes[(seq - 1) % palettes.length],
+                    tall: seq % 3 === 2,
+                    image: item.imagePath,
+                  })
+                  seq += 1
+                }
+              } else if ('src' in entry && entry.src) {
                 flattenedGallery.push({
                   id: seq,
-                  title: item.caption || album.albumName,
-                  category: album.albumName,
+                  title: entry.caption || entry.category || 'Dokumentasi Kegiatan',
+                  category: entry.category || 'Kegiatan Sekolah',
                   scene: 'quran',
                   palette: palettes[(seq - 1) % palettes.length],
                   tall: seq % 3 === 2,
-                  image: item.imagePath,
+                  image: entry.src,
                 })
                 seq += 1
               }
@@ -168,15 +227,18 @@ export function CMSProvider({ children }: { children: React.ReactNode }) {
 
           const pillarsContent = sections.pillars?.items
           const faqsContent = sections.faqs?.items
+          const doasContent = sections.khazanah?.doas
 
           return {
             ...prev,
             site: nextSite,
             news: nextNews,
+            programs: nextPrograms,
             facilities: nextFacilities,
             gallery: flattenedGallery.length > 0 ? flattenedGallery : prev.gallery,
             pillars: Array.isArray(pillarsContent) && pillarsContent.length > 0 ? (pillarsContent as PillarItem[]) : prev.pillars,
             faqs: Array.isArray(faqsContent) && faqsContent.length > 0 ? (faqsContent as FAQItem[]) : prev.faqs,
+            doas: Array.isArray(doasContent) && doasContent.length > 0 ? (doasContent as DoaItem[]) : prev.doas,
             pageContent: {
               ...prev.pageContent,
               hero: sections.hero ? { ...prev.pageContent.hero, ...sections.hero } : prev.pageContent.hero,
