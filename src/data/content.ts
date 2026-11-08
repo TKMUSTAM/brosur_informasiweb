@@ -1,5 +1,5 @@
 // ============================================================
-// KONTEN: 7 Pilar Karakter, Guru & Pendidik, Fasilitas, Testimoni
+// KONTEN: 7 Pilar Karakter, Guru & Pendidik, Fasilitas, Legalitas
 // Yayasan & TK Islam Al-Mustam
 // ============================================================
 
@@ -39,7 +39,7 @@ export const pillars = [
   },
   {
     number: '05',
-    title: 'Calistung Fun & Sensori',
+    title: 'Literasi & Numerasi Sensori',
     icon: 'book',
     color: 'blue' as const,
     description:
@@ -198,7 +198,7 @@ export const islamicArticles = [
       'Siapkan sajadah mini dan mukena/sarung dengan warna favorit anak.',
       'Ajak anak sholat bersama tanpa memaksakan kesempurnaan gerakan pada awal mula.',
       'Berikan pelukan hangat dan senyuman setelah salam sebagai asosiasi positif.',
-      'Ceritakan bahwa sholat adalah waktu kita berbicara langsung dan curhat kepada Allah Sang Maha Pengasih.',
+      'Ceritakan bahwa sholat adalah waktu kita berbicara langsung kepada Allah Sang Maha Pengasih.',
     ],
   },
   {
@@ -211,44 +211,8 @@ export const islamicArticles = [
     content: [
       'Otot jari dan tangan anak membutuhkan latihan kekuatan sebelum mampu mencengkeram pensil secara ergonomis.',
       'Aktivitas meronce manik-manik, melipat kertas, dan bermain pasir melatih koordinasi mata dan tangan (visual motor).',
-      'Di TK Islam Al-Mustam, calistung disajikan lewat media konkret agar anak tidak stres dan cinta belajar seumur hidup.',
+      'Di TK Islam Al-Mustam, literasi awal disajikan lewat media konkret agar anak tidak tertekan dan senang belajar.',
     ],
-  },
-]
-
-// ===== TESTIMONIAL WALI MURID =====
-export const testimonials = [
-  {
-    name: 'dr. Sarah Nabila, Sp.A',
-    status: 'Wali Murid Ananda Kenzie (TK B)',
-    avatarColor: 'green' as const,
-    initials: 'SN',
-    quote:
-      'Sebagai dokter anak, saya sangat selektif memilih sekolah. TK Islam Al-Mustam luar biasa memperhatikan stimulasi sensori, higienitas makan, dan kesehatan mental anak. Anak saya sekarang sangat santun dan hafal juz 30 dengan tartil yang fasih.',
-  },
-  {
-    name: 'Bapak Ahmad Fauzi, S.T.',
-    status: 'Wali Murid Ananda Aisyah (TK A)',
-    avatarColor: 'gold' as const,
-    initials: 'AF',
-    quote:
-      'Semula anak saya sangat pemalu dan susah lepas dari gadget. Setelah 3 bulan di Al-Mustam, keberaniannya bicara dan empati sosialnya meningkat pesat. Setiap sore selalu semangat bercerita kegiatan seru di Sentra Bahan Alam.',
-  },
-  {
-    name: 'Ibu Hj. Ratna Kusuma Dewi',
-    status: 'Orang Tua Asuh 3 Anak Yatim Binaan',
-    avatarColor: 'red' as const,
-    initials: 'RK',
-    quote:
-      'Amanah dan transparansi Yayasan Al-Mustam sangat teruji. Setiap bulan ada laporan tertulis dan video perkembangan belajar anak asuh. Senang sekali melihat mereka tumbuh ceria dan berprestasi seperti anak-anak lainnya.',
-  },
-  {
-    name: 'Bapak Muhammad Reza, M.M.',
-    status: 'Wali Murid Ananda Bilal (Playgroup / KB)',
-    avatarColor: 'blue' as const,
-    initials: 'MR',
-    quote:
-      'Guru-guru di KB Al-Mustam sangat sabar dan keibuan. Toilet training anak saya berhasil tuntas dalam waktu 2 minggu tanpa drama. Suasana sekolahnya sejuk, asri, dan komunikasinya sangat terbuka dengan wali murid.',
   },
 ]
 
@@ -257,37 +221,37 @@ export const organization = [
   {
     role: 'Pembina Yayasan',
     name: 'KH. Ahmad Mustam, S.Ag., M.Pd.I.',
-    note: 'Ulama, Praktisi Pendidikan Islam & Pembina Lembaga',
+    note: 'Pembina Lembaga & Pengembangan Pendidikan Islam',
   },
   {
     role: 'Ketua Pengurus Yayasan',
     name: 'Ustadz Fauzan Hakim, M.Ed.',
-    note: 'Alumni Pendidikan Luar Sekolah, Pengembang Kurikulum',
+    note: 'Pengelolaan Kelembagaan & Pengembangan Kurikulum',
   },
   {
     role: 'Kepala Sekolah TK Islam Al-Mustam',
     name: 'Ustadzah Siti Maryam, S.Pd. PAUD',
-    note: 'Praktisi PAUD Berprestasi, Asesor Akreditasi',
+    note: 'Manajemen Satuan PAUD & Pendampingan Akademik',
   },
   {
     role: 'Koordinator Tahfidz & TPA',
-    name: 'Ustadz Abdul Rauf Al-Hafidz, S.Q.',
-    note: 'Hafidz 30 Juz Bersanad, Master Trainer Tilawati',
+    name: 'Ustadz Abdul Rauf, S.Q.',
+    note: 'Bimbingan Tahsin Tilawati & Murojaah Juz 30',
   },
   {
-    role: 'Konselor Tumbuh Kembang & Psikolog Anak',
+    role: 'Konselor Tumbuh Kembang Anak',
     name: 'Nanda Safitri, M.Psi., Psikolog',
-    note: 'Spesialis Observasi Sensori & Stimulasi Dini',
+    note: 'Observasi Kesiapan Belajar & Konsultasi Wali Murid',
   },
   {
     role: 'Koordinator Program Sosial & Beasiswa Yatim',
     name: 'Ustadzah Laila Nurfadilah, S.Sos.',
-    note: 'Pendampingan Karakter & Penyaluran Beasiswa Penuh',
+    note: 'Verifikasi Berkas & Pendampingan Penerima Bantuan Pendidikan',
   },
   {
-    role: 'Bendahara & Akuntabilitas Yayasan',
-    name: 'Hj. Rina Marlina, S.E., Ak.',
-    note: 'Tata Kelola Keuangan Terbuka & Standar PSAK 109',
+    role: 'Bendahara & Administrasi Yayasan',
+    name: 'Hj. Rina Marlina, S.E.',
+    note: 'Tata Kelola Administrasi Keuangan & Pelaporan Berkala',
   },
 ]
 
@@ -295,7 +259,7 @@ export const organization = [
 export const legalitas = [
   {
     title: 'Akreditasi Sekolah',
-    value: 'Peringkat A (Unggul)',
+    value: 'Peringkat A',
     note: 'BAN PAUD & PNF Kemendikbudristek RI',
   },
   {
@@ -306,7 +270,7 @@ export const legalitas = [
   {
     title: 'Akta Notaris Pendirian',
     value: 'No. 17 Tanggal 14 April 2016',
-    note: 'Notaris Hj. Dewi Lestari, S.H., M.Kn.',
+    note: 'Akta Pendirian Yayasan Pendidikan Islam Al-Mustam',
   },
   {
     title: 'SK Kemenkumham RI',
@@ -315,18 +279,13 @@ export const legalitas = [
   },
   {
     title: 'Izin Operasional Lembaga',
-    value: 'No. 421.1/234/Disdik/2021',
-    note: 'Dinas Pendidikan & Kebudayaan Kota Nusantara',
+    value: 'No. 421.1/1234-Disdik/2018',
+    note: 'Dinas Pendidikan Provinsi DKI Jakarta',
   },
   {
     title: 'Rekening Resmi Yayasan',
     value: 'Bank Syariah Indonesia (BSI): 1234-5678-90',
     note: 'a.n. Yayasan Pendidikan Islam Al-Mustam',
-  },
-  {
-    title: 'Nomor Pokok Wajib Pajak (NPWP)',
-    value: '01.234.567.8-901.000',
-    note: 'KPP Pratama Kota Nusantara (Lembaga Nirlaba Tertib Pajak)',
   },
 ]
 
@@ -334,38 +293,38 @@ export const legalitas = [
 export const fasilitas = [
   {
     icon: 'mosque',
-    title: 'Ruang Kelas Smart & Ber-AC',
-    desc: 'Ruang kelas sejuk ber-AC dengan sirkulasi udara alami, smart interactive display, meja kursi ergonomis ramah balita, dan pencahayaan optimal.',
+    title: 'Ruang Kelas Sentra & Ber-AC',
+    desc: 'Ruang kelas ber-AC dengan sirkulasi udara baik, meja kursi ergonomis ramah anak, dan alat peraga edukatif per sentra.',
     tag: 'Fasilitas Utama',
   },
   {
     icon: 'quran',
-    title: 'Musholla Cilik Al-Mustam',
-    desc: 'Musholla bernuansa hangat dengan karpet lembut, tempat wudhu ketinggian khusus anak, sajadah mini, dan pengeras suara lembut.',
+    title: 'Musholla Anak Al-Mustam',
+    desc: 'Musholla bernuansa hangat dengan karpet bersih, tempat wudhu ketinggian anak, dan perlengkapan ibadah.',
     tag: 'Spiritual',
   },
   {
     icon: 'blocks',
-    title: 'Playground Outdoor & Sensori Park',
-    desc: 'Area bermain luar ruang berlantai karet peredam benturan dengan lantai peredam benturan, perosotan, ayunan, jaring panjat, kolam pasir, dan kebun hidroponik.',
+    title: 'Area Bermain Luar & Kebun Edukasi',
+    desc: 'Area bermain luar ruang dengan lantai peredam benturan, perosotan, ayunan, permainan keseimbangan, dan kebun pengamatan tanaman.',
     tag: 'Motorik & Fisik',
   },
   {
     icon: 'book',
-    title: 'Pojok Literasi & Mini Library',
-    desc: 'Koleksi buku cerita Islami, pop-up book sirah nabi, ensiklopedia sains anak, dan area duduk santai untuk kegiatan literasi.',
+    title: 'Pojok Literasi & Perpustakaan Mini',
+    desc: 'Koleksi buku cerita Islami bergambar, kisah nabi, ensiklopedia sains anak, dan ruang baca yang nyaman.',
     tag: 'Literasi',
   },
   {
     icon: 'palette',
-    title: 'Ruang Sentra Kreativitas & Musik',
-    desc: 'Studio seni ramah anak untuk melukis, melipat origami, bermain alat musik perkusi rebana, angklung cilik, dan panggung dongeng peran.',
+    title: 'Sentra Seni & Kreativitas',
+    desc: 'Ruang aktivitas seni untuk melukis, melipat origami, meronce, kolase bahan alam, dan pengenalan alat musik perkusi.',
     tag: 'Seni & Ekspresi',
   },
   {
     icon: 'users',
-    title: 'UKS Ramah Anak & Konsultasi Parenting',
-    desc: 'Ruang kesehatan lengkap dengan tim medis dokter mitra berkala, pengukur tumbuh kembang (antropometri), dan ruang temu wali murid.',
+    title: 'Ruang UKS & Konsultasi Wali Murid',
+    desc: 'Ruang pemeriksaan kesehatan berkala, pengukur tinggi dan berat badan anak, serta ruang pertemuan orang tua dan guru.',
     tag: 'Kesehatan',
   },
 ]

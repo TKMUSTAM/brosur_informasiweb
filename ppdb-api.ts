@@ -103,6 +103,14 @@ function cleanText(value: unknown, maxLength: number): string {
   return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
 }
 
+function canonicalPhone(value: string): string {
+  const digits = value.replace(/\D/g, "");
+  if (digits.startsWith("0062")) return `0${digits.slice(4)}`;
+  if (digits.startsWith("62")) return `0${digits.slice(2)}`;
+  if (digits.startsWith("8")) return `0${digits}`;
+  return digits;
+}
+
 function normalizeRegistration(input: RegistrationInput): NormalizedRegistration {
   const name = cleanText(input.name, 150);
   const birthDate = cleanText(input.birthDate, 10);
@@ -256,15 +264,148 @@ async function findApplication(client: PoolClient | typeof pool, id: string) {
 
 app.get("/", (c) => c.json({ service: "TK Al-Mustam PPDB API", status: "ok" }));
 
+app.get("/ppdb/meta", async (c) => {
+  try {
+    const [periods, classes, documentTypes] = await Promise.all([
+      pool.query(`
+        SELECT
+          p.id::text,
+          p.period_name AS name,
+          p.registration_start::text AS "registrationStart",
+          p.registration_end::text AS "registrationEnd",
+          p.status,
+          ay.year_name AS "academicYear"
+        FROM admission_periods p
+        JOIN academic_years ay ON ay.id = p.academic_year_id
+        WHERE p.status IN ('OPEN', 'DRAFT')
+        ORDER BY p.registration_start ASC
+      `),
+      pool.query(`
+        SELECT
+          c.id::text,
+          c.class_name AS "className",
+          c.class_level AS "classLevel",
+          c.capacity,
+          el.level_code AS "levelCode",
+          el.level_name AS "levelName",
+          COUNT(ce.id) FILTER (WHERE ce.status = 'ACTIVE')::int AS "enrolledCount"
+        FROM classes c
+        LEFT JOIN education_levels el ON el.id = c.education_level_id
+        LEFT JOIN class_enrollments ce ON ce.class_id = c.id
+        WHERE c.status = 'ACTIVE'
+        GROUP BY c.id, el.level_code, el.level_name
+        ORDER BY c.class_name ASC
+      `),
+      pool.query(`
+        SELECT
+          document_code AS code,
+          document_name AS name,
+          is_required AS "isRequired",
+          description
+        FROM admission_document_types
+        WHERE status = 'ACTIVE'
+        ORDER BY is_required DESC, document_code ASC
+      `),
+    ]);
+
+    return c.json({
+      periods: periods.rows,
+      classes: classes.rows,
+      documentTypes: documentTypes.rows,
+    });
+  } catch (error) {
+    console.error("[ppdb:meta]", error);
+    return c.json({ error: "Informasi PPDB belum dapat dimuat." }, 503);
+  }
+});
+
 app.get("/cms/public", async (c) => {
   try {
-    const result = await pool.query(`
-      SELECT section_key AS "sectionKey", title, content, updated_at AS "updatedAt"
-      FROM cms_sections
-      WHERE publication_status = 'PUBLISHED'
-      ORDER BY display_order, section_key
-    `);
-    return c.json({ sections: result.rows });
+    const [sections, news, programs, facilities, gallery, pages, periods] = await Promise.all([
+      pool.query(`
+        SELECT section_key AS "sectionKey", title, content, updated_at AS "updatedAt"
+        FROM cms_sections
+        WHERE publication_status = 'PUBLISHED'
+        ORDER BY display_order, section_key
+      `),
+      pool.query(`
+        SELECT
+          n.id::text,
+          n.title,
+          n.slug,
+          n.excerpt,
+          n.content,
+          n.cover_image_path AS "image",
+          COALESCE(to_char(n.published_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD'), to_char(n.created_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD')) AS "date",
+          COALESCE(u.display_name, 'Admin Sekolah') AS author
+        FROM news_posts n
+        LEFT JOIN users u ON u.id = n.author_id
+        WHERE n.status = 'PUBLISHED'
+        ORDER BY n.published_at DESC NULLS LAST, n.created_at DESC
+      `),
+      pool.query(`
+        SELECT
+          id::text,
+          program_name AS name,
+          description,
+          image_path AS image,
+          display_order AS "displayOrder"
+        FROM school_programs
+        WHERE status = 'ACTIVE'
+        ORDER BY display_order ASC, program_name ASC
+      `),
+      pool.query(`
+        SELECT
+          id::text,
+          facility_name AS name,
+          description,
+          image_path AS image,
+          display_order AS "displayOrder"
+        FROM school_facilities
+        WHERE status = 'ACTIVE'
+        ORDER BY display_order ASC, facility_name ASC
+      `),
+      pool.query(`
+        SELECT
+          gi.id::text,
+          ga.album_name AS category,
+          ga.event_date::text AS "eventDate",
+          gi.image_path AS src,
+          gi.caption,
+          gi.display_order AS "displayOrder"
+        FROM gallery_items gi
+        JOIN gallery_albums ga ON ga.id = gi.album_id
+        WHERE ga.status = 'ACTIVE'
+        ORDER BY gi.display_order ASC, gi.created_at DESC
+      `),
+      pool.query(`
+        SELECT slug, title, content, published_at::text AS "publishedAt"
+        FROM cms_pages
+        WHERE publication_status = 'PUBLISHED'
+        ORDER BY title ASC
+      `),
+      pool.query(`
+        SELECT
+          p.id::text,
+          p.period_name AS name,
+          p.registration_start::text AS "registrationStart",
+          p.registration_end::text AS "registrationEnd",
+          p.status,
+          ay.year_name AS "academicYear"
+        FROM admission_periods p
+        JOIN academic_years ay ON ay.id = p.academic_year_id
+        ORDER BY p.registration_start ASC
+      `),
+    ]);
+    return c.json({
+      sections: sections.rows,
+      news: news.rows,
+      programs: programs.rows,
+      facilities: facilities.rows,
+      gallery: gallery.rows,
+      pages: pages.rows,
+      periods: periods.rows,
+    });
   } catch {
     return c.json({ error: "Konten website belum dapat dimuat." }, 503);
   }
@@ -320,7 +461,7 @@ app.post("/registrations", async (c) => {
     );
     if (duplicate.rows[0]) {
       await client.query("ROLLBACK");
-      if (duplicate.rows[0].phone !== registration.whatsapp) {
+      if (canonicalPhone(String(duplicate.rows[0].phone ?? "")) !== canonicalPhone(registration.whatsapp)) {
         return c.json({ error: "NIK calon siswa sudah terdaftar. Hubungi Admin PPDB jika data perlu diperbaiki." }, 409);
       }
       return c.json({
@@ -453,56 +594,36 @@ const documentTypes = new Set([
   "PAS_FOTO",
 ]);
 const documentMimeTypes = new Set(["application/pdf", "image/jpeg", "image/png", "image/webp"]);
+const cmsMediaMimeTypes = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/svg+xml",
+  "application/pdf",
+]);
 
-app.post("/registrations/:id/documents", async (c) => {
-  if (!process.env.AWS_ENDPOINT_URL_S3) return c.json({ error: "Penyimpanan berkas belum tersedia." }, 503);
-  const id = c.req.param("id");
-  if (!/^[0-9a-f-]{36}$/i.test(id)) return c.json({ error: "ID pendaftaran tidak valid." }, 400);
-  const contentLength = Number(c.req.header("content-length") ?? "0");
-  if (contentLength > 6 * 1024 * 1024) return c.json({ error: "Ukuran berkas maksimal 5 MB." }, 413);
-
-  let form: FormData;
-  try {
-    form = await c.req.formData();
-  } catch {
-    return c.json({ error: "Form berkas tidak valid." }, 400);
-  }
-
-  const applicationNumberValue = cleanText(form.get("applicationNumber"), 80);
-  const phone = cleanText(form.get("phone"), 30).replace(/[^+\d]/g, "");
-  const documentType = cleanText(form.get("documentType"), 50).toUpperCase();
-  const file = form.get("file");
-  if (!applicationNumberValue || phone.replace(/\D/g, "").length < 9) {
-    return c.json({ error: "Nomor pendaftaran dan WhatsApp wajib diisi." }, 400);
-  }
-  if (!documentTypes.has(documentType)) return c.json({ error: "Jenis berkas tidak dikenal." }, 400);
-  if (!(file instanceof File) || file.size === 0) return c.json({ error: "Berkas wajib dipilih." }, 400);
-  if (file.size > 5 * 1024 * 1024) return c.json({ error: "Ukuran berkas maksimal 5 MB." }, 413);
-  if (!documentMimeTypes.has(file.type)) return c.json({ error: "Format berkas harus PDF, JPG, PNG, atau WebP." }, 415);
-
-  const registration = await pool.query(
-    `SELECT a.id
-     FROM admission_applications a
-     JOIN guardians g ON g.id = a.primary_guardian_id
-     WHERE a.id = $1 AND a.application_number = $2 AND g.phone = $3`,
-    [id, applicationNumberValue, phone],
-  );
-  if (!registration.rows[0]) return c.json({ error: "Pendaftaran tidak ditemukan." }, 404);
-
-  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-").slice(-120) || "document";
-  const objectKey = `registrations/${id}/${documentType}/${randomUUID()}-${safeName}`;
+async function storeApplicationDocument(params: {
+  applicationId: string;
+  applicationNumber: string;
+  currentStatus: string;
+  documentType: string;
+  file: File;
+  isRevisionUpload: boolean;
+}) {
+  const safeName = params.file.name.replace(/[^a-zA-Z0-9._-]/g, "-").slice(-120) || "document";
+  const objectKey = `registrations/${params.applicationId}/${params.documentType}/${randomUUID()}-${safeName}`;
   const previous = await pool.query(
     "SELECT file_path FROM admission_documents WHERE application_id = $1 AND document_type = $2",
-    [id, documentType],
+    [params.applicationId, params.documentType],
   );
 
   try {
     await s3.send(new PutObjectCommand({
       Bucket: "ppdb-documents",
       Key: objectKey,
-      Body: new Uint8Array(await file.arrayBuffer()),
-      ContentType: file.type,
-      Metadata: { applicationId: id, documentType },
+      Body: new Uint8Array(await params.file.arrayBuffer()),
+      ContentType: params.file.type,
+      Metadata: { applicationId: params.applicationId, documentType: params.documentType },
     }));
     const saved = await pool.query(
       `INSERT INTO admission_documents (
@@ -520,20 +641,143 @@ app.post("/registrations/:id/documents", async (c) => {
          file_size_bytes = EXCLUDED.file_size_bytes,
          uploaded_at = NOW()
        RETURNING id::text AS id, document_type AS type, file_name AS "fileName",
-                 verification_status AS status`,
-      [id, documentType, safeName, objectKey, file.type, file.size],
+                 verification_status AS status, verification_note AS note`,
+      [params.applicationId, params.documentType, safeName, objectKey, params.file.type, params.file.size],
     );
+    if (params.isRevisionUpload) {
+      await pool.query(
+        `UPDATE admission_applications
+         SET updated_at = NOW()
+         WHERE id = $1`,
+        [params.applicationId],
+      );
+      await pool.query(
+        `INSERT INTO admission_status_histories (application_id, previous_status, new_status, note)
+         VALUES ($1, $2, $2, $3)`,
+        [
+          params.applicationId,
+          params.currentStatus,
+          `Wali murid mengunggah ulang berkas ${params.documentType.replaceAll("_", " ")}.`,
+        ],
+      );
+    }
     const oldKey = previous.rows[0]?.file_path as string | undefined;
     if (oldKey && oldKey !== objectKey) {
       await s3.send(new DeleteObjectCommand({ Bucket: "ppdb-documents", Key: oldKey })).catch((error) => {
         console.error("[ppdb:document-cleanup]", error);
       });
     }
-    return c.json({ document: saved.rows[0] }, 201);
+    return { document: saved.rows[0] };
   } catch (error) {
     console.error("[ppdb:document-upload]", error);
     await s3.send(new DeleteObjectCommand({ Bucket: "ppdb-documents", Key: objectKey })).catch(() => undefined);
+    throw error;
+  }
+}
+
+app.post("/registrations/:id/documents", async (c) => {
+  if (!process.env.AWS_ENDPOINT_URL_S3) return c.json({ error: "Penyimpanan berkas belum tersedia." }, 503);
+  const id = c.req.param("id");
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return c.json({ error: "ID pendaftaran tidak valid." }, 400);
+  const contentLength = Number(c.req.header("content-length") ?? "0");
+  if (contentLength > 6 * 1024 * 1024) return c.json({ error: "Ukuran berkas maksimal 5 MB." }, 413);
+
+  let form: FormData;
+  try {
+    form = await c.req.formData();
+  } catch {
+    return c.json({ error: "Form berkas tidak valid." }, 400);
+  }
+
+  const applicationNumberValue = cleanText(form.get("applicationNumber"), 80);
+  const phone = cleanText(form.get("phone"), 30);
+  const phoneCanon = canonicalPhone(phone);
+  const documentType = cleanText(form.get("documentType"), 50).toUpperCase();
+  const file = form.get("file");
+  if (!applicationNumberValue || phoneCanon.length < 9) {
+    return c.json({ error: "Nomor pendaftaran dan WhatsApp wajib diisi." }, 400);
+  }
+  if (!documentTypes.has(documentType)) return c.json({ error: "Jenis berkas tidak dikenal." }, 400);
+  if (!(file instanceof File) || file.size === 0) return c.json({ error: "Berkas wajib dipilih." }, 400);
+  if (file.size > 5 * 1024 * 1024) return c.json({ error: "Ukuran berkas maksimal 5 MB." }, 413);
+  if (!documentMimeTypes.has(file.type)) return c.json({ error: "Format berkas harus PDF, JPG, PNG, atau WebP." }, 415);
+
+  const candidates = await pool.query(
+    `SELECT a.id, a.status, g.phone
+     FROM admission_applications a
+     JOIN guardians g ON g.id = a.primary_guardian_id
+     WHERE a.id = $1 AND a.application_number = $2`,
+    [id, applicationNumberValue],
+  );
+  const matched = candidates.rows.find((row) => canonicalPhone(String(row.phone ?? "")) === phoneCanon);
+  if (!matched) return c.json({ error: "Pendaftaran tidak ditemukan." }, 404);
+
+  try {
+    const result = await storeApplicationDocument({
+      applicationId: id,
+      applicationNumber: applicationNumberValue,
+      currentStatus: String(matched.status),
+      documentType,
+      file,
+      isRevisionUpload: false,
+    });
+    return c.json(result, 201);
+  } catch {
     return c.json({ error: "Berkas belum dapat disimpan. Silakan coba lagi." }, 500);
+  }
+});
+
+app.post("/status/:applicationNumber/documents", async (c) => {
+  if (!process.env.AWS_ENDPOINT_URL_S3) return c.json({ error: "Penyimpanan berkas belum tersedia." }, 503);
+  const applicationNumberValue = cleanText(c.req.param("applicationNumber"), 80);
+  const contentLength = Number(c.req.header("content-length") ?? "0");
+  if (contentLength > 6 * 1024 * 1024) return c.json({ error: "Ukuran berkas maksimal 5 MB." }, 413);
+
+  let form: FormData;
+  try {
+    form = await c.req.formData();
+  } catch {
+    return c.json({ error: "Form berkas tidak valid." }, 400);
+  }
+
+  const phone = cleanText(form.get("phone"), 30);
+  const phoneCanon = canonicalPhone(phone);
+  const documentType = cleanText(form.get("documentType"), 50).toUpperCase();
+  const file = form.get("file");
+
+  if (!applicationNumberValue || phoneCanon.length < 9) {
+    return c.json({ error: "Nomor pendaftaran dan WhatsApp wajib diisi." }, 400);
+  }
+  if (!documentTypes.has(documentType)) return c.json({ error: "Jenis berkas tidak dikenal." }, 400);
+  if (!(file instanceof File) || file.size === 0) return c.json({ error: "Berkas wajib dipilih." }, 400);
+  if (file.size > 5 * 1024 * 1024) return c.json({ error: "Ukuran berkas maksimal 5 MB." }, 413);
+  if (!documentMimeTypes.has(file.type)) return c.json({ error: "Format berkas harus PDF, JPG, PNG, atau WebP." }, 415);
+
+  const candidates = await pool.query(
+    `SELECT a.id::text, a.status, g.phone
+     FROM admission_applications a
+     JOIN guardians g ON g.id = a.primary_guardian_id
+     WHERE a.application_number = $1`,
+    [applicationNumberValue],
+  );
+  const matched = candidates.rows.find((row) => canonicalPhone(String(row.phone ?? "")) === phoneCanon);
+  if (!matched) return c.json({ error: "Data pendaftaran tidak ditemukan." }, 404);
+  if (!["SUBMITTED", "NEEDS_REVISION"].includes(String(matched.status))) {
+    return c.json({ error: "Berkas hanya dapat diunggah ulang saat status Menunggu Verifikasi atau Perlu Perbaikan." }, 409);
+  }
+
+  try {
+    const result = await storeApplicationDocument({
+      applicationId: String(matched.id),
+      applicationNumber: applicationNumberValue,
+      currentStatus: String(matched.status),
+      documentType,
+      file,
+      isRevisionUpload: true,
+    });
+    return c.json(result, 201);
+  } catch {
+    return c.json({ error: "Berkas belum dapat diunggah ulang. Silakan coba lagi." }, 500);
   }
 });
 
@@ -605,19 +849,25 @@ app.get("/registrations", async (c) => {
 
 app.get("/status/:applicationNumber", async (c) => {
   const applicationNumber = cleanText(c.req.param("applicationNumber"), 80);
-  const phone = cleanText(c.req.query("phone"), 30).replace(/[^+\d]/g, "");
-  if (!applicationNumber || phone.replace(/\D/g, "").length < 9) {
+  const phone = cleanText(c.req.query("phone"), 30);
+  const phoneCanon = canonicalPhone(phone);
+  if (!applicationNumber || phoneCanon.length < 9) {
     return c.json({ error: "Nomor pendaftaran dan WhatsApp wajib diisi." }, 400);
   }
   const result = await pool.query(
-    `${applicationSelect} WHERE a.application_number = $1 AND g.phone = $2`,
-    [applicationNumber, phone],
+    `${applicationSelect} WHERE a.application_number = $1`,
+    [applicationNumber],
   );
-  if (!result.rows[0]) return c.json({ error: "Data pendaftaran tidak ditemukan." }, 404);
-  const row = result.rows[0];
+  const row = result.rows.find((candidate) => canonicalPhone(String(candidate.teleponWali ?? "")) === phoneCanon);
+  if (!row) return c.json({ error: "Data pendaftaran tidak ditemukan." }, 404);
   return c.json({
+    id: row.id,
     applicationNumber: row.noPendaftaran,
     candidateName: row.nama,
+    program: row.program || null,
+    jalur: row.jalur,
+    nisn: row.nisn || null,
+    nitkm: row.nitkm || null,
     status: row.statusSeleksi,
     databaseStatus: row.databaseStatus,
     verificationNote: row.verificationNote,
@@ -626,6 +876,7 @@ app.get("/status/:applicationNumber", async (c) => {
     className: row.kelasTujuan || null,
     interviewScheduledAt: row.interviewScheduledAt || null,
     interviewLocation: row.interviewLocation || null,
+    documents: row.documents ?? [],
     updatedAt: row.tanggalDaftar,
   });
 });
@@ -722,10 +973,12 @@ app.patch("/registrations/:id", async (c) => {
       );
       await client.query(
         `UPDATE admission_applications
-         SET status = $2, application_metadata = application_metadata || $3::jsonb,
+         SET status = $2,
+             decision_note = COALESCE($4, decision_note),
+             application_metadata = application_metadata || $3::jsonb,
              updated_at = NOW()
          WHERE id = $1`,
-        [id, nextStatus, metadata],
+        [id, nextStatus, metadata, note],
       );
     } else if (body.action === "COMPLETE_INTERVIEW") {
       const observationNotes = cleanText(body.metadata?.observationNotes, 4000);
@@ -789,17 +1042,20 @@ app.patch("/registrations/:id", async (c) => {
       }
       await client.query(
         `UPDATE admission_applications
-         SET status = $2, application_metadata = application_metadata || $3::jsonb,
+         SET status = $2,
+             decision_note = COALESCE($4, decision_note),
+             application_metadata = application_metadata || $3::jsonb,
              updated_at = NOW()
          WHERE id = $1`,
-        [id, nextStatus, metadata],
+        [id, nextStatus, metadata, note],
       );
     } else if (body.action === "PLACE") {
+      const classId = cleanText(body.metadata?.classId, 60);
       const className = cleanText(body.metadata?.className, 80);
       const classSlug = cleanText(body.metadata?.classSlug, 80);
       const nisn = cleanText(body.metadata?.nisn, 40);
       const nitkm = cleanText(body.metadata?.nitkm, 40);
-      if (!className || !nitkm) {
+      if ((!classId && !className) || !nitkm) {
         await client.query("ROLLBACK");
         return c.json({ error: "Kelas dan nomor induk wajib diisi untuk penempatan." }, 400);
       }
@@ -807,16 +1063,35 @@ app.patch("/registrations/:id", async (c) => {
         `SELECT a.application_number, a.candidate_name, a.candidate_nickname, a.candidate_gender, a.candidate_birth_place, a.candidate_birth_date,
                 a.candidate_address, a.candidate_nik, a.candidate_religion, a.family_card_number,
                 a.child_order, a.sibling_count, a.primary_guardian_id, g.full_name, g.phone,
-                c.id AS class_id
+                c.id AS class_id, c.class_name AS resolved_class_name, c.capacity AS class_capacity
          FROM admission_applications a
          JOIN guardians g ON g.id = a.primary_guardian_id
-         LEFT JOIN classes c ON c.class_name = $2 OR c.class_name = $3
+         LEFT JOIN classes c ON c.status = 'ACTIVE'
+           AND (($4 <> '' AND c.id::text = $4) OR c.class_name = $2 OR c.class_name = $3)
          WHERE a.id = $1 LIMIT 1`,
-        [id, className, classSlug],
+        [id, className, classSlug, classId],
       );
       if (!details.rows[0]?.class_id) {
         await client.query("ROLLBACK");
         return c.json({ error: "Kelas tujuan belum tersedia di master data." }, 409);
+      }
+      const resolvedClassId = String(details.rows[0].class_id);
+      const resolvedClassName = String(details.rows[0].resolved_class_name);
+      const classCapacity = Number(details.rows[0].class_capacity ?? 0);
+      if (classCapacity > 0) {
+        const capCheck = await client.query(
+          `SELECT COUNT(*)::int AS active_count
+           FROM class_enrollments ce
+           LEFT JOIN students s ON s.id = ce.student_id
+           WHERE ce.class_id = $1
+             AND ce.status = 'ACTIVE'
+             AND COALESCE(s.source_application_id::text, '') <> $2`,
+          [resolvedClassId, id],
+        );
+        if (Number(capCheck.rows[0]?.active_count ?? 0) >= classCapacity) {
+          await client.query("ROLLBACK");
+          return c.json({ error: `Kapasitas kelas ${resolvedClassName} sudah penuh (${classCapacity} santri).` }, 409);
+        }
       }
       const student = await client.query(
         `INSERT INTO students (
@@ -846,17 +1121,32 @@ app.patch("/registrations/:id", async (c) => {
         [student.rows[0].id, details.rows[0].primary_guardian_id],
       );
       await client.query(
+        `UPDATE class_enrollments
+         SET status = 'TRANSFERRED', released_at = CURRENT_DATE, updated_at = NOW()
+         WHERE student_id = $1 AND class_id <> $2 AND status = 'ACTIVE'`,
+        [student.rows[0].id, resolvedClassId],
+      );
+      await client.query(
         `INSERT INTO class_enrollments (student_id, class_id, enrolled_at, status)
          VALUES ($1, $2, CURRENT_DATE, 'ACTIVE')
-         ON CONFLICT DO NOTHING`,
-        [student.rows[0].id, details.rows[0].class_id],
+         ON CONFLICT (student_id, class_id) DO UPDATE SET
+           status = 'ACTIVE',
+           enrolled_at = CURRENT_DATE,
+           released_at = NULL,
+           updated_at = NOW()`,
+        [student.rows[0].id, resolvedClassId],
       );
+      const placeMetadata = JSON.stringify({
+        ...(body.metadata ?? {}),
+        classId: resolvedClassId,
+        className: resolvedClassName,
+      });
       await client.query(
         `UPDATE admission_applications
          SET status = 'COMPLETED', application_metadata = application_metadata || $2::jsonb,
              updated_at = NOW(), decision_note = COALESCE($3, decision_note)
          WHERE id = $1`,
-        [id, metadata, note],
+        [id, placeMetadata, note],
       );
       nextStatus = "COMPLETED";
     } else {
@@ -919,6 +1209,10 @@ app.patch("/registrations/:id", async (c) => {
     return c.json({ application });
   } catch (error) {
     await client.query("ROLLBACK");
+    const pgCode = (error as { code?: string }).code;
+    if (pgCode === "23505") {
+      return c.json({ error: "Nomor Induk, NISN, atau NIK sudah digunakan oleh santri lain." }, 409);
+    }
     console.error("[ppdb:update]", error);
     return c.json({ error: "Status pendaftaran belum dapat diperbarui." }, 500);
   } finally {
@@ -955,6 +1249,7 @@ app.delete("/registrations/:id", async (c) => {
       await client.query("DELETE FROM student_guardians WHERE student_id = $1", [student.id]);
       await client.query("DELETE FROM attendance_records WHERE student_id = $1", [student.id]);
       await client.query("DELETE FROM student_assessments WHERE student_id = $1", [student.id]);
+      await client.query("DELETE FROM student_daily_notes WHERE student_id = $1", [student.id]);
       await client.query("DELETE FROM report_cards WHERE student_id = $1", [student.id]);
       await client.query("DELETE FROM bills WHERE student_id = $1", [student.id]);
       await client.query("DELETE FROM student_documents WHERE student_id = $1", [student.id]);
@@ -978,6 +1273,129 @@ app.delete("/registrations/:id", async (c) => {
     return c.json({ error: "Data pendaftaran belum dapat dihapus." }, 500);
   } finally {
     client.release();
+  }
+});
+
+app.get("/cms/media", async (c) => {
+  if (!hasAdminAccess(c.req.raw)) return c.json({ error: "Unauthorized" }, 401);
+  try {
+    const result = await pool.query(`
+      SELECT
+        id::text,
+        object_key AS "objectKey",
+        original_name AS "originalName",
+        mime_type AS "mimeType",
+        file_size_bytes::int AS "fileSizeBytes",
+        alt_text AS "altText",
+        visibility,
+        created_at::text AS "createdAt"
+      FROM media_files
+      ORDER BY created_at DESC
+      LIMIT 60
+    `);
+    return c.json({ files: result.rows });
+  } catch (error) {
+    console.error("[cms:media-list]", error);
+    return c.json({ error: "Daftar media gagal dimuat." }, 500);
+  }
+});
+
+app.post("/cms/media", async (c) => {
+  if (!hasAdminAccess(c.req.raw)) return c.json({ error: "Unauthorized" }, 401);
+  if (!process.env.AWS_ENDPOINT_URL_S3) return c.json({ error: "Penyimpanan media belum tersedia." }, 503);
+  const contentLength = Number(c.req.header("content-length") ?? "0");
+  if (contentLength > 6 * 1024 * 1024) return c.json({ error: "Ukuran media maksimal 5 MB." }, 413);
+
+  let form: FormData;
+  try {
+    form = await c.req.formData();
+  } catch {
+    return c.json({ error: "Form unggahan media tidak valid." }, 400);
+  }
+
+  const file = form.get("file");
+  const altText = cleanText(form.get("altText"), 250) || null;
+  const rawVis = cleanText(form.get("visibility") || "PUBLIC", 20).toUpperCase();
+  const visibility = rawVis === "PRIVATE" ? "PRIVATE" : "PUBLIC";
+
+  if (!(file instanceof File) || file.size === 0) return c.json({ error: "Berkas media wajib dipilih." }, 400);
+  if (file.size > 5 * 1024 * 1024) return c.json({ error: "Ukuran media maksimal 5 MB." }, 413);
+  if (!cmsMediaMimeTypes.has(file.type)) {
+    return c.json({ error: "Format media harus JPG, PNG, WebP, SVG, atau PDF." }, 415);
+  }
+
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-").slice(-120) || "media";
+  const objectKey = `cms/${randomUUID()}-${safeName}`;
+
+  try {
+    await s3.send(new PutObjectCommand({
+      Bucket: "ppdb-documents",
+      Key: objectKey,
+      Body: new Uint8Array(await file.arrayBuffer()),
+      ContentType: file.type,
+    }));
+    const saved = await pool.query(
+      `INSERT INTO media_files (
+         object_key, original_name, mime_type, file_size_bytes, alt_text, visibility, uploaded_by
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING
+         id::text,
+         object_key AS "objectKey",
+         original_name AS "originalName",
+         mime_type AS "mimeType",
+         file_size_bytes::int AS "fileSizeBytes",
+         alt_text AS "altText",
+         visibility,
+         created_at::text AS "createdAt"`,
+      [objectKey, safeName, file.type, file.size, altText, visibility, actorId(c.req.raw)],
+    );
+    return c.json({ file: saved.rows[0] }, 201);
+  } catch (error) {
+    console.error("[cms:media-upload]", error);
+    await s3.send(new DeleteObjectCommand({ Bucket: "ppdb-documents", Key: objectKey })).catch(() => undefined);
+    return c.json({ error: "Media gagal diunggah." }, 500);
+  }
+});
+
+app.delete("/cms/media/:id", async (c) => {
+  if (!hasAdminAccess(c.req.raw)) return c.json({ error: "Unauthorized" }, 401);
+  const id = c.req.param("id");
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return c.json({ error: "ID media tidak valid." }, 400);
+  const deleted = await pool.query(
+    "DELETE FROM media_files WHERE id = $1 RETURNING object_key",
+    [id],
+  );
+  if (!deleted.rows[0]) return c.json({ error: "Media tidak ditemukan." }, 404);
+  const key = String(deleted.rows[0].object_key);
+  await s3.send(new DeleteObjectCommand({ Bucket: "ppdb-documents", Key: key })).catch((err) => {
+    console.error("[cms:media-delete-object]", err);
+  });
+  return c.body(null, 204);
+});
+
+app.get("/media/:id", async (c) => {
+  if (!process.env.AWS_ENDPOINT_URL_S3) return c.json({ error: "Penyimpanan media belum tersedia." }, 503);
+  const id = c.req.param("id");
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return c.json({ error: "Media tidak ditemukan." }, 404);
+  const result = await pool.query(
+    "SELECT object_key, mime_type, original_name FROM media_files WHERE id = $1 AND visibility = 'PUBLIC'",
+    [id],
+  );
+  if (!result.rows[0]) return c.json({ error: "Media tidak ditemukan." }, 404);
+  try {
+    const obj = await s3.send(new GetObjectCommand({
+      Bucket: "ppdb-documents",
+      Key: String(result.rows[0].object_key),
+    }));
+    const bytes = await obj.Body?.transformToByteArray();
+    if (!bytes) return c.json({ error: "Berkas kosong." }, 404);
+    return c.body(bytes, 200, {
+      "Content-Type": String(result.rows[0].mime_type || "application/octet-stream"),
+      "Cache-Control": "public, max-age=3600",
+    });
+  } catch (error) {
+    console.error("[cms:media-serve]", error);
+    return c.json({ error: "Media gagal dimuat." }, 500);
   }
 });
 

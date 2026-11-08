@@ -4,8 +4,8 @@ import Logo from './Logo'
 import SearchOverlay from './SearchOverlay'
 import { navItems, type NavItem } from '../data/site'
 import { useCMS } from '../hooks/useCMS'
+import { getPageIcon } from './icons/pageIconUtils'
 import {
-  getPageIcon,
   RiSearchLine,
   RiMenu3Line,
   RiCloseLine,

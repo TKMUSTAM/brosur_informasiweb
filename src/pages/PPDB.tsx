@@ -88,16 +88,27 @@ export default function PPDB() {
         crumbs={[{ label: `PPDB ${ppdb.academicYear}` }]}
       >
         <div className="mt-8 flex flex-wrap gap-3">
-          {ppdb.registrationOpen && <ButtonLink to="/ppdb/daftar" variant="gold" size="lg" withArrow className="shadow-gold">Daftar Online di Portal PPDB</ButtonLink>}
-          <a
-            href={`https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent('Assalamualaikum, saya ingin menanyakan brosur dan panduan PPDB TK Islam Al-Mustam.')}`}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3.5 text-sm font-bold text-white backdrop-blur-md transition-all hover:bg-white/25"
+          {ppdb.registrationOpen && (
+            <ButtonLink to="/ppdb/daftar" variant="gold" size="lg" withArrow className="shadow-gold">
+              Daftar Online di Portal PPDB
+            </ButtonLink>
+          )}
+          <ButtonLink
+            to="/ppdb/status"
+            variant="white"
+            size="lg"
+            className="border border-white/30 bg-white/10 text-white hover:bg-white/25"
+          >
+            Cek Status Pendaftaran
+          </ButtonLink>
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-bold text-white backdrop-blur-md transition-all hover:bg-white/25"
           >
             <RiDownloadLine className="h-4 w-4 text-gold" />
-            Unduh Brosur &amp; Rincian PDF
-          </a>
+            <span>Cetak Panduan &amp; Rincian Biaya</span>
+          </button>
         </div>
       </PageHeader>
 
@@ -333,7 +344,7 @@ export default function PPDB() {
             </ul>
 
             <div className="mt-8 rounded-2xl bg-softgreen p-4 text-xs font-semibold text-primary">
-              💡 Seluruh proses observasi dikemas dalam bentuk bermain ramah anak tanpa tes akademik yang memberatkan.
+              Seluruh proses observasi dikemas dalam bentuk bermain ramah anak tanpa tes akademik yang memberatkan.
             </div>
           </Reveal>
 
@@ -346,9 +357,9 @@ export default function PPDB() {
               {[
                 { label: 'Gelombang 1 (Early Bird Diskon 10% Uang Pangkal)', value: '1 Jan – 31 Maret 2026' },
                 { label: 'Gelombang 2 (Reguler)', value: '1 April – 30 Juni 2026' },
-                { label: 'Observasi & Pemetaan Karakter Anak', value: 'Setiap Sabtu (08.30–11.00 WIB)' },
-                { label: 'Pengumuman Penempatan Kelas', value: '3 Hari Setelah Observasi' },
-                { label: 'Masa Pengenalan Lingkungan Sekolah (MPLS)', value: '13 – 17 Juli 2026' },
+                { label: 'Observasi & Pemetaan Karakter Anak', value: 'Sesuai jadwal yang dipilih setelah berkas lengkap' },
+                { label: 'Pengumuman Penempatan Kelas', value: 'Dapat dipantau langsung di halaman Cek Status PPDB' },
+                { label: 'Masa Pengenalan Lingkungan Sekolah (MPLS)', value: 'Juli 2026' },
               ].map((s) => (
                 <div key={s.label} className="flex flex-col justify-between gap-1 border-b border-primary/5 pb-3.5 last:border-0 last:pb-0 sm:flex-row sm:items-center">
                   <dt className="text-xs font-bold text-ink-soft">{s.label}</dt>
@@ -361,12 +372,12 @@ export default function PPDB() {
       </section>
 
       <CTASection
-        title={<>Amankan Kursi untuk Buah Hati Anda Sekarang</>}
-        description="Kuota murid per kelas dibatasi maksimal 14 anak demi memastikan perhatian dan pendampingan optimal."
+        title={<>Daftarkan Buah Hati Anda Sekarang</>}
+        description="Kapasitas tiap rombongan belajar disesuaikan agar guru dapat mendampingi tumbuh kembang ananda secara terarah."
         primaryLabel="Isi Formulir Online"
         primaryTo="/ppdb/daftar"
         secondaryLabel="Konsultasi WhatsApp"
-        secondaryTo={`https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent('Assalamualaikum, saya ingin menanyakan sisa kuota pendaftaran TK Islam Al-Mustam.')}`}
+        secondaryTo={`https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent('Assalamualaikum, saya ingin menanyakan informasi pendaftaran TK Islam Al-Mustam.')}`}
       />
     </>
   )

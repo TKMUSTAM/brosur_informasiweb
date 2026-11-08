@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useCMS } from '../context/CMSContext'
+import { useCMS } from '../hooks/useCMS'
 import PPDBForm from '../components/forms/PPDBForm'
 import { site } from '../data/site'
 import { RiAlertLine, RiWhatsappLine, RiArrowLeftLine, RiInformationLine } from 'react-icons/ri'
@@ -125,7 +125,7 @@ export default function PPDBDaftar() {
                           : 'bg-amber-100 text-amber-800'
                       }`}
                     >
-                      {wave.status === 'OPEN' ? '🟢 DIBUKA' : wave.status === 'CLOSED' ? '🔴 DITUTUP' : '🟡 BELUM DIBUKA'}
+                      {wave.status === 'OPEN' ? 'DIBUKA' : wave.status === 'CLOSED' ? 'DITUTUP' : 'BELUM DIBUKA'}
                     </span>
                   </div>
 

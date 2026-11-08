@@ -9,15 +9,15 @@ export const site = {
   tagline: 'Membentuk Generasi Qur’ani, Beradab, & Cerdas Holistik',
   description:
     'Informasi program Playgroup (KB), TK A, TK B, TPA Tahfidz, kegiatan sekolah, PPDB, serta bantuan pendidikan yatim dan dhuafa.',
-  accreditation: 'Terakreditasi A (Unggul)',
+  accreditation: 'Terakreditasi A',
   npsn: '69876543',
   skKemenkumham: 'AHU-0012345.AH.01.04.Tahun 2016',
   izinOperasional: '421.1/1234-Disdik/2018',
   foundedYear: 2016,
 
   contact: {
-    address: 'Jl. Pendidikan Islam No. 17, Kel. Melati Putih, Kota Nusantara',
-    addressShort: 'Jl. Pendidikan Islam No. 17, Kota Nusantara',
+    address: 'Jl. Pendidikan Islam No. 17, Kel. Melati Putih, Jakarta Selatan',
+    addressShort: 'Jl. Pendidikan Islam No. 17, Jakarta Selatan',
     phone: '+62 21 8765 4321',
     whatsapp: '6281234567890',
     whatsappDisplay: '0812-3456-7890',
@@ -65,7 +65,7 @@ export const navItems: NavItem[] = [
       { label: 'Tentang Yayasan & TK', href: '/profil', desc: 'Profil lengkap, nilai keislaman & komitmen mutu' },
       { label: 'Visi, Misi & 7 Pilar Karakter', href: '/visi-misi', desc: 'Arah perjuangan & pembentukan akhlaqul karimah' },
       { label: 'Sejarah Perjalanan', href: '/sejarah', desc: 'Jejak langkah pengabdian sejak 2016' },
-      { label: 'Pendidik & Struktur Organisasi', href: '/organisasi', desc: 'Guru berijazah S1 PAUD & konselor anak' },
+      { label: 'Pendidik & Struktur Organisasi', href: '/organisasi', desc: 'Dewan pembina, kepala sekolah, dan tenaga pendidik' },
       { label: 'Legalitas & Akreditasi A', href: '/legalitas', desc: 'SK Kemenkumham, NPSN, & izin operasional resmi', badge: 'Akreditasi A' },
       { label: 'Fasilitas Kampus', href: '/fasilitas', desc: 'Ruang belajar, area bermain, dan fasilitas pendukung' },
     ],
@@ -76,8 +76,8 @@ export const navItems: NavItem[] = [
     children: [
       { label: 'Semua Jenjang Kelas', href: '/program', desc: 'Ikhtisar jenjang KB, TK A, TK B, dan TPA' },
       { label: 'Playgroup / KB (3–4 Tahun)', href: '/program/kb', desc: 'Stimulasi sensori-motorik & sosialisasi ceria' },
-      { label: 'TK A (4–5 Tahun)', href: '/program/tk-a', desc: 'Kemandirian, tahfidz awal & calistung fun' },
-      { label: 'TK B Persiapan SD (5–6 Tahun)', href: '/program/tk-b', desc: 'Kesiapan belajar, kemandirian, dan adab untuk transisi ke SD', badge: 'Populer' },
+      { label: 'TK A (4–5 Tahun)', href: '/program/tk-a', desc: 'Kemandirian, tahfidz awal & literasi konkret' },
+      { label: 'TK B Persiapan SD (5–6 Tahun)', href: '/program/tk-b', desc: 'Kesiapan belajar, kemandirian, dan adab untuk transisi ke SD' },
       { label: 'TPA & Tahfidz Cilik', href: '/program/tpa', desc: 'Bimbingan baca Al-Qur’an metode Tilawati' },
       { label: 'Kurikulum & 5 Sentra Belajar', href: '/kurikulum', desc: 'Metode BCCT, jadwal rutinitas & kompetensi' },
     ],
@@ -88,7 +88,8 @@ export const navItems: NavItem[] = [
     children: [
       { label: 'Informasi & Alur PPDB', href: '/ppdb', desc: 'Tahapan pendaftaran, gelombang & kuota kelas' },
       { label: 'Rincian Biaya & Syarat', href: '/ppdb#biaya', desc: 'Transparansi uang pangkal, SPP & formulir', badge: 'Transparan' },
-      { label: 'Formulir Pendaftaran Online', href: '/ppdb/daftar', desc: 'Isi data calon siswa dan lanjutkan konfirmasi melalui WhatsApp', badge: 'Dibuka' },
+      { label: 'Formulir Pendaftaran Online', href: '/ppdb/daftar', desc: 'Isi data calon siswa dan unggah berkas pendaftaran', badge: 'Dibuka' },
+      { label: 'Cek Status Pendaftaran', href: '/ppdb/status', desc: 'Pantau hasil verifikasi berkas dan jadwal wawancara' },
       { label: 'Bantuan Pendidikan Yatim & Dhuafa', href: '/yatim', desc: 'Dukungan biaya sesuai hasil verifikasi dan ketersediaan program' },
     ],
   },

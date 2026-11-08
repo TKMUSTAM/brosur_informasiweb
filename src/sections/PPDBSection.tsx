@@ -92,7 +92,7 @@ export default function PPDBSection() {
                           : 'bg-amber-100 text-amber-800'
                       }`}
                     >
-                      {wave.status === 'OPEN' ? '🟢 DIBUKA' : wave.status === 'CLOSED' ? '🔴 DITUTUP' : '🟡 BELUM DIBUKA'}
+                      {wave.status === 'OPEN' ? 'DIBUKA' : wave.status === 'CLOSED' ? 'DITUTUP' : 'BELUM DIBUKA'}
                     </span>
                   </div>
 
@@ -128,7 +128,7 @@ export default function PPDBSection() {
                 <span className="text-white/40">•</span>
                 <span className="text-white/80">KB (3–4 th) &amp; TK A–B (4–6 th)</span>
                 <span className="text-white/40">•</span>
-                <span className="text-white/80">Maksimal 15 Murid / Kelas</span>
+                <span className="text-white/80">Pendampingan Sesuai Tahap Usia</span>
               </div>
 
               <h3 className="text-xl sm:text-2xl lg:text-3xl font-extrabold font-heading text-white">

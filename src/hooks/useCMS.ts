@@ -1,1 +1,1 @@
-export { useCMS } from '../context/CMSContext'
+export { useCMS } from '../context/cmsStore'
