@@ -115,27 +115,6 @@ export default function AdminLoginModal() {
             <ArrowRight className="h-4 w-4" />
           </button>
 
-          {/* Quick Demo Credentials Helper */}
-          <div className="rounded-2xl border border-primary/15 bg-softgreen/40 p-4 text-left">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-primary">Akun Simulasi CMS</span>
-              <button
-                type="button"
-                onClick={() => {
-                  setUsername('admin')
-                  setPassword('admin123')
-                  setError(false)
-                }}
-                className="rounded-lg bg-gold/20 px-2.5 py-1 text-xs font-black text-primary-deep hover:bg-gold/40 cursor-pointer transition-colors"
-              >
-                Gunakan Akun Demo
-              </button>
-            </div>
-            <p className="mt-1.5 text-xs text-ink-mute">
-              User: <span className="font-mono font-bold text-ink">admin</span> &bull; Pass: <span className="font-mono font-bold text-ink">admin123</span>
-            </p>
-          </div>
-
           <div className="flex items-center justify-between pt-2 text-xs">
             <a
               href="/"
@@ -144,9 +123,7 @@ export default function AdminLoginModal() {
               &larr; Halaman Publik
             </a>
             <a
-              href="http://localhost:3000"
-              target="_blank"
-              rel="noreferrer"
+              href="/admin"
               className="font-bold text-ink-mute hover:text-primary"
             >
               Sistem Admin Sekolah &rarr;

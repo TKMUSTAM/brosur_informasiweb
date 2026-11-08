@@ -1,6 +1,6 @@
-import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useCMS } from '../context/CMSContext'
+import PPDBForm from '../components/forms/PPDBForm'
 import { site } from '../data/site'
 import { RiAlertLine, RiWhatsappLine, RiArrowLeftLine, RiInformationLine } from 'react-icons/ri'
 
@@ -29,23 +29,18 @@ export default function PPDBDaftar() {
   const hasOpenWave = waves.some((w) => w.status === 'OPEN')
   const isAvailable = Boolean(ppdb.registrationOpen && hasOpenWave)
 
-  useEffect(() => {
-    if (isAvailable) {
-      window.location.replace('http://localhost:5175/daftar')
-    }
-  }, [isAvailable])
-
   if (isAvailable) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4 py-20 bg-cream">
-        <div className="h-9 w-9 animate-spin rounded-full border-3 border-primary border-t-transparent mb-4" />
-        <h2 className="font-heading text-xl font-bold text-primary">Mengalihkan ke Portal PPDB Mandiri...</h2>
-        <p className="text-xs text-ink-mute mt-2 max-w-md">
-          Pendaftaran online sedang dibuka. Jika Anda tidak dialihkan secara otomatis, silakan{' '}
-          <a href="http://localhost:5175/daftar" className="text-gold-dark font-extrabold underline hover:text-primary">
-            klik di sini untuk membuka formulir pendaftaran
-          </a>.
-        </p>
+      <div className="min-h-[75vh] bg-cream/60 px-4 py-12 sm:px-6 sm:py-16">
+        <div className="mx-auto max-w-4xl">
+          <div className="mb-8 text-center">
+            <span className="inline-flex rounded-full border border-primary/10 bg-softgreen px-4 py-1.5 text-xs font-extrabold uppercase tracking-wider text-primary">PPDB {ppdb.academicYear}</span>
+            <h1 className="mt-4 font-heading text-3xl font-extrabold text-primary sm:text-4xl">Formulir Pendaftaran Calon Siswa</h1>
+            <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-ink-soft">Isi data sesuai dokumen resmi. Setelah formulir dan berkas terkirim, simpan nomor registrasi untuk memantau proses verifikasi hingga penetapan.</p>
+            <Link to="/ppdb/status" className="mt-4 inline-flex min-h-11 items-center rounded-full border border-primary/20 bg-white px-5 text-sm font-bold text-primary hover:bg-softgreen">Cek status pendaftaran</Link>
+          </div>
+          <PPDBForm />
+        </div>
       </div>
     )
   }

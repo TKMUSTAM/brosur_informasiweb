@@ -45,7 +45,7 @@ const footerColumns = [
     links: [
       { label: 'Informasi PPDB 2026/2027', href: '/ppdb' },
       { label: 'Portal Mandiri PPDB (Pendaftaran)', href: '/ppdb/daftar' },
-      { label: 'Cek Status Pendaftaran', href: 'http://localhost:5175/cek-status' },
+      { label: 'Cek Status Pendaftaran', href: '/ppdb/status' },
       { label: 'Rincian Biaya Transparan', href: '/ppdb#biaya' },
       { label: 'Jadwal Gelombang & Syarat', href: '/ppdb#syarat' },
       { label: 'Berita & Kegiatan', href: '/berita' },
@@ -256,9 +256,7 @@ export default function Footer() {
             </Link>
             <span className="text-white/20">&bull;</span>
             <a
-              href="http://localhost:3000"
-              target="_blank"
-              rel="noreferrer"
+              href="/admin"
               className="text-white/70 hover:text-gold transition-colors"
             >
               Sistem Admin Sekolah &rarr;

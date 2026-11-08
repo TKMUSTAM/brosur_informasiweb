@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Route, Routes, Navigate } from 'react-router-dom'
 import Layout from './components/Layout'
 import Home from './pages/Home'
@@ -15,6 +16,7 @@ import OrangTuaAsuh from './pages/OrangTuaAsuh'
 import Transparansi from './pages/Transparansi'
 import PPDB from './pages/PPDB'
 import PPDBDaftar from './pages/PPDBDaftar'
+import PPDBStatus from './pages/PPDBStatus'
 import Berita from './pages/Berita'
 import BeritaDetail from './pages/BeritaDetail'
 import Galeri from './pages/Galeri'
@@ -22,8 +24,15 @@ import KontenIslami from './pages/KontenIslami'
 import Doa from './pages/Doa'
 import JadwalSholat from './pages/JadwalSholat'
 import Kontak from './pages/Kontak'
-import AdminDashboard from './pages/admin/AdminDashboard'
 import NotFound from './pages/NotFound'
+
+function AdminPortalRedirect() {
+  const destination = import.meta.env.VITE_ADMIN_PORTAL_URL?.trim() || 'http://localhost:3000'
+  useEffect(() => {
+    window.location.replace(destination)
+  }, [destination])
+  return <main className="grid min-h-screen place-items-center bg-cream px-6 text-center text-sm font-semibold text-primary">Membuka portal administrasi yang aman…</main>
+}
 
 export default function App() {
   return (
@@ -45,6 +54,7 @@ export default function App() {
         <Route path="/yatim/transparansi" element={<Transparansi />} />
         <Route path="/ppdb" element={<PPDB />} />
         <Route path="/ppdb/daftar" element={<PPDBDaftar />} />
+        <Route path="/ppdb/status" element={<PPDBStatus />} />
         <Route path="/berita" element={<Berita />} />
         <Route path="/berita/:slug" element={<BeritaDetail />} />
         <Route path="/galeri" element={<Galeri />} />
@@ -54,7 +64,7 @@ export default function App() {
         <Route path="/kontak" element={<Kontak />} />
         <Route path="*" element={<NotFound />} />
       </Route>
-      <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/admin" element={<AdminPortalRedirect />} />
     </Routes>
   )
 }

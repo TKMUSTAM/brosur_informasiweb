@@ -6,9 +6,9 @@ import type { SiteData } from '../../../types/cms'
 export default function SiteSettingsTab() {
   const { data, updateSite } = useCMS()
   const [form, setForm] = useState<SiteData>(data.site)
-  const [usernameInput, setUsernameInput] = useState(data.site.adminUsername || 'admin')
-  const [passwordInput, setPasswordInput] = useState(data.site.adminPassword || 'admin123')
-  const [pinInput, setPinInput] = useState(data.site.adminPin || '123456')
+  const [usernameInput, setUsernameInput] = useState(data.site.adminUsername || '')
+  const [passwordInput, setPasswordInput] = useState(data.site.adminPassword || '')
+  const [pinInput, setPinInput] = useState(data.site.adminPin || '')
 
   const handleChange = (field: keyof SiteData, value: any) => {
     setForm((prev) => ({ ...prev, [field]: value }))
@@ -39,9 +39,9 @@ export default function SiteSettingsTab() {
     e.preventDefault()
     updateSite({
       ...form,
-      adminUsername: usernameInput.trim() || 'admin',
-      adminPassword: passwordInput || 'admin123',
-      adminPin: pinInput || '123456',
+      adminUsername: usernameInput.trim(),
+      adminPassword: passwordInput,
+      adminPin: pinInput,
     })
   }
 

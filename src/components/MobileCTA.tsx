@@ -35,15 +35,13 @@ export default function MobileCTA() {
         </Link>
 
         {ppdbOpen ? (
-          <a
-            href="http://localhost:5175/daftar"
-            target="_blank"
-            rel="noreferrer"
+          <Link
+            to="/ppdb/daftar"
             className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary px-3 py-2.5 text-center text-xs font-extrabold text-white shadow-soft transition-all active:scale-95"
           >
             <span>Daftar PPDB</span>
             <RiArrowRightLine className="h-3.5 w-3.5 text-gold" />
-          </a>
+          </Link>
         ) : (
           <Link
             to="/ppdb"

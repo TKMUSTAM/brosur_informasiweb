@@ -144,7 +144,7 @@ export default function PPDBSection() {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 shrink-0 w-full lg:w-auto">
               {isOpen ? (
                 <ButtonLink
-                  to="http://localhost:5175/daftar"
+                  to="/ppdb/daftar"
                   variant="gold"
                   size="lg"
                   withArrow

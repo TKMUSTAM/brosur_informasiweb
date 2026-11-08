@@ -213,7 +213,7 @@ export default function Navbar() {
             {/* PPDB Action Button */}
             {data.pageContent.ppdb.registrationOpen && (data.pageContent.ppdb.waves?.some((w) => w.status === 'OPEN') ?? true) ? (
               <a
-                href="http://localhost:5175/daftar"
+                href="/ppdb/daftar"
                 target="_blank"
                 rel="noreferrer"
                 className="group flex min-h-10 items-center gap-1.5 rounded-lg bg-gold px-4 py-2 text-xs font-bold text-primary-deep transition-all hover:bg-gold-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:text-sm shadow-xs"
@@ -379,7 +379,7 @@ export default function Navbar() {
             <div className="mt-5 border-t border-primary/10 pt-4">
               {data.pageContent.ppdb.registrationOpen && (data.pageContent.ppdb.waves?.some((w) => w.status === 'OPEN') ?? true) ? (
                 <a
-                  href="http://localhost:5175/daftar"
+                  href="/ppdb/daftar"
                   target="_blank"
                   rel="noreferrer"
                   onClick={() => setMobileOpen(false)}
@@ -409,9 +409,7 @@ export default function Navbar() {
                 Portal Admin CMS &rarr;
               </Link>
               <a
-                href="http://localhost:3000"
-                target="_blank"
-                rel="noreferrer"
+                href="/admin"
                 className="font-semibold text-ink-mute hover:text-primary"
               >
                 Sistem Sekolah &rarr;

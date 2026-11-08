@@ -37,7 +37,7 @@ export default function Hero() {
 
           <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
             {data.pageContent.ppdb.registrationOpen && (data.pageContent.ppdb.waves?.some((w) => w.status === 'OPEN') ?? true) ? (
-              <ButtonLink to="http://localhost:5175/daftar" variant="primary" size="lg" withArrow className="shadow-lift font-bold">
+              <ButtonLink to="/ppdb/daftar" variant="primary" size="lg" withArrow className="shadow-lift font-bold">
                 {hero.primaryLabel} {data.pageContent.ppdb.academicYear}
               </ButtonLink>
             ) : (

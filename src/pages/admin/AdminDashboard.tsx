@@ -407,7 +407,7 @@ export default function AdminDashboard() {
 
         <div className="pt-3 border-t border-white/10 mt-3 px-1">
           <a
-            href="http://localhost:5175/admin/dashboard"
+            href="/admin"
             target="_blank"
             rel="noreferrer"
             className="flex w-full items-center gap-2.5 rounded-2xl bg-gold/15 border border-gold/40 px-3.5 py-2.5 text-xs font-bold text-gold-light hover:bg-gold/25 transition-all shadow-soft"

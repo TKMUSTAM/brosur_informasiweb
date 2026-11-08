@@ -88,7 +88,7 @@ export default function PPDB() {
         crumbs={[{ label: `PPDB ${ppdb.academicYear}` }]}
       >
         <div className="mt-8 flex flex-wrap gap-3">
-          {ppdb.registrationOpen && <ButtonLink to="http://localhost:5175/daftar" variant="gold" size="lg" withArrow className="shadow-gold">Daftar Online di Portal PPDB</ButtonLink>}
+          {ppdb.registrationOpen && <ButtonLink to="/ppdb/daftar" variant="gold" size="lg" withArrow className="shadow-gold">Daftar Online di Portal PPDB</ButtonLink>}
           <a
             href={`https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent('Assalamualaikum, saya ingin menanyakan brosur dan panduan PPDB TK Islam Al-Mustam.')}`}
             target="_blank"
@@ -151,7 +151,7 @@ export default function PPDB() {
                     <p className="font-heading text-lg font-extrabold text-primary">{calcResult.ageStr}</p>
                     <p className="mt-1 text-sm font-bold text-primary-light">{calcResult.recommendation}</p>
                   </div>
-                  <ButtonLink to="http://localhost:5175/daftar" variant="primary" size="sm" withArrow className="mt-2 sm:mt-0">
+                  <ButtonLink to="/ppdb/daftar" variant="primary" size="sm" withArrow className="mt-2 sm:mt-0">
                     Daftar Kelas Ini
                   </ButtonLink>
                 </div>
@@ -270,7 +270,7 @@ export default function PPDB() {
               </div>
 
               <div className="mt-6 border-t border-warmred/10 pt-4">
-                <ButtonLink to="http://localhost:5175/daftar" variant="outline" className="w-full justify-center border-warmred text-warmred hover:bg-warmred hover:text-white">
+                <ButtonLink to="/ppdb/daftar" variant="outline" className="w-full justify-center border-warmred text-warmred hover:bg-warmred hover:text-white">
                   Daftar Jalur Beasiswa Yatim
                 </ButtonLink>
               </div>
@@ -364,7 +364,7 @@ export default function PPDB() {
         title={<>Amankan Kursi untuk Buah Hati Anda Sekarang</>}
         description="Kuota murid per kelas dibatasi maksimal 14 anak demi memastikan perhatian dan pendampingan optimal."
         primaryLabel="Isi Formulir Online"
-        primaryTo="http://localhost:5175/daftar"
+        primaryTo="/ppdb/daftar"
         secondaryLabel="Konsultasi WhatsApp"
         secondaryTo={`https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent('Assalamualaikum, saya ingin menanyakan sisa kuota pendaftaran TK Islam Al-Mustam.')}`}
       />

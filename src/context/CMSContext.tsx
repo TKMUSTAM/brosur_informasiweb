@@ -23,15 +23,14 @@ import { organization, fasilitas, pillars as initialPillars, doas, islamicArticl
 import { adminPpdb, adminDonations } from '../data/donations'
 
 const STORAGE_KEY = 'WEBMUSTAM_CMS_DATA_V1'
-const AUTH_KEY = 'WEBMUSTAM_ADMIN_AUTH'
 
 // ===== DATA DEFAULT AWAL SISTEM =====
 export const initialCMSData: CMSData = {
   site: {
     ...initialSite,
-    adminUsername: 'admin',
-    adminPassword: 'admin123',
-    adminPin: '123456',
+    adminUsername: '',
+    adminPassword: '',
+    adminPin: '',
     bank: {
       bankName: 'Bank Syariah Indonesia (BSI)',
       accountNumber: '1234-5678-90',
@@ -411,17 +410,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return initialCMSData
   })
 
-  // Auth State: Persisted in sessionStorage across refresh during the active browser session
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        return sessionStorage.getItem(AUTH_KEY) === 'true'
-      } catch {
-        return false
-      }
-    }
-    return false
-  })
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   // Toast Notifications
   const [toasts, setToasts] = useState<ToastNotification[]>([])
@@ -438,6 +427,40 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setToasts((prev) => prev.filter((t) => t.id !== id))
   }, [])
 
+  useEffect(() => {
+    const baseUrl = import.meta.env.VITE_PPDB_API_URL?.trim().replace(/\/$/, '')
+    if (!baseUrl) return
+    const controller = new AbortController()
+
+    fetch(`${baseUrl}/cms/public`, { signal: controller.signal })
+      .then(async (response) => {
+        const result = await response.json() as {
+          sections?: Array<{ sectionKey: keyof PageContent; content: Record<string, unknown>; updatedAt: string }>
+        }
+        if (!response.ok || !result.sections) throw new Error('Konten publik tidak tersedia')
+        setData((current) => {
+          const pageContent = { ...current.pageContent }
+          let lastUpdated = current.lastUpdated
+          for (const section of result.sections ?? []) {
+            if (section.sectionKey in pageContent) {
+              pageContent[section.sectionKey] = {
+                ...pageContent[section.sectionKey],
+                ...section.content,
+              } as never
+              lastUpdated = section.updatedAt || lastUpdated
+            }
+          }
+          return { ...current, pageContent, lastUpdated }
+        })
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === 'AbortError') return
+        console.error('Konten CMS Neon belum dapat dimuat', error)
+      })
+
+    return () => controller.abort()
+  }, [])
+
   // Persist data whenever it changes
   useEffect(() => {
     try {
@@ -447,51 +470,13 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [data])
 
-  // Auth Methods (Username + Password with PIN fallback)
-  const login = useCallback(
-    (usernameOrPin: string, password?: string) => {
-      const currentUsername = data.site.adminUsername || 'admin'
-      const currentPassword = data.site.adminPassword || 'admin123'
-      const currentPin = data.site.adminPin || '123456'
-
-      let isValid = false
-
-      if (password !== undefined) {
-        // Username & Password login
-        const matchCustom =
-          usernameOrPin.trim().toLowerCase() === currentUsername.toLowerCase() &&
-          password === currentPassword
-        const matchDefault =
-          usernameOrPin.trim().toLowerCase() === 'admin' &&
-          password === 'admin123'
-
-        isValid = matchCustom || matchDefault
-      } else {
-        // Fallback PIN login
-        isValid = usernameOrPin === currentPin || usernameOrPin === '123456'
-      }
-
-      if (isValid) {
-        try {
-          sessionStorage.setItem(AUTH_KEY, 'true')
-        } catch {}
-        setIsLoggedIn(true)
-        showToast('Login berhasil. Selamat datang di CMS!', 'success')
-        return true
-      }
-
-      showToast('Username atau password salah. Silakan periksa kembali.', 'error')
-      return false
-    },
-    [data.site.adminUsername, data.site.adminPassword, data.site.adminPin, showToast]
-  )
+  const login = useCallback((_usernameOrPin: string, _password?: string) => {
+    showToast('Login CMS dipindahkan ke portal administrasi resmi.', 'info')
+    return false
+  }, [showToast])
 
   const logout = useCallback(() => {
     setIsLoggedIn(false)
-    try {
-      sessionStorage.removeItem(AUTH_KEY)
-      localStorage.removeItem(AUTH_KEY)
-    } catch {}
   }, [])
 
   // ===== SITE ACTIONS =====
