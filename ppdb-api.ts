@@ -26,6 +26,7 @@ const allowedOrigins = new Set([
   "https://yayasanmustam.id",
   "https://www.yayasanmustam.id",
   "https://brosur-informasiweb-green.vercel.app",
+  "https://brosur-informasiweb-ikhwandas-projects.vercel.app",
   "http://localhost:5173",
   "http://127.0.0.1:5173",
 ]);
@@ -49,6 +50,8 @@ type RegistrationInput = {
   whatsapp?: unknown;
   email?: unknown;
   guardianAddress?: unknown;
+  waveId?: unknown;
+  customFields?: unknown;
 };
 
 type NormalizedRegistration = {
@@ -72,6 +75,8 @@ type NormalizedRegistration = {
   whatsapp: string;
   email: string | null;
   guardianAddress: string | null;
+  waveId: string | null;
+  customFields: Record<string, string | boolean>;
 };
 
 const app = new Hono();
@@ -111,6 +116,24 @@ function canonicalPhone(value: string): string {
   return digits;
 }
 
+function normalizeCustomFields(raw: unknown): Record<string, string | boolean> {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {};
+  const result: Record<string, string | boolean> = {};
+  for (const [key, val] of Object.entries(raw as Record<string, unknown>)) {
+    const cleanKey = key.trim().slice(0, 60);
+    if (!cleanKey) continue;
+    if (typeof val === "boolean") {
+      result[cleanKey] = val;
+    } else if (typeof val === "number" && Number.isFinite(val)) {
+      result[cleanKey] = String(val);
+    } else if (typeof val === "string") {
+      const trimmed = val.trim().slice(0, 500);
+      if (trimmed) result[cleanKey] = trimmed;
+    }
+  }
+  return result;
+}
+
 function normalizeRegistration(input: RegistrationInput): NormalizedRegistration {
   const name = cleanText(input.name, 150);
   const birthDate = cleanText(input.birthDate, 10);
@@ -125,6 +148,8 @@ function normalizeRegistration(input: RegistrationInput): NormalizedRegistration
   const familyCardNumber = cleanText(input.familyCardNumber, 32).replace(/\D/g, "") || null;
   const whatsapp = cleanText(input.whatsapp, 30).replace(/[^+\d]/g, "");
   const email = cleanText(input.email, 255).toLowerCase() || null;
+  const rawWaveId = cleanText(input.waveId, 60);
+  const waveId = /^[0-9a-f-]{36}$/i.test(rawWaveId) ? rawWaveId : null;
 
   if (name.length < 2) throw new Error("Nama calon siswa wajib diisi.");
   if (!/^\d{16}$/.test(nik)) throw new Error("NIK calon siswa wajib terdiri dari 16 digit.");
@@ -158,6 +183,8 @@ function normalizeRegistration(input: RegistrationInput): NormalizedRegistration
     whatsapp,
     email,
     guardianAddress: cleanText(input.guardianAddress, 1000) || null,
+    waveId,
+    customFields: normalizeCustomFields(input.customFields),
   };
 }
 
@@ -189,22 +216,22 @@ function educationLevelCode(program: string): "PLAYGROUP" | "TK_A" | "TK_B" {
 const applicationSelect = `
   SELECT
     a.id::text AS id,
-    a.application_number AS "noPendaftaran",
-    a.candidate_name AS nama,
-    COALESCE(a.candidate_gender, 'L') AS gender,
-    COALESCE(to_char(a.candidate_birth_date, 'YYYY-MM-DD'), '') AS "tanggalLahir",
-    a.candidate_birth_place AS "tempatLahir",
-    a.candidate_nik AS nik,
-    a.candidate_address AS alamat,
-    g.full_name AS "namaWali",
-    COALESCE(g.phone, '') AS "teleponWali",
-    g.father_name AS "namaAyah",
-    g.mother_name AS "namaIbu",
-    g.family_card_number AS "noKk",
-    g.father_nik AS "nikAyah",
-    g.mother_nik AS "nikIbu",
-    a.medical_notes AS "catatanMedis",
-    CASE WHEN a.admission_track = 'Beasiswa Yatim & Dhuafa'
+    a.nomor_pendaftaran AS "noPendaftaran",
+    a.nama_lengkap AS nama,
+    COALESCE(a.jenis_kelamin, 'L') AS gender,
+    COALESCE(to_char(a.tanggal_lahir, 'YYYY-MM-DD'), '') AS "tanggalLahir",
+    a.tempat_lahir AS "tempatLahir",
+    a.nik_calon_siswa AS nik,
+    a.alamat AS alamat,
+    g.nama_lengkap AS "namaWali",
+    COALESCE(g.nomor_hp, '') AS "teleponWali",
+    g.nama_ayah AS "namaAyah",
+    g.nama_ibu AS "namaIbu",
+    g.nomor_kk AS "noKk",
+    g.nik_ayah AS "nikAyah",
+    g.nik_ibu AS "nikIbu",
+    a.catatan_kesehatan AS "catatanMedis",
+    CASE WHEN a.jalur_pendaftaran = 'Beasiswa Yatim & Dhuafa'
       THEN 'Beasiswa Yatim 100%' ELSE 'Reguler' END AS jalur,
     CASE
       WHEN a.status IN ('ACCEPTED', 'COMPLETED') THEN 'Lulus'
@@ -217,44 +244,47 @@ const applicationSelect = `
       WHEN a.status = 'WAITLISTED' THEN 'Daftar Tunggu'
       ELSE 'Menunggu Verifikasi'
     END AS "statusSeleksi",
-    to_char(a.created_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD') AS "tanggalDaftar",
-    COALESCE(a.application_metadata->>'nisn', '') AS nisn,
-    COALESCE(a.application_metadata->>'nitkm', '') AS nitkm,
-    COALESCE(a.application_metadata->>'className', '') AS "kelasTujuan",
-    COALESCE(a.decision_note, 'Formulir pendaftaran daring diterima') AS keterangan,
-    a.verification_note AS "verificationNote",
-    COALESCE(a.missing_documents, '[]'::jsonb) AS "missingDocuments",
+    to_char(a.dibuat_pada AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD') AS "tanggalDaftar",
+    COALESCE(a.data_tambahan->>'nisn', '') AS nisn,
+    COALESCE(a.data_tambahan->>'nitkm', '') AS nitkm,
+    COALESCE(a.data_tambahan->>'className', '') AS "kelasTujuan",
+    COALESCE(a.data_tambahan->'customFields', '{}'::jsonb) AS "customFields",
+    gel.nama AS "gelombangNama",
+    COALESCE(a.catatan_keputusan, 'Formulir pendaftaran daring diterima') AS keterangan,
+    a.catatan_verifikasi AS "verificationNote",
+    COALESCE(a.dokumen_kurang, '[]'::jsonb) AS "missingDocuments",
     a.status AS "databaseStatus",
-    a.target_program AS program,
-    a.previous_school AS "previousSchool",
+    a.program_tujuan AS program,
+    a.asal_sekolah AS "previousSchool",
     g.email AS email,
-    i.scheduled_at AS "interviewScheduledAt",
-    i.location AS "interviewLocation",
-    i.interview_status AS "interviewStatus",
-    i.observation_notes AS "observationNotes",
-    i.recommendation AS "interviewRecommendation",
-    assessment.total_score AS "interviewTotalScore",
+    i.jadwal_wawancara AS "interviewScheduledAt",
+    i.lokasi AS "interviewLocation",
+    i.status AS "interviewStatus",
+    i.catatan_observasi AS "observationNotes",
+    i.rekomendasi AS "interviewRecommendation",
+    assessment.total_nilai AS "interviewTotalScore",
     COALESCE((
-      SELECT jsonb_object_agg(criterion.criterion_code, detail.score)
-      FROM admission_assessment_details detail
-      JOIN admission_evaluation_criteria criterion ON criterion.id = detail.criterion_id
-      WHERE detail.assessment_id = assessment.id
+      SELECT jsonb_object_agg(criterion.kode, detail.nilai)
+      FROM detail_penilaian_ppdb detail
+      JOIN kriteria_penilaian_ppdb criterion ON criterion.id = detail.kriteria_penilaian_ppdb_id
+      WHERE detail.penilaian_ppdb_id = assessment.id
     ), '{}'::jsonb) AS "interviewScores",
     COALESCE((
       SELECT jsonb_agg(jsonb_build_object(
         'id', d.id::text,
-        'type', d.document_type,
-        'fileName', d.file_name,
-        'status', d.verification_status,
-        'note', d.verification_note
-      ) ORDER BY d.uploaded_at)
-      FROM admission_documents d
-      WHERE d.application_id = a.id
+        'type', d.kode_jenis_dokumen,
+        'fileName', d.nama_file,
+        'status', d.status_verifikasi,
+        'note', d.catatan_verifikasi
+      ) ORDER BY d.diunggah_pada)
+      FROM dokumen_pendaftaran_ppdb d
+      WHERE d.pendaftaran_ppdb_id = a.id
     ), '[]'::jsonb) AS documents
-  FROM admission_applications a
-  JOIN guardians g ON g.id = a.primary_guardian_id
-  LEFT JOIN admission_interviews i ON i.application_id = a.id
-  LEFT JOIN admission_assessments assessment ON assessment.application_id = a.id
+  FROM pendaftaran_ppdb a
+  JOIN wali_siswa g ON g.id = a.wali_utama_id
+  LEFT JOIN gelombang_ppdb gel ON gel.id = a.gelombang_ppdb_id
+  LEFT JOIN wawancara_ppdb i ON i.pendaftaran_ppdb_id = a.id
+  LEFT JOIN penilaian_ppdb assessment ON assessment.pendaftaran_ppdb_id = a.id
 `;
 
 async function findApplication(client: PoolClient | typeof pool, id: string) {
@@ -266,52 +296,103 @@ app.get("/", (c) => c.json({ service: "TK Al-Mustam PPDB API", status: "ok" }));
 
 app.get("/ppdb/meta", async (c) => {
   try {
-    const [periods, classes, documentTypes] = await Promise.all([
+    const [periods, waves, classes, documentTypes, formFields, criteria] = await Promise.all([
       pool.query(`
         SELECT
           p.id::text,
-          p.period_name AS name,
-          p.registration_start::text AS "registrationStart",
-          p.registration_end::text AS "registrationEnd",
+          p.nama AS name,
+          p.tanggal_mulai::text AS "registrationStart",
+          p.tanggal_selesai::text AS "registrationEnd",
           p.status,
-          ay.year_name AS "academicYear"
-        FROM admission_periods p
-        JOIN academic_years ay ON ay.id = p.academic_year_id
+          ta.nama AS "academicYear"
+        FROM periode_ppdb p
+        JOIN tahun_ajaran ta ON ta.id = p.tahun_ajaran_id
         WHERE p.status IN ('OPEN', 'DRAFT')
-        ORDER BY p.registration_start ASC
+        ORDER BY p.tanggal_mulai ASC
       `),
       pool.query(`
         SELECT
-          c.id::text,
-          c.class_name AS "className",
-          c.class_level AS "classLevel",
-          c.capacity,
-          el.level_code AS "levelCode",
-          el.level_name AS "levelName",
-          COUNT(ce.id) FILTER (WHERE ce.status = 'ACTIVE')::int AS "enrolledCount"
-        FROM classes c
-        LEFT JOIN education_levels el ON el.id = c.education_level_id
-        LEFT JOIN class_enrollments ce ON ce.class_id = c.id
-        WHERE c.status = 'ACTIVE'
-        GROUP BY c.id, el.level_code, el.level_name
-        ORDER BY c.class_name ASC
+          g.id::text,
+          g.periode_ppdb_id::text AS "periodId",
+          g.kode AS code,
+          g.nama AS name,
+          g.periode_label AS period,
+          g.tanggal_mulai::text AS "startDate",
+          g.tanggal_selesai::text AS "endDate",
+          g.kuota AS capacity,
+          g.kuota_label AS quota,
+          g.status,
+          COALESCE(g.keterangan, '') AS description,
+          g.urutan AS "sortOrder"
+        FROM gelombang_ppdb g
+        ORDER BY g.urutan ASC, g.dibuat_pada ASC
       `),
       pool.query(`
         SELECT
-          document_code AS code,
-          document_name AS name,
-          is_required AS "isRequired",
-          description
-        FROM admission_document_types
-        WHERE status = 'ACTIVE'
-        ORDER BY is_required DESC, document_code ASC
+          k.id::text,
+          k.nama AS "className",
+          k.jenjang AS "classLevel",
+          k.kapasitas AS capacity,
+          tp.kode AS "levelCode",
+          tp.nama AS "levelName",
+          COUNT(sk.id) FILTER (WHERE sk.status = 'ACTIVE')::int AS "enrolledCount"
+        FROM kelas k
+        LEFT JOIN tingkat_pendidikan tp ON tp.id = k.tingkat_pendidikan_id
+        LEFT JOIN siswa_kelas sk ON sk.kelas_id = k.id
+        WHERE k.status = 'ACTIVE'
+        GROUP BY k.id, tp.kode, tp.nama
+        ORDER BY k.nama ASC
+      `),
+      pool.query(`
+        SELECT
+          id::text,
+          kode AS code,
+          nama AS name,
+          wajib AS "isRequired",
+          deskripsi AS description,
+          urutan AS "sortOrder"
+        FROM jenis_dokumen_ppdb
+        WHERE status = 'ACTIVE' AND status_aktif = TRUE
+        ORDER BY urutan ASC, wajib DESC, kode ASC
+      `),
+      pool.query(`
+        SELECT
+          id::text,
+          kode AS code,
+          label,
+          tipe_field AS "fieldType",
+          placeholder,
+          opsi AS options,
+          wajib AS "isRequired",
+          bagian AS section,
+          urutan AS "sortOrder"
+        FROM bidang_formulir_ppdb
+        WHERE status_aktif = TRUE
+        ORDER BY urutan ASC, dibuat_pada ASC
+      `),
+      pool.query(`
+        SELECT
+          id::text,
+          kode AS code,
+          nama AS name,
+          bobot::float AS weight,
+          urutan AS "sortOrder",
+          tipe_nilai AS "valueType",
+          nilai_min::float AS "minValue",
+          nilai_max::float AS "maxValue"
+        FROM kriteria_penilaian_ppdb
+        WHERE status = 'ACTIVE' AND status_aktif = TRUE
+        ORDER BY urutan ASC, kode ASC
       `),
     ]);
 
     return c.json({
       periods: periods.rows,
+      waves: waves.rows,
       classes: classes.rows,
       documentTypes: documentTypes.rows,
+      formFields: formFields.rows,
+      criteria: criteria.rows,
     });
   } catch (error) {
     console.error("[ppdb:meta]", error);
@@ -321,80 +402,124 @@ app.get("/ppdb/meta", async (c) => {
 
 app.get("/cms/public", async (c) => {
   try {
-    const [sections, news, programs, facilities, gallery, pages, periods] = await Promise.all([
+    const [sections, news, programs, facilities, gallery, pages, periods, waves, documentTypes, formFields] = await Promise.all([
       pool.query(`
-        SELECT section_key AS "sectionKey", title, content, updated_at AS "updatedAt"
-        FROM cms_sections
-        WHERE publication_status = 'PUBLISHED'
-        ORDER BY display_order, section_key
+        SELECT kunci_bagian AS "sectionKey", judul AS title, konten AS content, diperbarui_pada AS "updatedAt"
+        FROM bagian_cms
+        WHERE status = 'PUBLISHED'
+        ORDER BY urutan, kunci_bagian
       `),
       pool.query(`
         SELECT
-          n.id::text,
-          n.title,
-          n.slug,
-          n.excerpt,
-          n.content,
-          n.cover_image_path AS "image",
-          COALESCE(to_char(n.published_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD'), to_char(n.created_at AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD')) AS "date",
-          COALESCE(u.display_name, 'Admin Sekolah') AS author
-        FROM news_posts n
-        LEFT JOIN users u ON u.id = n.author_id
-        WHERE n.status = 'PUBLISHED'
-        ORDER BY n.published_at DESC NULLS LAST, n.created_at DESC
-      `),
-      pool.query(`
-        SELECT
-          id::text,
-          program_name AS name,
-          description,
-          image_path AS image,
-          display_order AS "displayOrder"
-        FROM school_programs
-        WHERE status = 'ACTIVE'
-        ORDER BY display_order ASC, program_name ASC
+          b.id::text,
+          b.judul AS title,
+          b.slug,
+          b.ringkasan AS excerpt,
+          b.isi AS content,
+          b.gambar_sampul_url AS "image",
+          COALESCE(to_char(b.diterbitkan_pada AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD'), to_char(b.dibuat_pada AT TIME ZONE 'Asia/Jakarta', 'YYYY-MM-DD')) AS "date",
+          COALESCE(u.nama_lengkap, 'Admin Sekolah') AS author
+        FROM berita b
+        LEFT JOIN pengguna u ON u.id = b.penulis_id
+        WHERE b.status = 'PUBLISHED'
+        ORDER BY b.diterbitkan_pada DESC NULLS LAST, b.dibuat_pada DESC
       `),
       pool.query(`
         SELECT
           id::text,
-          facility_name AS name,
-          description,
-          image_path AS image,
-          display_order AS "displayOrder"
-        FROM school_facilities
+          nama AS name,
+          deskripsi AS description,
+          gambar_url AS image,
+          urutan AS "displayOrder"
+        FROM program_sekolah
         WHERE status = 'ACTIVE'
-        ORDER BY display_order ASC, facility_name ASC
+        ORDER BY urutan ASC, nama ASC
       `),
       pool.query(`
         SELECT
-          gi.id::text,
-          ga.album_name AS category,
-          ga.event_date::text AS "eventDate",
-          gi.image_path AS src,
-          gi.caption,
-          gi.display_order AS "displayOrder"
-        FROM gallery_items gi
-        JOIN gallery_albums ga ON ga.id = gi.album_id
-        WHERE ga.status = 'ACTIVE'
-        ORDER BY gi.display_order ASC, gi.created_at DESC
+          id::text,
+          nama AS name,
+          deskripsi AS description,
+          gambar_url AS image,
+          urutan AS "displayOrder"
+        FROM fasilitas_sekolah
+        WHERE status = 'ACTIVE'
+        ORDER BY urutan ASC, nama ASC
       `),
       pool.query(`
-        SELECT slug, title, content, published_at::text AS "publishedAt"
-        FROM cms_pages
-        WHERE publication_status = 'PUBLISHED'
-        ORDER BY title ASC
+        SELECT
+          g.id::text,
+          ag.nama AS category,
+          ag.tanggal_kegiatan::text AS "eventDate",
+          g.gambar_url AS src,
+          g.deskripsi AS caption,
+          g.urutan AS "displayOrder"
+        FROM galeri g
+        JOIN album_galeri ag ON ag.id = g.album_galeri_id
+        WHERE ag.status = 'ACTIVE'
+        ORDER BY g.urutan ASC, g.dibuat_pada DESC
+      `),
+      pool.query(`
+        SELECT slug, judul AS title, isi AS content, diterbitkan_pada::text AS "publishedAt"
+        FROM halaman_cms
+        WHERE status = 'PUBLISHED'
+        ORDER BY judul ASC
       `),
       pool.query(`
         SELECT
           p.id::text,
-          p.period_name AS name,
-          p.registration_start::text AS "registrationStart",
-          p.registration_end::text AS "registrationEnd",
+          p.nama AS name,
+          p.tanggal_mulai::text AS "registrationStart",
+          p.tanggal_selesai::text AS "registrationEnd",
           p.status,
-          ay.year_name AS "academicYear"
-        FROM admission_periods p
-        JOIN academic_years ay ON ay.id = p.academic_year_id
-        ORDER BY p.registration_start ASC
+          ta.nama AS "academicYear"
+        FROM periode_ppdb p
+        JOIN tahun_ajaran ta ON ta.id = p.tahun_ajaran_id
+        ORDER BY p.tanggal_mulai ASC
+      `),
+      pool.query(`
+        SELECT
+          id::text,
+          periode_ppdb_id::text AS "periodId",
+          kode AS code,
+          nama AS name,
+          periode_label AS period,
+          tanggal_mulai::text AS "startDate",
+          tanggal_selesai::text AS "endDate",
+          kuota AS capacity,
+          kuota_label AS quota,
+          status,
+          COALESCE(keterangan, '') AS description,
+          urutan AS "sortOrder"
+        FROM gelombang_ppdb
+        ORDER BY urutan ASC, dibuat_pada ASC
+      `),
+      pool.query(`
+        SELECT
+          id::text,
+          kode AS code,
+          nama AS name,
+          wajib AS "isRequired",
+          deskripsi AS description,
+          urutan AS "sortOrder"
+        FROM jenis_dokumen_ppdb
+        WHERE status = 'ACTIVE' AND status_aktif = TRUE
+        ORDER BY urutan ASC, wajib DESC, kode ASC
+      `),
+      pool.query(`
+        SELECT
+          id::text,
+          kode AS code,
+          label,
+          tipe_field AS "fieldType",
+          placeholder,
+          opsi AS options,
+          wajib AS "isRequired",
+          bagian AS section,
+          urutan AS "sortOrder"
+        FROM bidang_formulir_ppdb
+        WHERE status_aktif = TRUE
+        ORDER BY urutan ASC, dibuat_pada ASC
       `),
     ]);
     return c.json({
@@ -405,8 +530,12 @@ app.get("/cms/public", async (c) => {
       gallery: gallery.rows,
       pages: pages.rows,
       periods: periods.rows,
+      waves: waves.rows,
+      documentTypes: documentTypes.rows,
+      formFields: formFields.rows,
     });
-  } catch {
+  } catch (error) {
+    console.error("[cms:public]", error);
     return c.json({ error: "Konten website belum dapat dimuat." }, 503);
   }
 });
@@ -451,32 +580,32 @@ app.post("/registrations", async (c) => {
     await client.query("BEGIN");
 
     const duplicate = await client.query(
-      `SELECT a.id, a.application_number, g.phone
-       FROM admission_applications a
-       JOIN guardians g ON g.id = a.primary_guardian_id
-       WHERE a.candidate_nik = $1
-       ORDER BY a.created_at DESC
+      `SELECT a.id, a.nomor_pendaftaran, g.nomor_hp
+       FROM pendaftaran_ppdb a
+       JOIN wali_siswa g ON g.id = a.wali_utama_id
+       WHERE a.nik_calon_siswa = $1
+       ORDER BY a.dibuat_pada DESC
        LIMIT 1`,
       [registration.nik],
     );
     if (duplicate.rows[0]) {
       await client.query("ROLLBACK");
-      if (canonicalPhone(String(duplicate.rows[0].phone ?? "")) !== canonicalPhone(registration.whatsapp)) {
+      if (canonicalPhone(String(duplicate.rows[0].nomor_hp ?? "")) !== canonicalPhone(registration.whatsapp)) {
         return c.json({ error: "NIK calon siswa sudah terdaftar. Hubungi Admin PPDB jika data perlu diperbaiki." }, 409);
       }
       return c.json({
         id: duplicate.rows[0].id,
-        applicationNumber: duplicate.rows[0].application_number,
+        applicationNumber: duplicate.rows[0].nomor_pendaftaran,
         duplicate: true,
       }, 200);
     }
 
     const period = await client.query(
       `SELECT id
-       FROM admission_periods
+       FROM periode_ppdb
        WHERE status = 'OPEN'
-         AND NOW() BETWEEN registration_start AND registration_end
-       ORDER BY registration_start DESC
+         AND NOW() BETWEEN tanggal_mulai AND tanggal_selesai
+       ORDER BY tanggal_mulai DESC
        LIMIT 1`,
     );
     if (!period.rows[0]) {
@@ -484,22 +613,33 @@ app.post("/registrations", async (c) => {
       return c.json({ error: "Periode pendaftaran belum dibuka." }, 503);
     }
 
+    let resolvedWaveId: string | null = registration.waveId;
+    if (!resolvedWaveId) {
+      const openWave = await client.query(
+        `SELECT id FROM gelombang_ppdb
+         WHERE periode_ppdb_id = $1 AND status = 'OPEN'
+         ORDER BY urutan ASC LIMIT 1`,
+        [period.rows[0].id],
+      );
+      resolvedWaveId = openWave.rows[0]?.id ?? null;
+    }
+
     const guardian = await client.query(
-      `INSERT INTO guardians (
-         full_name, nik, phone, email, address, father_name, mother_name,
-         family_card_number, father_nik, mother_nik
+      `INSERT INTO wali_siswa (
+         nama_lengkap, nik, nomor_hp, email, alamat, nama_ayah, nama_ibu,
+         nomor_kk, nik_ayah, nik_ibu
        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        ON CONFLICT (nik) DO UPDATE SET
-         full_name = EXCLUDED.full_name,
-         phone = EXCLUDED.phone,
-         email = COALESCE(EXCLUDED.email, guardians.email),
-         address = COALESCE(EXCLUDED.address, guardians.address),
-         father_name = COALESCE(EXCLUDED.father_name, guardians.father_name),
-         mother_name = COALESCE(EXCLUDED.mother_name, guardians.mother_name),
-         family_card_number = COALESCE(EXCLUDED.family_card_number, guardians.family_card_number),
-         father_nik = COALESCE(EXCLUDED.father_nik, guardians.father_nik),
-         mother_nik = COALESCE(EXCLUDED.mother_nik, guardians.mother_nik),
-         updated_at = NOW()
+         nama_lengkap = EXCLUDED.nama_lengkap,
+         nomor_hp = EXCLUDED.nomor_hp,
+         email = COALESCE(EXCLUDED.email, wali_siswa.email),
+         alamat = COALESCE(EXCLUDED.alamat, wali_siswa.alamat),
+         nama_ayah = COALESCE(EXCLUDED.nama_ayah, wali_siswa.nama_ayah),
+         nama_ibu = COALESCE(EXCLUDED.nama_ibu, wali_siswa.nama_ibu),
+         nomor_kk = COALESCE(EXCLUDED.nomor_kk, wali_siswa.nomor_kk),
+         nik_ayah = COALESCE(EXCLUDED.nik_ayah, wali_siswa.nik_ayah),
+         nik_ibu = COALESCE(EXCLUDED.nik_ibu, wali_siswa.nik_ibu),
+         diperbarui_pada = NOW()
        RETURNING id`,
       [
         registration.guardianName,
@@ -516,7 +656,7 @@ app.post("/registrations", async (c) => {
     );
 
     const educationLevel = await client.query(
-      "SELECT id FROM education_levels WHERE level_code = $1 AND status = 'ACTIVE' LIMIT 1",
+      "SELECT id FROM tingkat_pendidikan WHERE kode = $1 AND status = 'ACTIVE' LIMIT 1",
       [educationLevelCode(registration.program)],
     );
     if (!educationLevel.rows[0]) {
@@ -524,30 +664,37 @@ app.post("/registrations", async (c) => {
       return c.json({ error: "Jenjang pendidikan belum tersedia pada master data." }, 409);
     }
 
+    const initialMetadata = Object.keys(registration.customFields).length > 0
+      ? JSON.stringify({ customFields: registration.customFields })
+      : "{}";
+
     const number = applicationNumber(registration.program);
     const application = await client.query(
-      `INSERT INTO admission_applications (
-         admission_period_id,
-         primary_guardian_id,
-         application_number,
-         candidate_name,
-         candidate_gender,
-         candidate_birth_place,
-         candidate_birth_date,
-         candidate_address,
-         candidate_nik,
-         previous_school,
-         target_program,
-         admission_track,
-         medical_notes,
-         education_level_id,
-         family_card_number,
+      `INSERT INTO pendaftaran_ppdb (
+         periode_ppdb_id,
+         gelombang_ppdb_id,
+         wali_utama_id,
+         nomor_pendaftaran,
+         nama_lengkap,
+         jenis_kelamin,
+         tempat_lahir,
+         tanggal_lahir,
+         alamat,
+         nik_calon_siswa,
+         asal_sekolah,
+         program_tujuan,
+         jalur_pendaftaran,
+         catatan_kesehatan,
+         tingkat_pendidikan_id,
+         nomor_kk,
+         data_tambahan,
          status,
-         submitted_at
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, 'SUBMITTED', NOW())
-       RETURNING id, created_at`,
+         tanggal_daftar
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17::jsonb, 'SUBMITTED', NOW())
+       RETURNING id, dibuat_pada`,
       [
         period.rows[0].id,
+        resolvedWaveId,
         guardian.rows[0].id,
         number,
         registration.name,
@@ -562,11 +709,12 @@ app.post("/registrations", async (c) => {
         registration.medicalNotes,
         educationLevel.rows[0].id,
         registration.familyCardNumber,
+        initialMetadata,
       ],
     );
 
     await client.query(
-      `INSERT INTO admission_status_histories (application_id, previous_status, new_status, note)
+      `INSERT INTO riwayat_status_ppdb (pendaftaran_ppdb_id, status_sebelumnya, status, catatan)
        VALUES ($1, NULL, 'SUBMITTED', 'Dikirim dari formulir PPDB web informasi')`,
       [application.rows[0].id],
     );
@@ -575,7 +723,7 @@ app.post("/registrations", async (c) => {
     return c.json({
       id: application.rows[0].id,
       applicationNumber: number,
-      submittedAt: application.rows[0].created_at,
+      submittedAt: application.rows[0].dibuat_pada,
     }, 201);
   } catch (error) {
     await client.query("ROLLBACK");
@@ -586,13 +734,6 @@ app.post("/registrations", async (c) => {
   }
 });
 
-const documentTypes = new Set([
-  "KARTU_KELUARGA",
-  "AKTA_KELAHIRAN",
-  "KTP_WALI",
-  "RIWAYAT_KESEHATAN",
-  "PAS_FOTO",
-]);
 const documentMimeTypes = new Set(["application/pdf", "image/jpeg", "image/png", "image/webp"]);
 const cmsMediaMimeTypes = new Set([
   "image/jpeg",
@@ -602,18 +743,27 @@ const cmsMediaMimeTypes = new Set([
   "application/pdf",
 ]);
 
+async function resolveDocumentTypeId(documentTypeCode: string): Promise<string | null> {
+  const res = await pool.query(
+    `SELECT id::text FROM jenis_dokumen_ppdb WHERE kode = $1 AND status = 'ACTIVE' AND status_aktif = TRUE LIMIT 1`,
+    [documentTypeCode],
+  );
+  return (res.rows[0]?.id as string | undefined) ?? null;
+}
+
 async function storeApplicationDocument(params: {
   applicationId: string;
   applicationNumber: string;
   currentStatus: string;
   documentType: string;
+  documentTypeId: string;
   file: File;
   isRevisionUpload: boolean;
 }) {
   const safeName = params.file.name.replace(/[^a-zA-Z0-9._-]/g, "-").slice(-120) || "document";
   const objectKey = `registrations/${params.applicationId}/${params.documentType}/${randomUUID()}-${safeName}`;
   const previous = await pool.query(
-    "SELECT file_path FROM admission_documents WHERE application_id = $1 AND document_type = $2",
+    "SELECT file_url FROM dokumen_pendaftaran_ppdb WHERE pendaftaran_ppdb_id = $1 AND kode_jenis_dokumen = $2",
     [params.applicationId, params.documentType],
   );
 
@@ -626,33 +776,42 @@ async function storeApplicationDocument(params: {
       Metadata: { applicationId: params.applicationId, documentType: params.documentType },
     }));
     const saved = await pool.query(
-      `INSERT INTO admission_documents (
-         application_id, document_type, file_name, file_path, verification_status,
-         mime_type, file_size_bytes
-       ) VALUES ($1, $2, $3, $4, 'PENDING', $5, $6)
-       ON CONFLICT (application_id, document_type) DO UPDATE SET
-         file_name = EXCLUDED.file_name,
-         file_path = EXCLUDED.file_path,
-         verification_status = 'PENDING',
-         verification_note = NULL,
-         verified_by = NULL,
-         verified_at = NULL,
+      `INSERT INTO dokumen_pendaftaran_ppdb (
+         pendaftaran_ppdb_id, jenis_dokumen_id, kode_jenis_dokumen, nama_file, file_url,
+         status_verifikasi, mime_type, ukuran_byte
+       ) VALUES ($1, $2, $3, $4, $5, 'PENDING', $6, $7)
+       ON CONFLICT (pendaftaran_ppdb_id, kode_jenis_dokumen) DO UPDATE SET
+         jenis_dokumen_id = EXCLUDED.jenis_dokumen_id,
+         nama_file = EXCLUDED.nama_file,
+         file_url = EXCLUDED.file_url,
+         status_verifikasi = 'PENDING',
+         catatan_verifikasi = NULL,
+         diverifikasi_oleh = NULL,
+         diverifikasi_pada = NULL,
          mime_type = EXCLUDED.mime_type,
-         file_size_bytes = EXCLUDED.file_size_bytes,
-         uploaded_at = NOW()
-       RETURNING id::text AS id, document_type AS type, file_name AS "fileName",
-                 verification_status AS status, verification_note AS note`,
-      [params.applicationId, params.documentType, safeName, objectKey, params.file.type, params.file.size],
+         ukuran_byte = EXCLUDED.ukuran_byte,
+         diunggah_pada = NOW()
+       RETURNING id::text AS id, kode_jenis_dokumen AS type, nama_file AS "fileName",
+                 status_verifikasi AS status, catatan_verifikasi AS note`,
+      [
+        params.applicationId,
+        params.documentTypeId,
+        params.documentType,
+        safeName,
+        objectKey,
+        params.file.type,
+        params.file.size,
+      ],
     );
     if (params.isRevisionUpload) {
       await pool.query(
-        `UPDATE admission_applications
-         SET updated_at = NOW()
+        `UPDATE pendaftaran_ppdb
+         SET diperbarui_pada = NOW()
          WHERE id = $1`,
         [params.applicationId],
       );
       await pool.query(
-        `INSERT INTO admission_status_histories (application_id, previous_status, new_status, note)
+        `INSERT INTO riwayat_status_ppdb (pendaftaran_ppdb_id, status_sebelumnya, status, catatan)
          VALUES ($1, $2, $2, $3)`,
         [
           params.applicationId,
@@ -661,7 +820,7 @@ async function storeApplicationDocument(params: {
         ],
       );
     }
-    const oldKey = previous.rows[0]?.file_path as string | undefined;
+    const oldKey = previous.rows[0]?.file_url as string | undefined;
     if (oldKey && oldKey !== objectKey) {
       await s3.send(new DeleteObjectCommand({ Bucket: "ppdb-documents", Key: oldKey })).catch((error) => {
         console.error("[ppdb:document-cleanup]", error);
@@ -697,19 +856,20 @@ app.post("/registrations/:id/documents", async (c) => {
   if (!applicationNumberValue || phoneCanon.length < 9) {
     return c.json({ error: "Nomor pendaftaran dan WhatsApp wajib diisi." }, 400);
   }
-  if (!documentTypes.has(documentType)) return c.json({ error: "Jenis berkas tidak dikenal." }, 400);
+  const documentTypeId = await resolveDocumentTypeId(documentType);
+  if (!documentTypeId) return c.json({ error: "Jenis berkas tidak dikenal atau nonaktif." }, 400);
   if (!(file instanceof File) || file.size === 0) return c.json({ error: "Berkas wajib dipilih." }, 400);
   if (file.size > 5 * 1024 * 1024) return c.json({ error: "Ukuran berkas maksimal 5 MB." }, 413);
   if (!documentMimeTypes.has(file.type)) return c.json({ error: "Format berkas harus PDF, JPG, PNG, atau WebP." }, 415);
 
   const candidates = await pool.query(
-    `SELECT a.id, a.status, g.phone
-     FROM admission_applications a
-     JOIN guardians g ON g.id = a.primary_guardian_id
-     WHERE a.id = $1 AND a.application_number = $2`,
+    `SELECT a.id, a.status, g.nomor_hp
+     FROM pendaftaran_ppdb a
+     JOIN wali_siswa g ON g.id = a.wali_utama_id
+     WHERE a.id = $1 AND a.nomor_pendaftaran = $2`,
     [id, applicationNumberValue],
   );
-  const matched = candidates.rows.find((row) => canonicalPhone(String(row.phone ?? "")) === phoneCanon);
+  const matched = candidates.rows.find((row) => canonicalPhone(String(row.nomor_hp ?? "")) === phoneCanon);
   if (!matched) return c.json({ error: "Pendaftaran tidak ditemukan." }, 404);
 
   try {
@@ -718,6 +878,7 @@ app.post("/registrations/:id/documents", async (c) => {
       applicationNumber: applicationNumberValue,
       currentStatus: String(matched.status),
       documentType,
+      documentTypeId,
       file,
       isRevisionUpload: false,
     });
@@ -748,19 +909,20 @@ app.post("/status/:applicationNumber/documents", async (c) => {
   if (!applicationNumberValue || phoneCanon.length < 9) {
     return c.json({ error: "Nomor pendaftaran dan WhatsApp wajib diisi." }, 400);
   }
-  if (!documentTypes.has(documentType)) return c.json({ error: "Jenis berkas tidak dikenal." }, 400);
+  const documentTypeId = await resolveDocumentTypeId(documentType);
+  if (!documentTypeId) return c.json({ error: "Jenis berkas tidak dikenal atau nonaktif." }, 400);
   if (!(file instanceof File) || file.size === 0) return c.json({ error: "Berkas wajib dipilih." }, 400);
   if (file.size > 5 * 1024 * 1024) return c.json({ error: "Ukuran berkas maksimal 5 MB." }, 413);
   if (!documentMimeTypes.has(file.type)) return c.json({ error: "Format berkas harus PDF, JPG, PNG, atau WebP." }, 415);
 
   const candidates = await pool.query(
-    `SELECT a.id::text, a.status, g.phone
-     FROM admission_applications a
-     JOIN guardians g ON g.id = a.primary_guardian_id
-     WHERE a.application_number = $1`,
+    `SELECT a.id::text, a.status, g.nomor_hp
+     FROM pendaftaran_ppdb a
+     JOIN wali_siswa g ON g.id = a.wali_utama_id
+     WHERE a.nomor_pendaftaran = $1`,
     [applicationNumberValue],
   );
-  const matched = candidates.rows.find((row) => canonicalPhone(String(row.phone ?? "")) === phoneCanon);
+  const matched = candidates.rows.find((row) => canonicalPhone(String(row.nomor_hp ?? "")) === phoneCanon);
   if (!matched) return c.json({ error: "Data pendaftaran tidak ditemukan." }, 404);
   if (!["SUBMITTED", "NEEDS_REVISION"].includes(String(matched.status))) {
     return c.json({ error: "Berkas hanya dapat diunggah ulang saat status Menunggu Verifikasi atau Perlu Perbaikan." }, 409);
@@ -772,6 +934,7 @@ app.post("/status/:applicationNumber/documents", async (c) => {
       applicationNumber: applicationNumberValue,
       currentStatus: String(matched.status),
       documentType,
+      documentTypeId,
       file,
       isRevisionUpload: true,
     });
@@ -789,8 +952,8 @@ app.get("/registrations/:id/documents/:documentId", async (c) => {
     return c.json({ error: "ID berkas tidak valid." }, 400);
   }
   const result = await pool.query(
-    `SELECT file_path, file_name FROM admission_documents
-     WHERE id = $1 AND application_id = $2`,
+    `SELECT file_url, nama_file FROM dokumen_pendaftaran_ppdb
+     WHERE id = $1 AND pendaftaran_ppdb_id = $2`,
     [documentId, id],
   );
   if (!result.rows[0]) return c.json({ error: "Berkas tidak ditemukan." }, 404);
@@ -799,8 +962,8 @@ app.get("/registrations/:id/documents/:documentId", async (c) => {
       s3,
       new GetObjectCommand({
         Bucket: "ppdb-documents",
-        Key: result.rows[0].file_path,
-        ResponseContentDisposition: `inline; filename="${String(result.rows[0].file_name).replace(/["\\]/g, "-")}"`,
+        Key: result.rows[0].file_url,
+        ResponseContentDisposition: `inline; filename="${String(result.rows[0].nama_file).replace(/["\\]/g, "-")}"`,
       }),
       { expiresIn: 300 },
     );
@@ -824,12 +987,12 @@ app.patch("/registrations/:id/documents/:documentId", async (c) => {
     return c.json({ error: "Status verifikasi berkas tidak valid." }, 400);
   }
   const result = await pool.query(
-    `UPDATE admission_documents
-     SET verification_status = $3, verification_note = $4,
-         verified_by = $5, verified_at = NOW()
-     WHERE id = $1 AND application_id = $2
-     RETURNING id::text AS id, document_type AS type, file_name AS "fileName",
-               verification_status AS status, verification_note AS note`,
+    `UPDATE dokumen_pendaftaran_ppdb
+     SET status_verifikasi = $3, catatan_verifikasi = $4,
+         diverifikasi_oleh = $5, diverifikasi_pada = NOW()
+     WHERE id = $1 AND pendaftaran_ppdb_id = $2
+     RETURNING id::text AS id, kode_jenis_dokumen AS type, nama_file AS "fileName",
+               status_verifikasi AS status, catatan_verifikasi AS note`,
     [documentId, id, status, cleanText(body?.note, 1000) || null, actorId(c.req.raw)],
   );
   if (!result.rows[0]) return c.json({ error: "Berkas tidak ditemukan." }, 404);
@@ -839,7 +1002,7 @@ app.patch("/registrations/:id/documents/:documentId", async (c) => {
 app.get("/registrations", async (c) => {
   if (!hasAdminAccess(c.req.raw)) return c.json({ error: "Unauthorized" }, 401);
   try {
-    const result = await pool.query(`${applicationSelect} ORDER BY a.created_at DESC`);
+    const result = await pool.query(`${applicationSelect} ORDER BY a.dibuat_pada DESC`);
     return c.json({ applications: result.rows });
   } catch (error) {
     console.error("[ppdb:list]", error);
@@ -855,7 +1018,7 @@ app.get("/status/:applicationNumber", async (c) => {
     return c.json({ error: "Nomor pendaftaran dan WhatsApp wajib diisi." }, 400);
   }
   const result = await pool.query(
-    `${applicationSelect} WHERE a.application_number = $1`,
+    `${applicationSelect} WHERE a.nomor_pendaftaran = $1`,
     [applicationNumber],
   );
   const row = result.rows.find((candidate) => canonicalPhone(String(candidate.teleponWali ?? "")) === phoneCanon);
@@ -910,7 +1073,7 @@ app.patch("/registrations/:id", async (c) => {
   try {
     await client.query("BEGIN");
     const current = await client.query(
-      "SELECT status FROM admission_applications WHERE id = $1 FOR UPDATE",
+      "SELECT status FROM pendaftaran_ppdb WHERE id = $1 FOR UPDATE",
       [id],
     );
     if (!current.rows[0]) {
@@ -957,26 +1120,26 @@ app.patch("/registrations/:id", async (c) => {
       }
       nextStatus = "INTERVIEW_SCHEDULED";
       await client.query(
-        `INSERT INTO admission_interviews (
-           application_id, scheduled_at, location, interviewer_id, interview_status
+        `INSERT INTO wawancara_ppdb (
+           pendaftaran_ppdb_id, jadwal_wawancara, lokasi, pewawancara_id, status
          ) VALUES ($1, $2::timestamptz, $3, $4, 'SCHEDULED')
-         ON CONFLICT (application_id) DO UPDATE SET
-           scheduled_at = EXCLUDED.scheduled_at,
-           location = EXCLUDED.location,
-           interviewer_id = EXCLUDED.interviewer_id,
-           interview_status = 'SCHEDULED',
-           observation_notes = NULL,
-           recommendation = NULL,
-           completed_at = NULL,
-           updated_at = NOW()`,
+         ON CONFLICT (pendaftaran_ppdb_id) DO UPDATE SET
+           jadwal_wawancara = EXCLUDED.jadwal_wawancara,
+           lokasi = EXCLUDED.lokasi,
+           pewawancara_id = EXCLUDED.pewawancara_id,
+           status = 'SCHEDULED',
+           catatan_observasi = NULL,
+           rekomendasi = NULL,
+           selesai_pada = NULL,
+           diperbarui_pada = NOW()`,
         [id, scheduledAt, location, actor],
       );
       await client.query(
-        `UPDATE admission_applications
+        `UPDATE pendaftaran_ppdb
          SET status = $2,
-             decision_note = COALESCE($4, decision_note),
-             application_metadata = application_metadata || $3::jsonb,
-             updated_at = NOW()
+             catatan_keputusan = COALESCE($4, catatan_keputusan),
+             data_tambahan = data_tambahan || $3::jsonb,
+             diperbarui_pada = NOW()
          WHERE id = $1`,
         [id, nextStatus, metadata, note],
       );
@@ -984,25 +1147,35 @@ app.patch("/registrations/:id", async (c) => {
       const observationNotes = cleanText(body.metadata?.observationNotes, 4000);
       const recommendation = cleanText(body.metadata?.recommendation, 20).toUpperCase();
       const rawScores = body.metadata?.scores;
-      const criteriaCodes = ["JASMANI_ROHANI", "JARAK", "MOTORIK", "KOGNITIF"] as const;
-      const scores = Object.fromEntries(criteriaCodes.map((code) => [
-        code,
-        typeof rawScores === "object" && rawScores !== null
-          ? Number((rawScores as Record<string, unknown>)[code])
-          : Number.NaN,
-      ])) as Record<(typeof criteriaCodes)[number], number>;
-      const scoresAreValid = criteriaCodes.every((code) => Number.isFinite(scores[code]) && scores[code] >= 0 && scores[code] <= 100);
+
+      const activeCriteria = await client.query(
+        `SELECT id::text, kode, bobot::float AS bobot
+         FROM kriteria_penilaian_ppdb
+         WHERE status = 'ACTIVE' AND status_aktif = TRUE
+         ORDER BY urutan ASC, kode ASC`,
+      );
+      const criteriaList = activeCriteria.rows as Array<{ id: string; kode: string; bobot: number }>;
+      const scores: Record<string, number> = {};
+      for (const crit of criteriaList) {
+        const val = typeof rawScores === "object" && rawScores !== null
+          ? Number((rawScores as Record<string, unknown>)[crit.kode])
+          : Number.NaN;
+        scores[crit.kode] = val;
+      }
+      const scoresAreValid = criteriaList.length > 0 && criteriaList.every(
+        (crit) => Number.isFinite(scores[crit.kode]) && scores[crit.kode] >= 0 && scores[crit.kode] <= 100,
+      );
       if (!observationNotes || !["ACCEPT", "WAITLIST", "REJECT"].includes(recommendation) || !scoresAreValid) {
         await client.query("ROLLBACK");
-        return c.json({ error: "Empat nilai observasi, catatan, dan rekomendasi wajib diisi." }, 400);
+        return c.json({ error: "Seluruh nilai observasi aktif, catatan, dan rekomendasi wajib diisi." }, 400);
       }
       nextStatus = "INTERVIEW_COMPLETED";
       const interview = await client.query(
-        `UPDATE admission_interviews
-         SET interview_status = 'COMPLETED', observation_notes = $2,
-             recommendation = $3, completed_at = NOW(),
-             interviewer_id = COALESCE($4, interviewer_id), updated_at = NOW()
-         WHERE application_id = $1
+        `UPDATE wawancara_ppdb
+         SET status = 'COMPLETED', catatan_observasi = $2,
+             rekomendasi = $3, selesai_pada = NOW(),
+             pewawancara_id = COALESCE($4, pewawancara_id), diperbarui_pada = NOW()
+         WHERE pendaftaran_ppdb_id = $1
          RETURNING id`,
         [id, observationNotes, recommendation, actor],
       );
@@ -1010,42 +1183,37 @@ app.patch("/registrations/:id", async (c) => {
         await client.query("ROLLBACK");
         return c.json({ error: "Jadwal wawancara tidak ditemukan." }, 409);
       }
-      const totalScore = Number((
-        scores.JASMANI_ROHANI * 0.25
-        + scores.JARAK * 0.15
-        + scores.MOTORIK * 0.30
-        + scores.KOGNITIF * 0.30
-      ).toFixed(2));
+      const totalWeight = criteriaList.reduce((acc, item) => acc + item.bobot, 0) || 100;
+      const weightedSum = criteriaList.reduce((acc, item) => acc + scores[item.kode] * (item.bobot / totalWeight), 0);
+      const totalScore = Number(weightedSum.toFixed(2));
       const assessment = await client.query(
-        `INSERT INTO admission_assessments (
-           application_id, assessed_by, assessed_at, total_score, recommendation, note
+        `INSERT INTO penilaian_ppdb (
+           pendaftaran_ppdb_id, dinilai_oleh, tanggal_penilaian, total_nilai, rekomendasi, catatan
          ) VALUES ($1, $2, NOW(), $3, $4, $5)
-         ON CONFLICT (application_id) DO UPDATE SET
-           assessed_by = EXCLUDED.assessed_by,
-           assessed_at = NOW(),
-           total_score = EXCLUDED.total_score,
-           recommendation = EXCLUDED.recommendation,
-           note = EXCLUDED.note,
-           updated_at = NOW()
+         ON CONFLICT (pendaftaran_ppdb_id) DO UPDATE SET
+           dinilai_oleh = EXCLUDED.dinilai_oleh,
+           tanggal_penilaian = NOW(),
+           total_nilai = EXCLUDED.total_nilai,
+           rekomendasi = EXCLUDED.rekomendasi,
+           catatan = EXCLUDED.catatan,
+           diperbarui_pada = NOW()
          RETURNING id`,
         [id, actor, totalScore, recommendation, observationNotes],
       );
-      for (const criterionCode of criteriaCodes) {
+      for (const crit of criteriaList) {
         await client.query(
-          `INSERT INTO admission_assessment_details (assessment_id, criterion_id, score)
-           SELECT $1, c.id, $3
-           FROM admission_evaluation_criteria c
-           WHERE c.criterion_code = $2
-           ON CONFLICT (assessment_id, criterion_id) DO UPDATE SET score = EXCLUDED.score`,
-          [assessment.rows[0].id, criterionCode, scores[criterionCode]],
+          `INSERT INTO detail_penilaian_ppdb (penilaian_ppdb_id, kriteria_penilaian_ppdb_id, nilai)
+           VALUES ($1, $2::uuid, $3)
+           ON CONFLICT (penilaian_ppdb_id, kriteria_penilaian_ppdb_id) DO UPDATE SET nilai = EXCLUDED.nilai`,
+          [assessment.rows[0].id, crit.id, scores[crit.kode]],
         );
       }
       await client.query(
-        `UPDATE admission_applications
+        `UPDATE pendaftaran_ppdb
          SET status = $2,
-             decision_note = COALESCE($4, decision_note),
-             application_metadata = application_metadata || $3::jsonb,
-             updated_at = NOW()
+             catatan_keputusan = COALESCE($4, catatan_keputusan),
+             data_tambahan = data_tambahan || $3::jsonb,
+             diperbarui_pada = NOW()
          WHERE id = $1`,
         [id, nextStatus, metadata, note],
       );
@@ -1060,14 +1228,14 @@ app.patch("/registrations/:id", async (c) => {
         return c.json({ error: "Kelas dan nomor induk wajib diisi untuk penempatan." }, 400);
       }
       const details = await client.query(
-        `SELECT a.application_number, a.candidate_name, a.candidate_nickname, a.candidate_gender, a.candidate_birth_place, a.candidate_birth_date,
-                a.candidate_address, a.candidate_nik, a.candidate_religion, a.family_card_number,
-                a.child_order, a.sibling_count, a.primary_guardian_id, g.full_name, g.phone,
-                c.id AS class_id, c.class_name AS resolved_class_name, c.capacity AS class_capacity
-         FROM admission_applications a
-         JOIN guardians g ON g.id = a.primary_guardian_id
-         LEFT JOIN classes c ON c.status = 'ACTIVE'
-           AND (($4 <> '' AND c.id::text = $4) OR c.class_name = $2 OR c.class_name = $3)
+        `SELECT a.nomor_pendaftaran, a.nama_lengkap, a.nama_panggilan, a.jenis_kelamin, a.tempat_lahir, a.tanggal_lahir,
+                a.alamat, a.nik_calon_siswa, a.agama, a.nomor_kk,
+                a.anak_ke, a.jumlah_saudara, a.wali_utama_id, g.nama_lengkap AS nama_wali, g.nomor_hp,
+                k.id AS class_id, k.nama AS resolved_class_name, k.kapasitas AS class_capacity
+         FROM pendaftaran_ppdb a
+         JOIN wali_siswa g ON g.id = a.wali_utama_id
+         LEFT JOIN kelas k ON k.status = 'ACTIVE'
+           AND (($4 <> '' AND k.id::text = $4) OR k.nama = $2 OR k.nama = $3)
          WHERE a.id = $1 LIMIT 1`,
         [id, className, classSlug, classId],
       );
@@ -1081,11 +1249,11 @@ app.patch("/registrations/:id", async (c) => {
       if (classCapacity > 0) {
         const capCheck = await client.query(
           `SELECT COUNT(*)::int AS active_count
-           FROM class_enrollments ce
-           LEFT JOIN students s ON s.id = ce.student_id
-           WHERE ce.class_id = $1
-             AND ce.status = 'ACTIVE'
-             AND COALESCE(s.source_application_id::text, '') <> $2`,
+           FROM siswa_kelas sk
+           LEFT JOIN siswa s ON s.id = sk.siswa_id
+           WHERE sk.kelas_id = $1
+             AND sk.status = 'ACTIVE'
+             AND COALESCE(s.pendaftaran_ppdb_id::text, '') <> $2`,
           [resolvedClassId, id],
         );
         if (Number(capCheck.rows[0]?.active_count ?? 0) >= classCapacity) {
@@ -1094,46 +1262,46 @@ app.patch("/registrations/:id", async (c) => {
         }
       }
       const student = await client.query(
-        `INSERT INTO students (
-           student_number, nisn, source_application_id, full_name, nickname, gender,
-           birth_place, birth_date, religion, address, family_card_number,
-           child_order, sibling_count, admission_date, notes, nik
+        `INSERT INTO siswa (
+           nis, nisn, pendaftaran_ppdb_id, nama_lengkap, nama_panggilan, jenis_kelamin,
+           tempat_lahir, tanggal_lahir, agama, alamat, nomor_kk,
+           anak_ke, jumlah_saudara, tanggal_masuk, catatan, nik
          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, CURRENT_DATE, $14, $15)
-         ON CONFLICT (source_application_id) DO UPDATE SET
-           student_number = EXCLUDED.student_number,
-           nisn = COALESCE(EXCLUDED.nisn, students.nisn),
-           nik = COALESCE(EXCLUDED.nik, students.nik),
-           updated_at = NOW()
+         ON CONFLICT (pendaftaran_ppdb_id) DO UPDATE SET
+           nis = EXCLUDED.nis,
+           nisn = COALESCE(EXCLUDED.nisn, siswa.nisn),
+           nik = COALESCE(EXCLUDED.nik, siswa.nik),
+           diperbarui_pada = NOW()
          RETURNING id`,
         [
-          nitkm, nisn || null, id, details.rows[0].candidate_name, details.rows[0].candidate_nickname,
-          details.rows[0].candidate_gender, details.rows[0].candidate_birth_place,
-          details.rows[0].candidate_birth_date, details.rows[0].candidate_religion,
-          details.rows[0].candidate_address, details.rows[0].family_card_number,
-          details.rows[0].child_order, details.rows[0].sibling_count, `Sumber data: ${details.rows[0].application_number}`,
-          details.rows[0].candidate_nik,
+          nitkm, nisn || null, id, details.rows[0].nama_lengkap, details.rows[0].nama_panggilan,
+          details.rows[0].jenis_kelamin, details.rows[0].tempat_lahir,
+          details.rows[0].tanggal_lahir, details.rows[0].agama,
+          details.rows[0].alamat, details.rows[0].nomor_kk,
+          details.rows[0].anak_ke, details.rows[0].jumlah_saudara, `Sumber data: ${details.rows[0].nomor_pendaftaran}`,
+          details.rows[0].nik_calon_siswa,
         ],
       );
       await client.query(
-        `INSERT INTO student_guardians (student_id, guardian_id, relationship, is_primary_contact)
+        `INSERT INTO siswa_wali (siswa_id, wali_siswa_id, hubungan, wali_utama)
          VALUES ($1, $2, 'WALI', TRUE)
-         ON CONFLICT (student_id, guardian_id) DO UPDATE SET is_primary_contact = TRUE`,
-        [student.rows[0].id, details.rows[0].primary_guardian_id],
+         ON CONFLICT (siswa_id, wali_siswa_id) DO UPDATE SET wali_utama = TRUE`,
+        [student.rows[0].id, details.rows[0].wali_utama_id],
       );
       await client.query(
-        `UPDATE class_enrollments
-         SET status = 'TRANSFERRED', released_at = CURRENT_DATE, updated_at = NOW()
-         WHERE student_id = $1 AND class_id <> $2 AND status = 'ACTIVE'`,
+        `UPDATE siswa_kelas
+         SET status = 'TRANSFERRED', tanggal_keluar_kelas = CURRENT_DATE, diperbarui_pada = NOW()
+         WHERE siswa_id = $1 AND kelas_id <> $2 AND status = 'ACTIVE'`,
         [student.rows[0].id, resolvedClassId],
       );
       await client.query(
-        `INSERT INTO class_enrollments (student_id, class_id, enrolled_at, status)
+        `INSERT INTO siswa_kelas (siswa_id, kelas_id, tanggal_masuk_kelas, status)
          VALUES ($1, $2, CURRENT_DATE, 'ACTIVE')
-         ON CONFLICT (student_id, class_id) DO UPDATE SET
+         ON CONFLICT (siswa_id, kelas_id) DO UPDATE SET
            status = 'ACTIVE',
-           enrolled_at = CURRENT_DATE,
-           released_at = NULL,
-           updated_at = NOW()`,
+           tanggal_masuk_kelas = CURRENT_DATE,
+           tanggal_keluar_kelas = NULL,
+           diperbarui_pada = NOW()`,
         [student.rows[0].id, resolvedClassId],
       );
       const placeMetadata = JSON.stringify({
@@ -1142,59 +1310,59 @@ app.patch("/registrations/:id", async (c) => {
         className: resolvedClassName,
       });
       await client.query(
-        `UPDATE admission_applications
-         SET status = 'COMPLETED', application_metadata = application_metadata || $2::jsonb,
-             updated_at = NOW(), decision_note = COALESCE($3, decision_note)
+        `UPDATE pendaftaran_ppdb
+         SET status = 'COMPLETED', data_tambahan = data_tambahan || $2::jsonb,
+             diperbarui_pada = NOW(), catatan_keputusan = COALESCE($3, catatan_keputusan)
          WHERE id = $1`,
         [id, placeMetadata, note],
       );
       nextStatus = "COMPLETED";
     } else {
       await client.query(
-        `UPDATE admission_applications
+        `UPDATE pendaftaran_ppdb
          SET status = $2::varchar(30),
-             decision_at = CASE WHEN $2::varchar(30) IN ('ACCEPTED', 'REJECTED', 'WAITLISTED') THEN NOW() ELSE decision_at END,
-             decision_by = CASE WHEN $2::varchar(30) IN ('ACCEPTED', 'REJECTED', 'WAITLISTED') THEN $7 ELSE decision_by END,
-             verified_at = CASE WHEN $5 = 'VERIFY' THEN NOW() ELSE verified_at END,
-             verified_by = CASE WHEN $5 = 'VERIFY' THEN $7 ELSE verified_by END,
-             verification_note = CASE WHEN $5 = 'VERIFY' THEN $3 ELSE verification_note END,
-             missing_documents = CASE WHEN $5 = 'VERIFY' THEN $6::jsonb ELSE missing_documents END,
-             decision_note = CASE WHEN $5 = 'DECIDE' THEN $3 ELSE decision_note END,
-             application_metadata = application_metadata || $4::jsonb,
-             updated_at = NOW()
+             diputuskan_pada = CASE WHEN $2::varchar(30) IN ('ACCEPTED', 'REJECTED', 'WAITLISTED') THEN NOW() ELSE diputuskan_pada END,
+             diputuskan_oleh = CASE WHEN $2::varchar(30) IN ('ACCEPTED', 'REJECTED', 'WAITLISTED') THEN $7 ELSE diputuskan_oleh END,
+             diverifikasi_pada = CASE WHEN $5 = 'VERIFY' THEN NOW() ELSE diverifikasi_pada END,
+             diverifikasi_oleh = CASE WHEN $5 = 'VERIFY' THEN $7 ELSE diverifikasi_oleh END,
+             catatan_verifikasi = CASE WHEN $5 = 'VERIFY' THEN $3 ELSE catatan_verifikasi END,
+             dokumen_kurang = CASE WHEN $5 = 'VERIFY' THEN $6::jsonb ELSE dokumen_kurang END,
+             catatan_keputusan = CASE WHEN $5 = 'DECIDE' THEN $3 ELSE catatan_keputusan END,
+             data_tambahan = data_tambahan || $4::jsonb,
+             diperbarui_pada = NOW()
          WHERE id = $1`,
         [id, nextStatus, note, metadata, body.action, JSON.stringify(body.missingDocuments ?? []), actor],
       );
     }
     if (body.action === "VERIFY") {
       await client.query(
-        `INSERT INTO admission_verifications (
-           application_id, verification_status, note, verified_by, verified_at
+        `INSERT INTO verifikasi_ppdb (
+           pendaftaran_ppdb_id, status, catatan, diverifikasi_oleh, diverifikasi_pada
          ) VALUES ($1, $2, $3, $4, NOW())
-         ON CONFLICT (application_id) DO UPDATE SET
-           verification_status = EXCLUDED.verification_status,
-           note = EXCLUDED.note,
-           verified_by = EXCLUDED.verified_by,
-           verified_at = NOW(),
-           updated_at = NOW()`,
+         ON CONFLICT (pendaftaran_ppdb_id) DO UPDATE SET
+           status = EXCLUDED.status,
+           catatan = EXCLUDED.catatan,
+           diverifikasi_oleh = EXCLUDED.diverifikasi_oleh,
+           diverifikasi_pada = NOW(),
+           diperbarui_pada = NOW()`,
         [id, nextStatus === "UNDER_REVIEW" ? "VALID" : "NEEDS_REVISION", note, actor],
       );
     }
     if (body.action === "DECIDE") {
       await client.query(
-        `INSERT INTO admission_decisions (
-           application_id, decision_status, reason, decided_by, decided_at
+        `INSERT INTO keputusan_ppdb (
+           pendaftaran_ppdb_id, status_keputusan, alasan, diputuskan_oleh, diputuskan_pada
          ) VALUES ($1, $2, $3, $4, NOW())
-         ON CONFLICT (application_id) DO UPDATE SET
-           decision_status = EXCLUDED.decision_status,
-           reason = EXCLUDED.reason,
-           decided_by = EXCLUDED.decided_by,
-           decided_at = NOW()`,
+         ON CONFLICT (pendaftaran_ppdb_id) DO UPDATE SET
+           status_keputusan = EXCLUDED.status_keputusan,
+           alasan = EXCLUDED.alasan,
+           diputuskan_oleh = EXCLUDED.diputuskan_oleh,
+           diputuskan_pada = NOW()`,
         [id, nextStatus, note, actor],
       );
     }
     await client.query(
-      `INSERT INTO admission_status_histories (application_id, previous_status, new_status, note, changed_by)
+      `INSERT INTO riwayat_status_ppdb (pendaftaran_ppdb_id, status_sebelumnya, status, catatan, diubah_oleh)
        VALUES ($1, $2, $3, $4, $5)`,
       [
         id,
@@ -1229,7 +1397,7 @@ app.delete("/registrations/:id", async (c) => {
   try {
     await client.query("BEGIN");
     const application = await client.query(
-      "SELECT primary_guardian_id FROM admission_applications WHERE id = $1 FOR UPDATE",
+      "SELECT wali_utama_id FROM pendaftaran_ppdb WHERE id = $1 FOR UPDATE",
       [id],
     );
     if (!application.rows[0]) {
@@ -1237,30 +1405,30 @@ app.delete("/registrations/:id", async (c) => {
       return c.json({ error: "Pendaftaran tidak ditemukan." }, 404);
     }
     const storedObjects = await client.query(
-      "SELECT file_path FROM admission_documents WHERE application_id = $1 AND file_path IS NOT NULL",
+      "SELECT file_url FROM dokumen_pendaftaran_ppdb WHERE pendaftaran_ppdb_id = $1 AND file_url IS NOT NULL",
       [id],
     );
     const placedStudent = await client.query(
-      "SELECT id FROM students WHERE source_application_id = $1",
+      "SELECT id FROM siswa WHERE pendaftaran_ppdb_id = $1",
       [id],
     );
     for (const student of placedStudent.rows) {
-      await client.query("DELETE FROM class_enrollments WHERE student_id = $1", [student.id]);
-      await client.query("DELETE FROM student_guardians WHERE student_id = $1", [student.id]);
-      await client.query("DELETE FROM attendance_records WHERE student_id = $1", [student.id]);
-      await client.query("DELETE FROM student_assessments WHERE student_id = $1", [student.id]);
-      await client.query("DELETE FROM student_daily_notes WHERE student_id = $1", [student.id]);
-      await client.query("DELETE FROM report_cards WHERE student_id = $1", [student.id]);
-      await client.query("DELETE FROM bills WHERE student_id = $1", [student.id]);
-      await client.query("DELETE FROM student_documents WHERE student_id = $1", [student.id]);
-      await client.query("DELETE FROM students WHERE id = $1", [student.id]);
+      await client.query("DELETE FROM siswa_kelas WHERE siswa_id = $1", [student.id]);
+      await client.query("DELETE FROM siswa_wali WHERE siswa_id = $1", [student.id]);
+      await client.query("DELETE FROM absensi_siswa WHERE siswa_id = $1", [student.id]);
+      await client.query("DELETE FROM penilaian_siswa WHERE siswa_id = $1", [student.id]);
+      await client.query("DELETE FROM catatan_harian_siswa WHERE siswa_id = $1", [student.id]);
+      await client.query("DELETE FROM rapor WHERE siswa_id = $1", [student.id]);
+      await client.query("DELETE FROM tagihan WHERE siswa_id = $1", [student.id]);
+      await client.query("DELETE FROM dokumen_siswa WHERE siswa_id = $1", [student.id]);
+      await client.query("DELETE FROM siswa WHERE id = $1", [student.id]);
     }
-    await client.query("DELETE FROM admission_status_histories WHERE application_id = $1", [id]);
-    await client.query("DELETE FROM admission_documents WHERE application_id = $1", [id]);
-    await client.query("DELETE FROM admission_applications WHERE id = $1", [id]);
-    await client.query("DELETE FROM guardians WHERE id = $1", [application.rows[0].primary_guardian_id]);
+    await client.query("DELETE FROM riwayat_status_ppdb WHERE pendaftaran_ppdb_id = $1", [id]);
+    await client.query("DELETE FROM dokumen_pendaftaran_ppdb WHERE pendaftaran_ppdb_id = $1", [id]);
+    await client.query("DELETE FROM pendaftaran_ppdb WHERE id = $1", [id]);
+    await client.query("DELETE FROM wali_siswa WHERE id = $1", [application.rows[0].wali_utama_id]);
     await client.query("COMMIT");
-    const objectKeys = storedObjects.rows.map((row) => row.file_path as string);
+    const objectKeys = storedObjects.rows.map((row) => row.file_url as string);
     await Promise.all(objectKeys.map((objectKey) => (
       s3.send(new DeleteObjectCommand({ Bucket: "ppdb-documents", Key: objectKey })).catch((error) => {
         console.error("[ppdb:delete-object]", error);
@@ -1283,14 +1451,14 @@ app.get("/cms/media", async (c) => {
       SELECT
         id::text,
         object_key AS "objectKey",
-        original_name AS "originalName",
-        mime_type AS "mimeType",
-        file_size_bytes::int AS "fileSizeBytes",
-        alt_text AS "altText",
-        visibility,
-        created_at::text AS "createdAt"
-      FROM media_files
-      ORDER BY created_at DESC
+        nama_file AS "originalName",
+        tipe_file AS "mimeType",
+        ukuran_file::int AS "fileSizeBytes",
+        teks_alternatif AS "altText",
+        visibilitas AS visibility,
+        dibuat_pada::text AS "createdAt"
+      FROM media
+      ORDER BY dibuat_pada DESC
       LIMIT 60
     `);
     return c.json({ files: result.rows });
@@ -1335,18 +1503,18 @@ app.post("/cms/media", async (c) => {
       ContentType: file.type,
     }));
     const saved = await pool.query(
-      `INSERT INTO media_files (
-         object_key, original_name, mime_type, file_size_bytes, alt_text, visibility, uploaded_by
+      `INSERT INTO media (
+         object_key, nama_file, tipe_file, ukuran_file, teks_alternatif, visibilitas, diunggah_oleh
        ) VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING
          id::text,
          object_key AS "objectKey",
-         original_name AS "originalName",
-         mime_type AS "mimeType",
-         file_size_bytes::int AS "fileSizeBytes",
-         alt_text AS "altText",
-         visibility,
-         created_at::text AS "createdAt"`,
+         nama_file AS "originalName",
+         tipe_file AS "mimeType",
+         ukuran_file::int AS "fileSizeBytes",
+         teks_alternatif AS "altText",
+         visibilitas AS visibility,
+         dibuat_pada::text AS "createdAt"`,
       [objectKey, safeName, file.type, file.size, altText, visibility, actorId(c.req.raw)],
     );
     return c.json({ file: saved.rows[0] }, 201);
@@ -1362,7 +1530,7 @@ app.delete("/cms/media/:id", async (c) => {
   const id = c.req.param("id");
   if (!/^[0-9a-f-]{36}$/i.test(id)) return c.json({ error: "ID media tidak valid." }, 400);
   const deleted = await pool.query(
-    "DELETE FROM media_files WHERE id = $1 RETURNING object_key",
+    "DELETE FROM media WHERE id = $1 RETURNING object_key",
     [id],
   );
   if (!deleted.rows[0]) return c.json({ error: "Media tidak ditemukan." }, 404);
@@ -1378,7 +1546,7 @@ app.get("/media/:id", async (c) => {
   const id = c.req.param("id");
   if (!/^[0-9a-f-]{36}$/i.test(id)) return c.json({ error: "Media tidak ditemukan." }, 404);
   const result = await pool.query(
-    "SELECT object_key, mime_type, original_name FROM media_files WHERE id = $1 AND visibility = 'PUBLIC'",
+    "SELECT object_key, tipe_file, nama_file FROM media WHERE id = $1 AND visibilitas = 'PUBLIC'",
     [id],
   );
   if (!result.rows[0]) return c.json({ error: "Media tidak ditemukan." }, 404);
@@ -1390,7 +1558,7 @@ app.get("/media/:id", async (c) => {
     const bytes = await obj.Body?.transformToByteArray();
     if (!bytes) return c.json({ error: "Berkas kosong." }, 404);
     return c.body(bytes, 200, {
-      "Content-Type": String(result.rows[0].mime_type || "application/octet-stream"),
+      "Content-Type": String(result.rows[0].tipe_file || "application/octet-stream"),
       "Cache-Control": "public, max-age=3600",
     });
   } catch (error) {

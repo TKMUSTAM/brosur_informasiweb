@@ -9,7 +9,7 @@ import { ButtonLink } from '../components/Buttons'
 import { useSEO } from '../hooks/useSEO'
 import { useCMS } from '../hooks/useCMS'
 
-const timeline = [
+const defaultTimeline = [
   { no: '01', title: 'Isi Formulir Online', desc: 'Isi formulir online di website atau kunjungi sekretariat sekolah.' },
   { no: '02', title: 'Konfirmasi WhatsApp', desc: 'Dapatkan nomor registrasi dan verifikasi berkas via admin WhatsApp.' },
   { no: '03', title: 'Observasi Ceria Anak', desc: 'Observasi ramah anak & konsultasi tumbuh kembang bersama psikolog/guru.' },
@@ -17,7 +17,7 @@ const timeline = [
   { no: '05', title: 'Orientasi & Masuk Sekolah', desc: 'Kegiatan Masa Pengenalan Lingkungan Sekolah (MPLS) yang menyenangkan.' },
 ]
 
-const feeBreakdown = [
+const defaultFeeBreakdown = [
   { item: 'Biaya Pendaftaran & Observasi Anak', nominal: 'Rp 150.000', note: 'Sekali bayar di awal pendaftaran' },
   { item: 'Uang Pangkal / Infaq Gedung', nominal: 'Rp 2.500.000', note: 'Dapat dicicil hingga 3x pembayaran' },
   { item: 'Paket Seragam & Atribut (4 Setel)', nominal: 'Rp 750.000', note: 'Batik, Muslim Hijau, Olahraga, & Pramuka/Rompi' },
@@ -30,6 +30,8 @@ export default function PPDB() {
   const { site, programs } = data
   const ppdb = data.pageContent.ppdb
   const requirements = ppdb.requirements
+  const timeline = ppdb.timeline && ppdb.timeline.length > 0 ? ppdb.timeline : defaultTimeline
+  const feeBreakdown = ppdb.feeBreakdown && ppdb.feeBreakdown.length > 0 ? ppdb.feeBreakdown : defaultFeeBreakdown
   const startYear = Number(ppdb.academicYear.split('/')[0]) || new Date().getFullYear()
   useSEO({
     title: `PPDB ${ppdb.academicYear}: Pendaftaran Siswa Baru TK Islam Al-Mustam`,
@@ -44,7 +46,7 @@ export default function PPDB() {
   const handleCalculateAge = () => {
     if (!birthDate) return
     const birth = new Date(birthDate)
-    const targetDate = new Date(`${startYear}-07-01`)
+    const targetDate = new Date(ppdb.ageCutoffDate || `${startYear}-07-01`)
     
     let years = targetDate.getFullYear() - birth.getFullYear()
     let months = targetDate.getMonth() - birth.getMonth()

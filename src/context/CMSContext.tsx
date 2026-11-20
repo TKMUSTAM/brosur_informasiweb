@@ -77,6 +77,34 @@ type PublicCmsPayload = {
         }>
       }
   >
+  waves?: Array<{
+    id: string
+    code?: string
+    name: string
+    period: string
+    quota?: string
+    status: 'OPEN' | 'CLOSED' | 'UPCOMING' | 'DRAFT'
+    description?: string
+  }>
+  documentTypes?: Array<{
+    id?: string
+    code: string
+    name: string
+    isRequired: boolean
+    description?: string | null
+    sortOrder?: number
+  }>
+  formFields?: Array<{
+    id?: string
+    code: string
+    label: string
+    fieldType: 'text' | 'textarea' | 'number' | 'date' | 'select' | 'checkbox'
+    placeholder?: string | null
+    options?: string[]
+    isRequired: boolean
+    section?: string
+    sortOrder?: number
+  }>
 }
 
 export function CMSProvider({ children }: { children: React.ReactNode }) {
@@ -243,7 +271,15 @@ export function CMSProvider({ children }: { children: React.ReactNode }) {
               ...prev.pageContent,
               hero: sections.hero ? { ...prev.pageContent.hero, ...sections.hero } : prev.pageContent.hero,
               welcome: sections.welcome ? { ...prev.pageContent.welcome, ...sections.welcome } : prev.pageContent.welcome,
-              ppdb: sections.ppdb ? { ...prev.pageContent.ppdb, ...sections.ppdb } : prev.pageContent.ppdb,
+              ppdb: {
+                ...prev.pageContent.ppdb,
+                ...(sections.ppdb ?? {}),
+                ...(Array.isArray(result.waves) && result.waves.length > 0 ? { waves: result.waves } : {}),
+                ...(Array.isArray(result.documentTypes) && result.documentTypes.length > 0
+                  ? { documentTypes: result.documentTypes }
+                  : {}),
+                ...(Array.isArray(result.formFields) ? { formFields: result.formFields } : {}),
+              },
               profile: sections.profile
                 ? { ...(prev.pageContent.profile ?? initialCMSData.pageContent.profile!), ...sections.profile }
                 : prev.pageContent.profile,

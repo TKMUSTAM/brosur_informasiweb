@@ -29,13 +29,7 @@ type FormState = {
   catatanMedis: string
 }
 
-type DocumentMap = {
-  kartuKeluarga: File | null
-  aktaKelahiran: File | null
-  ktpWali: File | null
-  pasFoto: File | null
-  riwayatKesehatan: File | null
-}
+type DocumentMap = Record<string, File | null>
 
 const empty: FormState = {
   nama: '',
@@ -58,25 +52,17 @@ const empty: FormState = {
   catatanMedis: '',
 }
 
-const emptyDocs: DocumentMap = {
-  kartuKeluarga: null,
-  aktaKelahiran: null,
-  ktpWali: null,
-  pasFoto: null,
-  riwayatKesehatan: null,
-}
-
-const DOCUMENT_FIELDS: Array<{
-  key: keyof DocumentMap
-  type: PpdbDocumentType
-  label: string
-  required: boolean
+const DEFAULT_DOCUMENT_FIELDS: Array<{
+  code: PpdbDocumentType
+  name: string
+  isRequired: boolean
+  description?: string | null
 }> = [
-  { key: 'kartuKeluarga', type: 'KARTU_KELUARGA', label: 'Kartu Keluarga (Wajib)', required: true },
-  { key: 'aktaKelahiran', type: 'AKTA_KELAHIRAN', label: 'Akta Kelahiran Anak (Wajib)', required: true },
-  { key: 'ktpWali', type: 'KTP_WALI', label: 'KTP Orang Tua / Wali (Opsional)', required: false },
-  { key: 'pasFoto', type: 'PAS_FOTO', label: 'Pas Foto Calon Siswa (Opsional)', required: false },
-  { key: 'riwayatKesehatan', type: 'RIWAYAT_KESEHATAN', label: 'Riwayat Kesehatan (Opsional)', required: false },
+  { code: 'KARTU_KELUARGA', name: 'Kartu Keluarga', isRequired: true },
+  { code: 'AKTA_KELAHIRAN', name: 'Akta Kelahiran Anak', isRequired: true },
+  { code: 'KTP_WALI', name: 'KTP Orang Tua / Wali', isRequired: false },
+  { code: 'PAS_FOTO', name: 'Pas Foto Calon Siswa', isRequired: false },
+  { code: 'RIWAYAT_KESEHATAN', name: 'Riwayat Kesehatan', isRequired: false },
 ]
 
 export default function PPDBForm() {
@@ -84,15 +70,19 @@ export default function PPDBForm() {
   const site = data.site
   const programs = data.programs.length > 0 ? data.programs : defaultPrograms
   const ppdb = data.pageContent.ppdb
+  const activeDocumentFields =
+    ppdb.documentTypes && ppdb.documentTypes.length > 0 ? ppdb.documentTypes : DEFAULT_DOCUMENT_FIELDS
+  const customFormFields = ppdb.formFields ?? []
 
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [form, setForm] = useState<FormState>(empty)
+  const [customValues, setCustomValues] = useState<Record<string, string | boolean>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [regNo, setRegNo] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
-  const [documents, setDocuments] = useState<DocumentMap>(emptyDocs)
+  const [documents, setDocuments] = useState<DocumentMap>({})
 
   const set = (key: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [key]: e.target.value }))
@@ -120,29 +110,40 @@ export default function PPDBForm() {
     if (form.nikAyah && !/^\d{16}$/.test(form.nikAyah)) errs.nikAyah = 'NIK ayah harus 16 digit'
     if (form.nikIbu && !/^\d{16}$/.test(form.nikIbu)) errs.nikIbu = 'NIK ibu harus 16 digit'
     if (!form.alamatOrtu.trim()) errs.alamatOrtu = 'Alamat domisili wajib diisi'
+    for (const field of customFormFields) {
+      if (field.isRequired) {
+        const val = customValues[field.code]
+        if (field.fieldType === 'checkbox' ? val !== true : !String(val ?? '').trim()) {
+          errs[`custom_${field.code}`] = `${field.label} wajib diisi`
+        }
+      }
+    }
     setErrors(errs)
     return Object.keys(errs).length === 0
   }
 
   const validateDocuments = () => {
     const errs: Record<string, string> = {}
-    if (!documents.kartuKeluarga) errs.kartuKeluarga = 'Kartu Keluarga wajib diunggah'
-    if (!documents.aktaKelahiran) errs.aktaKelahiran = 'Akta kelahiran wajib diunggah'
-    setErrors(errs)
+    for (const doc of activeDocumentFields) {
+      if (doc.isRequired && !documents[doc.code]) {
+        errs[doc.code] = `${doc.name} wajib diunggah`
+      }
+    }
+    setErrors((prev) => ({ ...prev, ...errs }))
     return Object.keys(errs).length === 0
   }
 
-  const selectDocument = (key: keyof DocumentMap) => (event: React.ChangeEvent<HTMLInputElement>) => {
+  const selectDocument = (code: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null
     if (file && file.size > 5 * 1024 * 1024) {
-      setErrors((current) => ({ ...current, [key]: 'Ukuran berkas maksimal 5 MB' }))
+      setErrors((current) => ({ ...current, [code]: 'Ukuran berkas maksimal 5 MB' }))
       event.target.value = ''
       return
     }
-    setDocuments((current) => ({ ...current, [key]: file }))
+    setDocuments((current) => ({ ...current, [code]: file }))
     setErrors((current) => {
       const next = { ...current }
-      delete next[key]
+      delete next[code]
       return next
     })
   }
@@ -185,19 +186,20 @@ export default function PPDBForm() {
         whatsapp: form.whatsapp,
         email: form.email,
         guardianAddress: form.alamatOrtu,
+        customFields: customValues,
       })
       if (!result.id) {
         throw new Error('Data pendaftaran tersimpan, tetapi ID unggah berkas tidak tersedia. Silakan coba kirim kembali.')
       }
 
-      for (const field of DOCUMENT_FIELDS) {
-        const file = documents[field.key]
+      for (const field of activeDocumentFields) {
+        const file = documents[field.code]
         if (file) {
           await uploadPpdbDocument({
             applicationId: result.id,
             applicationNumber: result.applicationNumber,
             phone: form.whatsapp,
-            documentType: field.type,
+            documentType: field.code,
             file,
           })
         }
@@ -296,9 +298,10 @@ export default function PPDBForm() {
             size="sm"
             onClick={() => {
               setForm(empty)
+              setCustomValues({})
               setRegNo(null)
               setStep(1)
-              setDocuments(emptyDocs)
+              setDocuments({})
             }}
           >
             Daftarkan Calon Siswa Lain
@@ -517,36 +520,124 @@ export default function PPDBForm() {
             </div>
           </div>
 
+          {customFormFields.length > 0 && (
+            <fieldset className="rounded-2xl border border-primary/10 bg-cream p-5 space-y-4">
+              <legend className="px-2 text-xs font-bold uppercase tracking-wider text-primary">
+                Informasi Tambahan PPDB {ppdb.academicYear}
+              </legend>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {customFormFields.map((field) => {
+                  const errKey = `custom_${field.code}`
+                  const val = customValues[field.code]
+                  return (
+                    <div key={field.code} className={field.fieldType === 'textarea' ? 'sm:col-span-2' : ''}>
+                      {field.fieldType === 'checkbox' ? (
+                        <label className="flex items-center gap-2.5 rounded-2xl border border-primary/15 bg-white p-3.5 text-sm font-semibold text-ink cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={val === true}
+                            onChange={(e) =>
+                              setCustomValues((prev) => ({ ...prev, [field.code]: e.target.checked }))
+                            }
+                            className="h-4 w-4 accent-primary"
+                          />
+                          <span>
+                            {field.label}
+                            {field.isRequired ? ' *' : ''}
+                          </span>
+                        </label>
+                      ) : (
+                        <>
+                          <label htmlFor={errKey} className={labelCls}>
+                            {field.label}
+                            {field.isRequired ? ' *' : ''}
+                          </label>
+                          {field.fieldType === 'select' ? (
+                            <select
+                              id={errKey}
+                              value={String(val ?? '')}
+                              onChange={(e) =>
+                                setCustomValues((prev) => ({ ...prev, [field.code]: e.target.value }))
+                              }
+                              className={inputCls(errKey)}
+                            >
+                              <option value="">-- Pilih --</option>
+                              {(field.options ?? []).map((opt) => (
+                                <option key={opt} value={opt}>
+                                  {opt}
+                                </option>
+                              ))}
+                            </select>
+                          ) : field.fieldType === 'textarea' ? (
+                            <textarea
+                              id={errKey}
+                              rows={3}
+                              value={String(val ?? '')}
+                              onChange={(e) =>
+                                setCustomValues((prev) => ({ ...prev, [field.code]: e.target.value }))
+                              }
+                              placeholder={field.placeholder || ''}
+                              className={inputCls(errKey)}
+                            />
+                          ) : (
+                            <input
+                              id={errKey}
+                              type={field.fieldType === 'number' ? 'number' : field.fieldType === 'date' ? 'date' : 'text'}
+                              value={String(val ?? '')}
+                              onChange={(e) =>
+                                setCustomValues((prev) => ({ ...prev, [field.code]: e.target.value }))
+                              }
+                              placeholder={field.placeholder || ''}
+                              className={inputCls(errKey)}
+                            />
+                          )}
+                        </>
+                      )}
+                      {errors[errKey] && (
+                        <span className="mt-1 block text-xs font-semibold text-warmred">{errors[errKey]}</span>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </fieldset>
+          )}
+
           <fieldset className="rounded-2xl border border-primary/10 bg-cream p-5">
             <legend className="px-2 text-xs font-bold uppercase tracking-wider text-primary">Berkas Pendaftaran</legend>
             <p className="mb-4 text-xs leading-relaxed text-ink-mute">
-              Unggah PDF, JPG, PNG, atau WebP. Maksimal 5 MB per berkas. Kartu Keluarga dan Akta Kelahiran wajib disertakan.
+              Unggah PDF, JPG, PNG, atau WebP. Maksimal 5 MB per berkas. Dokumen bertanda Wajib harus disertakan.
             </p>
             <div className="grid gap-4 sm:grid-cols-2">
-              {DOCUMENT_FIELDS.map(({ key, label }) => (
+              {activeDocumentFields.map((doc) => (
                 <label
-                  key={key}
+                  key={doc.code}
                   className={`block rounded-2xl border-2 bg-white p-4 transition-colors ${
-                    errors[key] ? 'border-warmred' : 'border-primary/10 hover:border-primary/30'
+                    errors[doc.code] ? 'border-warmred' : 'border-primary/10 hover:border-primary/30'
                   }`}
                 >
                   <span className="flex items-center gap-2 text-sm font-bold text-primary">
                     <Upload className="h-4 w-4 shrink-0" />
-                    <span>{label}</span>
+                    <span>
+                      {doc.name} ({doc.isRequired ? 'Wajib' : 'Opsional'})
+                    </span>
                   </span>
+                  {doc.description && (
+                    <span className="mt-1 block text-[11px] text-ink-mute">{doc.description}</span>
+                  )}
                   <input
                     type="file"
                     accept="application/pdf,image/jpeg,image/png,image/webp"
-                    onChange={selectDocument(key)}
+                    onChange={selectDocument(doc.code)}
                     className="mt-3 block w-full text-xs text-ink-soft file:mr-3 file:rounded-full file:border-0 file:bg-softgreen file:px-3 file:py-2 file:text-xs file:font-bold file:text-primary"
                   />
-                  {documents[key] && (
+                  {documents[doc.code] && (
                     <span className="mt-2 block truncate text-xs font-semibold text-primary">
-                      Terpilih: {documents[key]?.name}
+                      Terpilih: {documents[doc.code]?.name}
                     </span>
                   )}
-                  {errors[key] && (
-                    <span className="mt-2 block text-xs font-semibold text-warmred">{errors[key]}</span>
+                  {errors[doc.code] && (
+                    <span className="mt-2 block text-xs font-semibold text-warmred">{errors[doc.code]}</span>
                   )}
                 </label>
               ))}

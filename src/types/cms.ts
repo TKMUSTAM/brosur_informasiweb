@@ -130,13 +130,47 @@ export type IslamicArticle = {
 }
 
 export type PPDBWave = {
-  id: 'gelombang-1' | 'gelombang-2';
-  name: string;
-  period: string;
-  quota?: string;
-  status: 'OPEN' | 'CLOSED' | 'UPCOMING';
-  description?: string;
-};
+  id: string
+  code?: string
+  name: string
+  period: string
+  quota?: string
+  status: 'OPEN' | 'CLOSED' | 'UPCOMING' | 'DRAFT'
+  description?: string
+}
+
+export type PPDBTimelineStep = {
+  no: string
+  title: string
+  desc: string
+}
+
+export type PPDBFeeItem = {
+  item: string
+  nominal: string
+  note: string
+}
+
+export type PPDBDocumentTypeItem = {
+  id?: string
+  code: string
+  name: string
+  isRequired: boolean
+  description?: string | null
+  sortOrder?: number
+}
+
+export type PPDBFormFieldItem = {
+  id?: string
+  code: string
+  label: string
+  fieldType: 'text' | 'textarea' | 'number' | 'date' | 'select' | 'checkbox'
+  placeholder?: string | null
+  options?: string[]
+  isRequired: boolean
+  section?: string
+  sortOrder?: number
+}
 
 export type PageContent = {
   hero: {
@@ -167,8 +201,13 @@ export type PageContent = {
     description: string
     notice: string
     closedMessage?: string
+    ageCutoffDate?: string
     waves?: PPDBWave[]
     requirements: string[]
+    timeline?: PPDBTimelineStep[]
+    feeBreakdown?: PPDBFeeItem[]
+    documentTypes?: PPDBDocumentTypeItem[]
+    formFields?: PPDBFormFieldItem[]
   }
   profile?: {
     title: string

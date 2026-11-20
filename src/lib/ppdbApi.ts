@@ -17,14 +17,11 @@ export type PpdbRegistrationPayload = {
   whatsapp: string
   email: string
   guardianAddress: string
+  waveId?: string
+  customFields?: Record<string, string | boolean>
 }
 
-export type PpdbDocumentType =
-  | 'KARTU_KELUARGA'
-  | 'AKTA_KELAHIRAN'
-  | 'KTP_WALI'
-  | 'RIWAYAT_KESEHATAN'
-  | 'PAS_FOTO'
+export type PpdbDocumentType = string
 
 export type PpdbDocumentStatus = {
   id: string
